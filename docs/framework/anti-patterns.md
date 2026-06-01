@@ -113,3 +113,9 @@
 - Failure: After the user has established the current workstream as the Codex + Claude + Gemini tri-party model framework, the agent treats a follow-up such as "补齐", "继续", "发布", "外推", or "记录进去" as an ordinary Codex-only implementation task and completes repository or GitHub work without running the tri-party protocol first.
 - Risk: The work is presented as part of the tri-party framework while lacking independent Claude/Gemini review, mutual cross-audit, and merge-gate evidence; public releases can ship without the supervision standard the framework itself requires.
 - Prevention: Treat same-workstream follow-ups as inherited tri-party triggers unless the user explicitly requests Codex-only execution. Codex may own code/repo edits, but tri-party-backed delivery requires preflight, independent reviews, mutual cross-audit, merge gate, and source-status reporting before final claims.
+
+## AP-020: Gemini Runtime Noise Counted As Clean Completion
+
+- Failure: Gemini CLI eventually returns text after internal 429 retries, tool-read failures, disconnected MCP noise, or ignored-artifact errors, and the framework marks the artifact as clean `Completed`.
+- Risk: Claude/Codex audit the runtime error log instead of Gemini's actual opinion, or a capacity-degraded run is reported as fully healthy.
+- Prevention: Use the Gemini headless policy, disabled MCP allowlist, longer timeout/retry/backoff, policy-hash recording, sanitized artifacts, sanitizer-version diagnostics in `state.json`, release capacity thresholds, and merge-blocking runtime-noise scans that include terminal warnings as noise.

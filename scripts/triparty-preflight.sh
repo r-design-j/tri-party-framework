@@ -4,10 +4,14 @@ set -u
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STAMP="$(date '+%Y%m%d-%H%M%S')"
 OUT_DIR="${1:-"$ROOT_DIR/docs/framework/runs/preflight-$STAMP"}"
-PROBE_TIMEOUT="${TRIPARTY_PROBE_TIMEOUT:-20}"
-PROBE_RETRIES="${TRIPARTY_PROBE_RETRIES:-1}"
+PROBE_TIMEOUT="${TRIPARTY_PROBE_TIMEOUT:-40}"
+PROBE_RETRIES="${TRIPARTY_PROBE_RETRIES:-2}"
+PROBE_RETRY_BACKOFF="${TRIPARTY_PROBE_RETRY_BACKOFF:-10}"
 GEMINI_MODEL="${TRIPARTY_GEMINI_MODEL:-gemini-3.1-pro-preview}"
 GEMINI_MCP_ALLOWED="${TRIPARTY_GEMINI_MCP_ALLOWED:-__none__}"
+GEMINI_APPROVAL_MODE="${TRIPARTY_GEMINI_APPROVAL_MODE:-plan}"
+GEMINI_POLICY_FILE="${TRIPARTY_GEMINI_POLICY_FILE:-"$ROOT_DIR/docs/framework/gemini-headless-policy.toml"}"
+GEMINI_TERM="${TRIPARTY_GEMINI_TERM:-xterm-256color}"
 VERSION_TIMEOUT="${TRIPARTY_VERSION_TIMEOUT:-8}"
 MODEL_BINDING_FILE="$ROOT_DIR/docs/framework/model-binding.yaml"
 
@@ -47,6 +51,31 @@ hash_file() {
   else
     printf 'missing'
   fi
+}
+
+diagnostic_count() {
+  local file="$1"
+  local pattern="$2"
+  if [ -f "$file" ]; then
+    grep -Eci "$pattern" "$file" 2>/dev/null || true
+  else
+    printf '0'
+  fi
+}
+
+capacity_event_count() {
+  local file="$1"
+  if [ ! -f "$file" ]; then
+    printf '0'
+    return
+  fi
+
+  if grep -Eq '^Attempt [0-9]+ failed with status 429' "$file"; then
+    grep -Ec '^Attempt [0-9]+ failed with status 429' "$file" 2>/dev/null || true
+    return
+  fi
+
+  diagnostic_count "$file" '429|RESOURCE_EXHAUSTED|MODEL_CAPACITY_EXHAUSTED|rateLimitExceeded|No capacity available'
 }
 
 command_version() {
@@ -92,6 +121,9 @@ probe_cli() {
       return 0
     fi
 
+    if [ "$attempt" -lt "$PROBE_RETRIES" ]; then
+      sleep $((PROBE_RETRY_BACKOFF * (attempt + 1)))
+    fi
     attempt=$((attempt + 1))
   done
 
@@ -110,7 +142,7 @@ CLAUDE_RESULT="$(probe_cli "Claude" "claude" "CLAUDE_OK" "$CLAUDE_OUT" \
   claude -p "Return exactly: CLAUDE_OK" --output-format text --tools "" --no-session-persistence --bare)"
 
 GEMINI_RESULT="$(probe_cli "Gemini" "gemini" "GEMINI_OK" "$GEMINI_OUT" \
-  gemini -m "$GEMINI_MODEL" -p "Return exactly: GEMINI_OK" --output-format text --skip-trust --allowed-mcp-server-names "$GEMINI_MCP_ALLOWED")"
+  env TERM="$GEMINI_TERM" gemini -m "$GEMINI_MODEL" -p "Return exactly: GEMINI_OK" --output-format text --skip-trust --approval-mode "$GEMINI_APPROVAL_MODE" --allowed-mcp-server-names "$GEMINI_MCP_ALLOWED" --policy "$GEMINI_POLICY_FILE")"
 
 parse_field() {
   printf '%s' "$1" | awk -F '|' -v idx="$2" '{print $idx}'
@@ -126,6 +158,8 @@ GEMINI_PATH="$(parse_field "$GEMINI_RESULT" 3)"
 GEMINI_BIN_SHA256="$(parse_field "$GEMINI_RESULT" 5)"
 GEMINI_ATTEMPT="$(parse_field "$GEMINI_RESULT" 6)"
 GEMINI_ERROR_CODE="$(parse_field "$GEMINI_RESULT" 7)"
+GEMINI_CAPACITY_EVENTS="$(capacity_event_count "$GEMINI_OUT")"
+GEMINI_TOOL_BLOCK_EVENTS="$(diagnostic_count "$GEMINI_OUT" 'ignored by configured ignore patterns|Unauthorized tool call|Tool .* not found|Error executing tool')"
 
 CLAUDE_VERSION="unavailable"
 GEMINI_VERSION="unavailable"
@@ -136,6 +170,7 @@ if [ "$GEMINI_PATH" != "not found" ]; then
   GEMINI_VERSION="$(command_version "$OUT_DIR/gemini-version.txt" gemini --version)"
 fi
 MODEL_BINDING_SHA256="$(hash_file "$MODEL_BINDING_FILE")"
+GEMINI_POLICY_SHA256="$(hash_file "$GEMINI_POLICY_FILE")"
 
 SOURCE_STATUS_TMP="$OUT_DIR/source-status.md.tmp.$$"
 cat > "$SOURCE_STATUS_TMP" <<EOF
@@ -149,8 +184,13 @@ cat > "$SOURCE_STATUS_TMP" <<EOF
 
 Probe timeout: ${PROBE_TIMEOUT}s
 Probe retries: ${PROBE_RETRIES}
+Probe retry backoff: ${PROBE_RETRY_BACKOFF}s
 Gemini model: ${GEMINI_MODEL}
 Gemini allowed MCP servers: ${GEMINI_MCP_ALLOWED}
+Gemini approval mode: ${GEMINI_APPROVAL_MODE}
+Gemini policy file: ${GEMINI_POLICY_FILE}
+Gemini policy SHA256: ${GEMINI_POLICY_SHA256}
+Gemini diagnostics: capacity_events=${GEMINI_CAPACITY_EVENTS}, tool_block_events=${GEMINI_TOOL_BLOCK_EVENTS}
 Model binding SHA256: ${MODEL_BINDING_SHA256}
 EOF
 mv "$SOURCE_STATUS_TMP" "$OUT_DIR/source-status.md"
@@ -170,8 +210,13 @@ STATUS_ENV_TMP="$OUT_DIR/status.env.tmp.$$"
   printf 'GEMINI_BIN_SHA256=%q\n' "${GEMINI_BIN_SHA256:-missing}"
   printf 'GEMINI_ATTEMPT=%q\n' "${GEMINI_ATTEMPT:-0}"
   printf 'GEMINI_ERROR_CODE=%q\n' "${GEMINI_ERROR_CODE:-E_UNKNOWN}"
+  printf 'GEMINI_CAPACITY_EVENTS=%q\n' "${GEMINI_CAPACITY_EVENTS:-0}"
+  printf 'GEMINI_TOOL_BLOCK_EVENTS=%q\n' "${GEMINI_TOOL_BLOCK_EVENTS:-0}"
   printf 'GEMINI_MODEL=%q\n' "$GEMINI_MODEL"
   printf 'GEMINI_MCP_ALLOWED=%q\n' "$GEMINI_MCP_ALLOWED"
+  printf 'GEMINI_APPROVAL_MODE=%q\n' "$GEMINI_APPROVAL_MODE"
+  printf 'GEMINI_POLICY_FILE=%q\n' "$GEMINI_POLICY_FILE"
+  printf 'GEMINI_POLICY_SHA256=%q\n' "$GEMINI_POLICY_SHA256"
   printf 'MODEL_BINDING_SHA256=%q\n' "$MODEL_BINDING_SHA256"
   printf 'OUT_DIR=%q\n' "$OUT_DIR"
 } > "$STATUS_ENV_TMP"

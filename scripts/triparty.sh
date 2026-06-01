@@ -20,10 +20,11 @@ Usage:
   scripts/triparty.sh runs [limit]
   scripts/triparty.sh stats
   scripts/triparty.sh archive [--keep N] [--dry-run]
+  scripts/triparty.sh release-gate [run-dir]
   scripts/triparty.sh lint
   scripts/triparty.sh regression
 
-The run command executes review -> cross-audit -> merge and writes state.json.
+The run command executes review -> cross-audit -> merge -> release-state validation and writes state.json.
 When run-dir is omitted, status/cross-audit/merge use the latest review run.
 EOF
 }
@@ -283,6 +284,13 @@ write_state() {
   CODEX_STATUS="Available"
   CLAUDE_STATUS="Missing"
   GEMINI_STATUS="Missing"
+  CLAUDE_PATH=""
+  CLAUDE_VERSION=""
+  CLAUDE_BIN_SHA256=""
+  GEMINI_PATH=""
+  GEMINI_VERSION=""
+  GEMINI_BIN_SHA256=""
+  GEMINI_POLICY_SHA256=""
   CLAUDE_REVIEW_STATUS="Missing"
   GEMINI_REVIEW_STATUS="Missing"
   CLAUDE_REVIEW_SHA256=""
@@ -297,6 +305,11 @@ write_state() {
   GEMINI_REVIEW_SOURCE_PATH=""
   CLAUDE_REVIEW_SOURCE_SHA256=""
   GEMINI_REVIEW_SOURCE_SHA256=""
+  GEMINI_REVIEW_ATTEMPT=0
+  GEMINI_REVIEW_CAPACITY_EVENTS=0
+  GEMINI_REVIEW_TOOL_BLOCK_EVENTS=0
+  GEMINI_REVIEW_SANITIZED=0
+  GEMINI_REVIEW_SANITIZER_VERSION="gemini-sanitize-v2"
   CLAUDE_CROSS_STATUS="Missing"
   GEMINI_CROSS_STATUS="Missing"
   CLAUDE_CROSS_SHA256=""
@@ -311,6 +324,11 @@ write_state() {
   GEMINI_CROSS_SOURCE_PATH=""
   CLAUDE_CROSS_SOURCE_SHA256=""
   GEMINI_CROSS_SOURCE_SHA256=""
+  GEMINI_CROSS_ATTEMPT=0
+  GEMINI_CROSS_CAPACITY_EVENTS=0
+  GEMINI_CROSS_TOOL_BLOCK_EVENTS=0
+  GEMINI_CROSS_SANITIZED=0
+  GEMINI_CROSS_SANITIZER_VERSION="gemini-sanitize-v2"
 
   load_env_if_present "$run_dir/preflight/status.env"
   load_env_if_present "$run_dir/status.env"
@@ -352,6 +370,9 @@ write_state() {
     },
     "claude": {
       "preflight": "$(json_string "${CLAUDE_STATUS:-Missing}")",
+      "preflight_path": "$(json_string "${CLAUDE_PATH:-}")",
+      "preflight_version": "$(json_string "${CLAUDE_VERSION:-}")",
+      "preflight_binary_sha256": "$(json_string "${CLAUDE_BIN_SHA256:-}")",
       "review": "$(json_string "${CLAUDE_REVIEW_STATUS:-Missing}")",
       "review_error_code": "$(json_string "${CLAUDE_REVIEW_ERROR_CODE:-$(status_error_code REVIEW "${CLAUDE_REVIEW_STATUS:-Missing}")}")",
       "review_provenance": "$(json_string "${CLAUDE_REVIEW_PROVENANCE:-automated_cli}")",
@@ -365,16 +386,34 @@ write_state() {
     },
     "gemini": {
       "preflight": "$(json_string "${GEMINI_STATUS:-Missing}")",
+      "preflight_path": "$(json_string "${GEMINI_PATH:-}")",
+      "preflight_version": "$(json_string "${GEMINI_VERSION:-}")",
+      "preflight_binary_sha256": "$(json_string "${GEMINI_BIN_SHA256:-}")",
+      "preflight_policy_sha256": "$(json_string "${GEMINI_POLICY_SHA256:-}")",
       "review": "$(json_string "${GEMINI_REVIEW_STATUS:-Missing}")",
       "review_error_code": "$(json_string "${GEMINI_REVIEW_ERROR_CODE:-$(status_error_code REVIEW "${GEMINI_REVIEW_STATUS:-Missing}")}")",
       "review_provenance": "$(json_string "${GEMINI_REVIEW_PROVENANCE:-automated_cli}")",
       "review_sha256": "$(json_string "${GEMINI_REVIEW_SHA256:-$(hash_file "$run_dir/gemini-review.md")}")",
       "review_provenance_detail": $(provenance_detail_json "${GEMINI_REVIEW_PROVENANCE:-automated_cli}" "${GEMINI_REVIEW_INJECTED_AT:-}" "${GEMINI_REVIEW_SOURCE_PATH:-}" "${GEMINI_REVIEW_SOURCE_SHA256:-}" "${GEMINI_REVIEW_SHA256:-$(hash_file "$run_dir/gemini-review.md")}"),
+      "review_diagnostics": {
+        "final_attempt": ${GEMINI_REVIEW_ATTEMPT:-0},
+        "capacity_events": ${GEMINI_REVIEW_CAPACITY_EVENTS:-0},
+        "tool_block_events": ${GEMINI_REVIEW_TOOL_BLOCK_EVENTS:-0},
+        "sanitized": ${GEMINI_REVIEW_SANITIZED:-0},
+        "sanitizer_version": "$(json_string "${GEMINI_REVIEW_SANITIZER_VERSION:-gemini-sanitize-v2}")"
+      },
       "cross_audit": "$(json_string "${GEMINI_CROSS_STATUS:-Missing}")",
       "cross_audit_error_code": "$(json_string "${GEMINI_CROSS_ERROR_CODE:-$(status_error_code CROSS "${GEMINI_CROSS_STATUS:-Missing}")}")",
       "cross_audit_provenance": "$(json_string "${GEMINI_CROSS_PROVENANCE:-automated_cli}")",
       "cross_audit_sha256": "$(json_string "${GEMINI_CROSS_SHA256:-$(hash_file "$run_dir/gemini-cross-audit.md")}")",
-      "cross_audit_provenance_detail": $(provenance_detail_json "${GEMINI_CROSS_PROVENANCE:-automated_cli}" "${GEMINI_CROSS_INJECTED_AT:-}" "${GEMINI_CROSS_SOURCE_PATH:-}" "${GEMINI_CROSS_SOURCE_SHA256:-}" "${GEMINI_CROSS_SHA256:-$(hash_file "$run_dir/gemini-cross-audit.md")}")
+      "cross_audit_provenance_detail": $(provenance_detail_json "${GEMINI_CROSS_PROVENANCE:-automated_cli}" "${GEMINI_CROSS_INJECTED_AT:-}" "${GEMINI_CROSS_SOURCE_PATH:-}" "${GEMINI_CROSS_SOURCE_SHA256:-}" "${GEMINI_CROSS_SHA256:-$(hash_file "$run_dir/gemini-cross-audit.md")}"),
+      "cross_audit_diagnostics": {
+        "final_attempt": ${GEMINI_CROSS_ATTEMPT:-0},
+        "capacity_events": ${GEMINI_CROSS_CAPACITY_EVENTS:-0},
+        "tool_block_events": ${GEMINI_CROSS_TOOL_BLOCK_EVENTS:-0},
+        "sanitized": ${GEMINI_CROSS_SANITIZED:-0},
+        "sanitizer_version": "$(json_string "${GEMINI_CROSS_SANITIZER_VERSION:-gemini-sanitize-v2}")"
+      }
     }
   },
   "artifacts": {
@@ -432,6 +471,11 @@ write_review_env() {
     printf 'GEMINI_REVIEW_INJECTED_AT=%q\n' "${GEMINI_REVIEW_INJECTED_AT:-}"
     printf 'GEMINI_REVIEW_SOURCE_PATH=%q\n' "${GEMINI_REVIEW_SOURCE_PATH:-}"
     printf 'GEMINI_REVIEW_SOURCE_SHA256=%q\n' "${GEMINI_REVIEW_SOURCE_SHA256:-}"
+    printf 'GEMINI_REVIEW_ATTEMPT=%q\n' "${GEMINI_REVIEW_ATTEMPT:-0}"
+    printf 'GEMINI_REVIEW_CAPACITY_EVENTS=%q\n' "${GEMINI_REVIEW_CAPACITY_EVENTS:-0}"
+    printf 'GEMINI_REVIEW_TOOL_BLOCK_EVENTS=%q\n' "${GEMINI_REVIEW_TOOL_BLOCK_EVENTS:-0}"
+    printf 'GEMINI_REVIEW_SANITIZED=%q\n' "${GEMINI_REVIEW_SANITIZED:-0}"
+    printf 'GEMINI_REVIEW_SANITIZER_VERSION=%q\n' "${GEMINI_REVIEW_SANITIZER_VERSION:-gemini-sanitize-v2}"
   } > "$tmp_env"
   mv "$tmp_env" "$run_dir/status.env"
   mkdir -p "$run_dir/status"
@@ -477,6 +521,11 @@ write_cross_env() {
     printf 'GEMINI_CROSS_INJECTED_AT=%q\n' "${GEMINI_CROSS_INJECTED_AT:-}"
     printf 'GEMINI_CROSS_SOURCE_PATH=%q\n' "${GEMINI_CROSS_SOURCE_PATH:-}"
     printf 'GEMINI_CROSS_SOURCE_SHA256=%q\n' "${GEMINI_CROSS_SOURCE_SHA256:-}"
+    printf 'GEMINI_CROSS_ATTEMPT=%q\n' "${GEMINI_CROSS_ATTEMPT:-0}"
+    printf 'GEMINI_CROSS_CAPACITY_EVENTS=%q\n' "${GEMINI_CROSS_CAPACITY_EVENTS:-0}"
+    printf 'GEMINI_CROSS_TOOL_BLOCK_EVENTS=%q\n' "${GEMINI_CROSS_TOOL_BLOCK_EVENTS:-0}"
+    printf 'GEMINI_CROSS_SANITIZED=%q\n' "${GEMINI_CROSS_SANITIZED:-0}"
+    printf 'GEMINI_CROSS_SANITIZER_VERSION=%q\n' "${GEMINI_CROSS_SANITIZER_VERSION:-gemini-sanitize-v2}"
   } > "$tmp_env"
   mv "$tmp_env" "$run_dir/cross-audit.env"
   mkdir -p "$run_dir/status"
@@ -489,6 +538,13 @@ load_run_env() {
   CODEX_STATUS="Available"
   CLAUDE_STATUS="Missing"
   GEMINI_STATUS="Missing"
+  CLAUDE_PATH=""
+  CLAUDE_VERSION=""
+  CLAUDE_BIN_SHA256=""
+  GEMINI_PATH=""
+  GEMINI_VERSION=""
+  GEMINI_BIN_SHA256=""
+  GEMINI_POLICY_SHA256=""
   CLAUDE_REVIEW_STATUS="Missing"
   GEMINI_REVIEW_STATUS="Missing"
   CLAUDE_REVIEW_SHA256=""
@@ -503,6 +559,11 @@ load_run_env() {
   GEMINI_REVIEW_SOURCE_PATH=""
   CLAUDE_REVIEW_SOURCE_SHA256=""
   GEMINI_REVIEW_SOURCE_SHA256=""
+  GEMINI_REVIEW_ATTEMPT=0
+  GEMINI_REVIEW_CAPACITY_EVENTS=0
+  GEMINI_REVIEW_TOOL_BLOCK_EVENTS=0
+  GEMINI_REVIEW_SANITIZED=0
+  GEMINI_REVIEW_SANITIZER_VERSION="gemini-sanitize-v2"
   CLAUDE_CROSS_STATUS="Missing"
   GEMINI_CROSS_STATUS="Missing"
   CLAUDE_CROSS_SHA256=""
@@ -517,6 +578,11 @@ load_run_env() {
   GEMINI_CROSS_SOURCE_PATH=""
   CLAUDE_CROSS_SOURCE_SHA256=""
   GEMINI_CROSS_SOURCE_SHA256=""
+  GEMINI_CROSS_ATTEMPT=0
+  GEMINI_CROSS_CAPACITY_EVENTS=0
+  GEMINI_CROSS_TOOL_BLOCK_EVENTS=0
+  GEMINI_CROSS_SANITIZED=0
+  GEMINI_CROSS_SANITIZER_VERSION="gemini-sanitize-v2"
   load_env_if_present "$run_dir/preflight/status.env"
   load_env_if_present "$run_dir/status.env"
   load_env_if_present "$run_dir/status/status.env"
@@ -813,6 +879,10 @@ case "$cmd" in
   archive)
     archive_runs "$@"
     ;;
+  release-gate)
+    "$ROOT_DIR/scripts/triparty-release-gate.sh" "${1:-}"
+    exit $?
+    ;;
   run)
     if [ "$#" -lt 1 ]; then
       usage >&2
@@ -831,6 +901,11 @@ case "$cmd" in
     "$ROOT_DIR/scripts/triparty-merge.sh" "$run_dir"
     merge_code=$?
     write_state "$run_dir"
+    validation_code=0
+    if [ "$merge_code" -eq 0 ]; then
+      "$ROOT_DIR/scripts/triparty-validate-state.py" --release "$run_dir/state.json"
+      validation_code=$?
+    fi
     print_status "$run_dir"
 
     if [ "$review_code" -ne 0 ]; then
@@ -838,6 +913,9 @@ case "$cmd" in
     fi
     if [ "$cross_code" -ne 0 ]; then
       exit "$cross_code"
+    fi
+    if [ "$validation_code" -ne 0 ]; then
+      exit "$validation_code"
     fi
     exit "$merge_code"
     ;;

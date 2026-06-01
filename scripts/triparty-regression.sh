@@ -4,6 +4,7 @@ set -u
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MERGE="$ROOT_DIR/scripts/triparty-merge.sh"
 TRIPARTY="$ROOT_DIR/scripts/triparty.sh"
+RELEASE_GATE="$ROOT_DIR/scripts/triparty-release-gate.sh"
 TMP_ROOT="${TMPDIR:-/tmp}/triparty-regression-$$"
 FAILED=0
 
@@ -44,6 +45,28 @@ write_complete_run() {
   mkdir -p "$run_dir/status"
   write_artifact "$run_dir/claude-review.md" "Claude" "review" "TRIPARTY_REVIEW_COMPLETE" "Claude review body."
   write_artifact "$run_dir/gemini-review.md" "Gemini" "review" "TRIPARTY_REVIEW_COMPLETE" "Gemini review body."
+
+  local test_cli_path
+  local test_cli_sha
+  local policy_sha
+  test_cli_path="$(command -v sh 2>/dev/null || command -v bash)"
+  test_cli_sha="$(hash_file "$test_cli_path")"
+  policy_sha="$(hash_file "$ROOT_DIR/docs/framework/gemini-headless-policy.toml")"
+
+  mkdir -p "$run_dir/preflight"
+  {
+    printf 'CLAUDE_STATUS=%q\n' "Available"
+    printf 'CLAUDE_PATH=%q\n' "$test_cli_path"
+    printf 'CLAUDE_VERSION=%q\n' "test-cli"
+    printf 'CLAUDE_BIN_SHA256=%q\n' "$test_cli_sha"
+    printf 'CLAUDE_ERROR_CODE=%q\n' "E_OK"
+    printf 'GEMINI_STATUS=%q\n' "Available"
+    printf 'GEMINI_PATH=%q\n' "$test_cli_path"
+    printf 'GEMINI_VERSION=%q\n' "test-cli"
+    printf 'GEMINI_BIN_SHA256=%q\n' "$test_cli_sha"
+    printf 'GEMINI_POLICY_SHA256=%q\n' "$policy_sha"
+    printf 'GEMINI_ERROR_CODE=%q\n' "E_OK"
+  } > "$run_dir/preflight/status.env"
 
   local claude_sha
   local gemini_sha
@@ -135,6 +158,7 @@ run_expect pass "merge_accepts_complete_cross_audited_run" "$MERGE" "$RUN_OK"
 expect_absent "$RUN_OK/partial-report.md" "merge_success_removes_stale_partial_report"
 run_expect pass "unified_status_writes_state_json" "$TRIPARTY" status "$RUN_OK"
 run_expect pass "resume_accepts_already_cross_audited_run" "$TRIPARTY" resume "$RUN_OK"
+run_expect pass "release_gate_accepts_ready_run" "$RELEASE_GATE" "$RUN_OK"
 if grep -q '"true_triparty_ready": true' "$RUN_OK/state.json" && grep -q '"phase": "merged_ready"' "$RUN_OK/state.json"; then
   printf 'PASS: state_json_marks_ready_run\n'
 else
@@ -192,11 +216,34 @@ expect_absent "$RUN_MISSING_CROSS/merge-input.md" "merge_failure_removes_stale_m
 RUN_PARTIAL="$TMP_ROOT/partial"
 write_complete_run "$RUN_PARTIAL" "Completed" "TimedOut" "1"
 run_expect fail "merge_rejects_partial_review" "$MERGE" "$RUN_PARTIAL"
+run_expect fail "release_gate_rejects_partial_run" "$RELEASE_GATE" "$RUN_PARTIAL"
 
 RUN_HASH="$TMP_ROOT/hash-mismatch"
 write_complete_run "$RUN_HASH" "Completed" "Completed" "1"
 printf 'tampered\n' >> "$RUN_HASH/gemini-review.md"
 run_expect fail "merge_rejects_review_hash_mismatch" "$MERGE" "$RUN_HASH"
+
+RUN_RUNTIME_NOISE="$TMP_ROOT/runtime-noise"
+write_complete_run "$RUN_RUNTIME_NOISE" "Completed" "Completed" "1"
+printf 'GaxiosError: MODEL_CAPACITY_EXHAUSTED\n' >> "$RUN_RUNTIME_NOISE/gemini-review.md"
+gemini_sha="$(hash_file "$RUN_RUNTIME_NOISE/gemini-review.md")"
+sed -i.bak "s|GEMINI_REVIEW_SHA256=.*|GEMINI_REVIEW_SHA256=$gemini_sha|" "$RUN_RUNTIME_NOISE/status.env"
+rm -f "$RUN_RUNTIME_NOISE/status.env.bak"
+run_expect fail "merge_rejects_runtime_noise" "$MERGE" "$RUN_RUNTIME_NOISE"
+run_expect fail "release_gate_rejects_runtime_noise" "$RELEASE_GATE" "$RUN_RUNTIME_NOISE"
+
+RUN_CAPACITY="$TMP_ROOT/capacity-threshold"
+write_complete_run "$RUN_CAPACITY" "Completed" "Completed" "1"
+{
+  printf 'GEMINI_REVIEW_CAPACITY_EVENTS=%q\n' "4"
+  printf 'GEMINI_CROSS_CAPACITY_EVENTS=%q\n' "0"
+} >> "$RUN_CAPACITY/status.env"
+run_expect fail "release_gate_rejects_capacity_threshold" "$RELEASE_GATE" "$RUN_CAPACITY"
+
+RUN_POLICY_HASH="$TMP_ROOT/policy-hash"
+write_complete_run "$RUN_POLICY_HASH" "Completed" "Completed" "1"
+printf 'GEMINI_POLICY_SHA256=%q\n' "0000000000000000000000000000000000000000000000000000000000000000" >> "$RUN_POLICY_HASH/preflight/status.env"
+run_expect fail "release_gate_rejects_policy_hash_mismatch" "$RELEASE_GATE" "$RUN_POLICY_HASH"
 
 RUN_METADATA_MISSING="$TMP_ROOT/metadata-missing"
 write_complete_run "$RUN_METADATA_MISSING" "Completed" "Completed" "1"

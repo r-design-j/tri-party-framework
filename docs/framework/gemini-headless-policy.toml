@@ -1,0 +1,27 @@
+[[rule]]
+toolName = "read_file"
+decision = "deny"
+priority = 999
+interactive = false
+denyMessage = "Tri-party headless Gemini calls receive all required evidence in the prompt; read_file is disabled to avoid ignored run artifacts."
+
+[[rule]]
+toolName = "run_shell_command"
+decision = "deny"
+priority = 999
+interactive = false
+denyMessage = "Tri-party headless Gemini calls are review-only; shell execution is disabled."
+
+[[rule]]
+toolName = "write_file"
+decision = "deny"
+priority = 999
+interactive = false
+denyMessage = "Tri-party headless Gemini calls must not edit files."
+
+[[rule]]
+toolName = "replace"
+decision = "deny"
+priority = 999
+interactive = false
+denyMessage = "Tri-party headless Gemini calls must not edit files."

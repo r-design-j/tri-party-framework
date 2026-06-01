@@ -9,6 +9,10 @@ Use this checklist before creating a GitHub release or promoting the project pub
 - [ ] `scripts/triparty-adapter-smoke.sh` passes.
 - [ ] `scripts/triparty-mcp-smoke.sh` passes.
 - [ ] A current tri-party review run has `true_triparty_ready: true`.
+- [ ] `scripts/triparty.sh release-gate <run-dir>` passes for the run supporting the public release.
+- [ ] `scripts/triparty-validate-state.py --release <run-dir>/state.json` passes.
+- [ ] Gemini capacity events are within the release threshold, and `tool_block_events=0`.
+- [ ] Gemini headless policy SHA256 in `state.json` matches `docs/framework/gemini-headless-policy.toml`.
 - [ ] The release notes do not claim true tri-party output without a run directory and source status.
 
 ## Public Documentation Gate
@@ -27,6 +31,8 @@ Use this checklist before creating a GitHub release or promoting the project pub
 - [ ] MCP adapter remains a thin wrapper around the portable core.
 - [ ] Adapters do not synthesize their own readiness labels.
 - [ ] `state.json` remains the machine-readable source of truth.
+- [ ] Gemini headless calls use `docs/framework/gemini-headless-policy.toml`, `--approval-mode plan`, disabled MCP allowlist, retry/backoff, runtime-noise sanitization, and sanitizer-version diagnostics.
+- [ ] Terminal warnings, raw 429 capacity traces, ignored-file reads, and unauthorized tool calls remain merge-blocking if they appear in completed artifacts.
 
 ## GitHub Launch Gate
 

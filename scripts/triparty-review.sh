@@ -4,11 +4,16 @@ set -u
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STAMP="$(date '+%Y%m%d-%H%M%S')"
 RUN_DIR="${TRIPARTY_RUN_DIR:-"$ROOT_DIR/docs/framework/runs/review-$STAMP"}"
-REVIEW_TIMEOUT="${TRIPARTY_REVIEW_TIMEOUT:-90}"
-REVIEW_RETRIES="${TRIPARTY_REVIEW_RETRIES:-1}"
+REVIEW_TIMEOUT="${TRIPARTY_REVIEW_TIMEOUT:-180}"
+REVIEW_RETRIES="${TRIPARTY_REVIEW_RETRIES:-2}"
+REVIEW_RETRY_BACKOFF="${TRIPARTY_REVIEW_RETRY_BACKOFF:-10}"
 PROMPT_MAX_CHARS="${TRIPARTY_PROMPT_MAX_CHARS:-6000}"
 GEMINI_MODEL="${TRIPARTY_GEMINI_MODEL:-gemini-3.1-pro-preview}"
 GEMINI_MCP_ALLOWED="${TRIPARTY_GEMINI_MCP_ALLOWED:-__none__}"
+GEMINI_APPROVAL_MODE="${TRIPARTY_GEMINI_APPROVAL_MODE:-plan}"
+GEMINI_POLICY_FILE="${TRIPARTY_GEMINI_POLICY_FILE:-"$ROOT_DIR/docs/framework/gemini-headless-policy.toml"}"
+GEMINI_TERM="${TRIPARTY_GEMINI_TERM:-xterm-256color}"
+GEMINI_SANITIZER_VERSION="${TRIPARTY_GEMINI_SANITIZER_VERSION:-gemini-sanitize-v2}"
 if [ "$#" -gt 0 ]; then
   QUESTION="$1"
   shift
@@ -58,6 +63,65 @@ hash_file() {
   else
     printf 'missing'
   fi
+}
+
+diagnostic_count() {
+  local file="$1"
+  local pattern="$2"
+  if [ -f "$file" ]; then
+    grep -Eci "$pattern" "$file" 2>/dev/null || true
+  else
+    printf '0'
+  fi
+}
+
+capacity_event_count() {
+  local file="$1"
+  if [ ! -f "$file" ]; then
+    printf '0'
+    return
+  fi
+
+  if grep -Eq '^Attempt [0-9]+ failed with status 429' "$file"; then
+    grep -Ec '^Attempt [0-9]+ failed with status 429' "$file" 2>/dev/null || true
+    return
+  fi
+
+  diagnostic_count "$file" '429|RESOURCE_EXHAUSTED|MODEL_CAPACITY_EXHAUSTED|rateLimitExceeded|No capacity available'
+}
+
+sanitize_gemini_output() {
+  local file="$1"
+  local tmp_file="$file.sanitized.$$"
+
+  awk '
+    /^Warning: Basic terminal detected/ { next }
+    /^Warning: 256-color support/ { next }
+    /^Warning: True color \(24-bit\) support not detected/ { next }
+    /^Ripgrep is not available/ { next }
+    /^Attempt [0-9]+ failed with status 429/ { skip = "gaxios"; next }
+    skip == "gaxios" && /Symbol\(gaxios-gaxios-error\)/ { skip = "gaxios-close"; next }
+    skip == "gaxios-close" && /^}$/ { skip = ""; next }
+    skip == "gaxios" || skip == "gaxios-close" { next }
+    /^Error executing tool (read_file|run_shell_command):/ { next }
+    /^\(Use `node --trace-deprecation/ { next }
+    /^\(node:[0-9]+\).*DeprecationWarning/ { next }
+    /^\[LocalAgentExecutor\] Blocked call:/ { next }
+    { print }
+  ' "$file" > "$tmp_file"
+
+  if [ ! -s "$tmp_file" ]; then
+    rm -f "$tmp_file"
+    return 1
+  fi
+
+  if cmp -s "$file" "$tmp_file"; then
+    rm -f "$tmp_file"
+    return 1
+  fi
+
+  mv "$tmp_file" "$file"
+  return 0
 }
 
 write_artifact_metadata() {
@@ -214,17 +278,22 @@ run_review_with_retry() {
   local attempt=0
   local code=1
   local attempt_file
+  RUN_LAST_ATTEMPT=0
 
   while [ "$attempt" -le "$REVIEW_RETRIES" ]; do
     attempt_file="$RAW_DIR/$(basename "$outfile").attempt-$attempt"
     run_with_timeout "$REVIEW_TIMEOUT" "$attempt_file" "$@"
     code=$?
+    RUN_LAST_ATTEMPT="$attempt"
     cp "$attempt_file" "$outfile"
 
     if [ "$code" -eq 0 ] && [ -s "$outfile" ]; then
       return 0
     fi
 
+    if [ "$attempt" -lt "$REVIEW_RETRIES" ]; then
+      sleep $((REVIEW_RETRY_BACKOFF * (attempt + 1)))
+    fi
     attempt=$((attempt + 1))
   done
 
@@ -277,6 +346,7 @@ fi
 cat > "$RUN_DIR/claude-prompt.txt" <<EOF
 You are Claude CLI. Your source label is Claude CLI.
 Do not claim to be Codex-only. Do not edit files.
+Do not call tools, shell commands, file readers, or MCP tools. Use only the provided prompt context.
 You are one independent party in a larger orchestrated run. The runner, not you, records whether Codex, Claude, and Gemini were called.
 Do not state that the overall run is partial, Codex-only, or that another party was not called. If another party's output is not in your prompt, say it is not evaluated in this independent review.
 Based only on the provided context, review the tri-party framework itself.
@@ -289,6 +359,7 @@ EOF
 cat > "$RUN_DIR/gemini-prompt.txt" <<EOF
 You are Gemini CLI. Your source label is Gemini CLI.
 Do not claim to be Codex-only. Do not edit files.
+Do not call tools, shell commands, file readers, or MCP tools. Use only the provided prompt context.
 You are one independent party in a larger orchestrated run. The runner, not you, records whether Codex, Claude, and Gemini were called.
 Do not state that the overall run is partial, Codex-only, or that another party was not called. If another party's output is not in your prompt, say it is not evaluated in this independent review.
 Based only on the provided context, review the tri-party framework itself.
@@ -312,12 +383,17 @@ fi
 
 if [ "${GEMINI_STATUS:-Unavailable}" = "Available" ]; then
   run_review_with_retry "$RUN_DIR/gemini-review.md" \
-    gemini -m "$GEMINI_MODEL" -p "$(cat "$RUN_DIR/gemini-prompt.txt")" --output-format text --skip-trust --allowed-mcp-server-names "$GEMINI_MCP_ALLOWED"
+    env TERM="$GEMINI_TERM" gemini -m "$GEMINI_MODEL" -p "$(cat "$RUN_DIR/gemini-prompt.txt")" --output-format text --skip-trust --approval-mode "$GEMINI_APPROVAL_MODE" --allowed-mcp-server-names "$GEMINI_MCP_ALLOWED" --policy "$GEMINI_POLICY_FILE"
   GEMINI_REVIEW_STATUS="$(status_from_code "$?")"
+  GEMINI_REVIEW_ATTEMPT="$RUN_LAST_ATTEMPT"
 else
   printf 'Gemini preflight status: %s\n' "${GEMINI_STATUS:-Unavailable}" > "$RUN_DIR/gemini-review.md"
   write_handoff_prompt "Gemini" "$RUN_DIR/gemini-prompt.txt" "$RUN_DIR/gemini-handoff.md"
 fi
+
+GEMINI_REVIEW_CAPACITY_EVENTS="$(capacity_event_count "$RUN_DIR/gemini-review.md")"
+GEMINI_REVIEW_TOOL_BLOCK_EVENTS="$(diagnostic_count "$RUN_DIR/gemini-review.md" 'ignored by configured ignore patterns|Unauthorized tool call|Tool .* not found|Error executing tool')"
+GEMINI_REVIEW_SANITIZED=0
 
 if [ "$CLAUDE_REVIEW_STATUS" != "Completed" ] && [ ! -f "$RUN_DIR/claude-handoff.md" ]; then
   write_handoff_prompt "Claude" "$RUN_DIR/claude-prompt.txt" "$RUN_DIR/claude-handoff.md"
@@ -333,6 +409,10 @@ if [ "$CLAUDE_REVIEW_STATUS" = "Completed" ]; then
 fi
 
 if [ "$GEMINI_REVIEW_STATUS" = "Completed" ]; then
+  cp "$RUN_DIR/gemini-review.md" "$RAW_DIR/gemini-review.before-sanitize.md"
+  if sanitize_gemini_output "$RUN_DIR/gemini-review.md"; then
+    GEMINI_REVIEW_SANITIZED=1
+  fi
   cp "$RUN_DIR/gemini-review.md" "$RAW_DIR/gemini-review.before-metadata.md"
   write_artifact_metadata "$RUN_DIR/gemini-review.md" "Gemini" "gemini-cli"
 fi
@@ -352,19 +432,22 @@ SOURCE_STATUS_TMP="$RUN_DIR/source-status.md.tmp.$$"
 cat > "$SOURCE_STATUS_TMP" <<EOF
 # Tri-party Review Source Status
 
-| Party | Preflight | Review | Evidence | Artifact SHA256 | Error Code |
-| --- | --- | --- | --- | --- | --- |
-| Codex | Available | Current session must synthesize | Current Codex session | n/a | E_OK |
-| Claude | ${CLAUDE_STATUS:-Unavailable} | $CLAUDE_REVIEW_STATUS | $RUN_DIR/claude-review.md | $CLAUDE_REVIEW_SHA256 | $CLAUDE_REVIEW_ERROR_CODE |
-| Gemini | ${GEMINI_STATUS:-Unavailable} | $GEMINI_REVIEW_STATUS | $RUN_DIR/gemini-review.md | $GEMINI_REVIEW_SHA256 | $GEMINI_REVIEW_ERROR_CODE |
+| Party | Preflight | Review | Evidence | Artifact SHA256 | Error Code | Diagnostics |
+| --- | --- | --- | --- | --- | --- | --- |
+| Codex | Available | Current session must synthesize | Current Codex session | n/a | E_OK | n/a |
+| Claude | ${CLAUDE_STATUS:-Unavailable} | $CLAUDE_REVIEW_STATUS | $RUN_DIR/claude-review.md | $CLAUDE_REVIEW_SHA256 | $CLAUDE_REVIEW_ERROR_CODE | n/a |
+| Gemini | ${GEMINI_STATUS:-Unavailable} | $GEMINI_REVIEW_STATUS | $RUN_DIR/gemini-review.md | $GEMINI_REVIEW_SHA256 | $GEMINI_REVIEW_ERROR_CODE | capacity_events=${GEMINI_REVIEW_CAPACITY_EVENTS:-0}; tool_block_events=${GEMINI_REVIEW_TOOL_BLOCK_EVENTS:-0}; sanitized=${GEMINI_REVIEW_SANITIZED:-0}; final_attempt=${GEMINI_REVIEW_ATTEMPT:-0}; sanitizer_version=${GEMINI_SANITIZER_VERSION} |
 
 Generated at: $GENERATED_AT
 Preflight exit code: $PREFLIGHT_CODE
 Review timeout: ${REVIEW_TIMEOUT}s
 Review retries: ${REVIEW_RETRIES}
+Review retry backoff: ${REVIEW_RETRY_BACKOFF}s
 Prompt max chars before slimming: ${PROMPT_MAX_CHARS}
 Gemini model: ${GEMINI_MODEL}
 Gemini allowed MCP servers: ${GEMINI_MCP_ALLOWED}
+Gemini approval mode: ${GEMINI_APPROVAL_MODE}
+Gemini policy file: ${GEMINI_POLICY_FILE}
 Conclusion label: $CONCLUSION_LABEL
 EOF
 mv "$SOURCE_STATUS_TMP" "$RUN_DIR/source-status.md"
@@ -383,6 +466,11 @@ STATUS_ENV_TMP="$RUN_DIR/status.env.tmp.$$"
 	  printf 'GEMINI_REVIEW_SHA256=%q\n' "$GEMINI_REVIEW_SHA256"
 	  printf 'GEMINI_REVIEW_ERROR_CODE=%q\n' "$GEMINI_REVIEW_ERROR_CODE"
 	  printf 'GEMINI_REVIEW_PROVENANCE=%q\n' "automated_cli"
+	  printf 'GEMINI_REVIEW_ATTEMPT=%q\n' "${GEMINI_REVIEW_ATTEMPT:-0}"
+	  printf 'GEMINI_REVIEW_CAPACITY_EVENTS=%q\n' "${GEMINI_REVIEW_CAPACITY_EVENTS:-0}"
+	  printf 'GEMINI_REVIEW_TOOL_BLOCK_EVENTS=%q\n' "${GEMINI_REVIEW_TOOL_BLOCK_EVENTS:-0}"
+	  printf 'GEMINI_REVIEW_SANITIZED=%q\n' "${GEMINI_REVIEW_SANITIZED:-0}"
+	  printf 'GEMINI_REVIEW_SANITIZER_VERSION=%q\n' "$GEMINI_SANITIZER_VERSION"
 	} > "$STATUS_ENV_TMP"
 mv "$STATUS_ENV_TMP" "$RUN_DIR/status.env"
 

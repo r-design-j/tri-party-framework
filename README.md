@@ -14,7 +14,8 @@ Download ZIP: https://github.com/r-design-j/tri-party-framework/archive/refs/hea
 - Collects independent Claude and Gemini review artifacts.
 - Forces mutual cross-audit: Claude audits Gemini, Gemini audits Claude.
 - Blocks final synthesis until the merge gate verifies source status, artifact metadata, completion markers, and hashes.
-- Writes a machine-readable `state.json` for UI, HTTP, MCP, CI, or external adapters.
+- Writes a machine-readable `state.json` with preflight binary evidence, provenance, Gemini diagnostics, and schema validation for UI, HTTP, MCP, CI, or external adapters.
+- Provides a release gate that rechecks merge readiness, state shape, artifact hashes, automated provenance, and runtime-noise cleanliness before public release claims.
 - Supports offline injection when Claude or Gemini output was collected manually.
 - Provides HTTP and MCP adapters without changing the portable core truth.
 
@@ -46,6 +47,9 @@ Run the full workflow:
 ```bash
 scripts/triparty.sh run "Review this repository for architecture, reliability, and user experience risks."
 ```
+
+When merge is ready, `run` also validates the release-level `state.json` contract so the default path catches schema, provenance, hash, and runtime-noise failures.
+By default the release validator allows small recovered Gemini capacity blips, but blocks tool-call failures and capacity events above the configured threshold.
 
 Check the latest state:
 
@@ -145,6 +149,24 @@ Run the merge gate:
 scripts/triparty.sh merge docs/framework/runs/review-YYYYMMDD-HHMMSS
 ```
 
+Run the release gate before public push/release claims:
+
+```bash
+scripts/triparty.sh release-gate docs/framework/runs/review-YYYYMMDD-HHMMSS
+```
+
+Validate a state file directly:
+
+```bash
+scripts/triparty-validate-state.py --release docs/framework/runs/review-YYYYMMDD-HHMMSS/state.json
+```
+
+Optional local pre-push hook:
+
+```bash
+scripts/install-triparty-git-hooks.sh
+```
+
 List and inspect runs:
 
 ```bash
@@ -208,6 +230,9 @@ See [examples](examples/) for:
 - `scripts/triparty-review.sh`: Claude and Gemini independent review runner.
 - `scripts/triparty-cross-audit.sh`: mutual Claude/Gemini audit runner.
 - `scripts/triparty-merge.sh`: merge gate for source status, artifact metadata, completion markers, and hashes.
+- `scripts/triparty-release-gate.sh`: public push/release readiness gate backed by `state.json`.
+- `scripts/triparty-validate-state.py`: dependency-free state and release-readiness validator.
+- `scripts/install-triparty-git-hooks.sh`: optional local pre-push hook installer for the release gate.
 - `scripts/triparty-lint.sh`: framework consistency checks.
 - `scripts/triparty-regression.sh`: historical failure-mode regression tests.
 - `adapters/http/triparty_http_adapter.py`: local HTTP adapter.

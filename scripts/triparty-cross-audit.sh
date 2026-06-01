@@ -8,10 +8,15 @@ fi
 
 RUN_DIR="$1"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CROSS_TIMEOUT="${TRIPARTY_CROSS_TIMEOUT:-90}"
-CROSS_RETRIES="${TRIPARTY_CROSS_RETRIES:-0}"
+CROSS_TIMEOUT="${TRIPARTY_CROSS_TIMEOUT:-240}"
+CROSS_RETRIES="${TRIPARTY_CROSS_RETRIES:-2}"
+CROSS_RETRY_BACKOFF="${TRIPARTY_CROSS_RETRY_BACKOFF:-10}"
 GEMINI_MODEL="${TRIPARTY_GEMINI_MODEL:-gemini-3.1-pro-preview}"
 GEMINI_MCP_ALLOWED="${TRIPARTY_GEMINI_MCP_ALLOWED:-__none__}"
+GEMINI_APPROVAL_MODE="${TRIPARTY_GEMINI_APPROVAL_MODE:-plan}"
+GEMINI_POLICY_FILE="${TRIPARTY_GEMINI_POLICY_FILE:-"$ROOT_DIR/docs/framework/gemini-headless-policy.toml"}"
+GEMINI_TERM="${TRIPARTY_GEMINI_TERM:-xterm-256color}"
+GEMINI_SANITIZER_VERSION="${TRIPARTY_GEMINI_SANITIZER_VERSION:-gemini-sanitize-v2}"
 
 RAW_DIR="$RUN_DIR/raw"
 STATUS_DIR="$RUN_DIR/status"
@@ -53,6 +58,65 @@ hash_file() {
   else
     printf 'missing'
   fi
+}
+
+diagnostic_count() {
+  local file="$1"
+  local pattern="$2"
+  if [ -f "$file" ]; then
+    grep -Eci "$pattern" "$file" 2>/dev/null || true
+  else
+    printf '0'
+  fi
+}
+
+capacity_event_count() {
+  local file="$1"
+  if [ ! -f "$file" ]; then
+    printf '0'
+    return
+  fi
+
+  if grep -Eq '^Attempt [0-9]+ failed with status 429' "$file"; then
+    grep -Ec '^Attempt [0-9]+ failed with status 429' "$file" 2>/dev/null || true
+    return
+  fi
+
+  diagnostic_count "$file" '429|RESOURCE_EXHAUSTED|MODEL_CAPACITY_EXHAUSTED|rateLimitExceeded|No capacity available'
+}
+
+sanitize_gemini_output() {
+  local file="$1"
+  local tmp_file="$file.sanitized.$$"
+
+  awk '
+    /^Warning: Basic terminal detected/ { next }
+    /^Warning: 256-color support/ { next }
+    /^Warning: True color \(24-bit\) support not detected/ { next }
+    /^Ripgrep is not available/ { next }
+    /^Attempt [0-9]+ failed with status 429/ { skip = "gaxios"; next }
+    skip == "gaxios" && /Symbol\(gaxios-gaxios-error\)/ { skip = "gaxios-close"; next }
+    skip == "gaxios-close" && /^}$/ { skip = ""; next }
+    skip == "gaxios" || skip == "gaxios-close" { next }
+    /^Error executing tool (read_file|run_shell_command):/ { next }
+    /^\(Use `node --trace-deprecation/ { next }
+    /^\(node:[0-9]+\).*DeprecationWarning/ { next }
+    /^\[LocalAgentExecutor\] Blocked call:/ { next }
+    { print }
+  ' "$file" > "$tmp_file"
+
+  if [ ! -s "$tmp_file" ]; then
+    rm -f "$tmp_file"
+    return 1
+  fi
+
+  if cmp -s "$file" "$tmp_file"; then
+    rm -f "$tmp_file"
+    return 1
+  fi
+
+  mv "$tmp_file" "$file"
+  return 0
 }
 
 write_artifact_metadata() {
@@ -111,13 +175,18 @@ run_with_retry() {
   local attempt=0
   local code=1
   local attempt_file
+  RUN_LAST_ATTEMPT=0
   while [ "$attempt" -le "$CROSS_RETRIES" ]; do
     attempt_file="$RAW_DIR/$(basename "$outfile").attempt-$attempt"
     run_with_timeout "$CROSS_TIMEOUT" "$attempt_file" "$@"
     code=$?
+    RUN_LAST_ATTEMPT="$attempt"
     cp "$attempt_file" "$outfile"
     if [ "$code" -eq 0 ] && [ -s "$outfile" ]; then
       return 0
+    fi
+    if [ "$attempt" -lt "$CROSS_RETRIES" ]; then
+      sleep $((CROSS_RETRY_BACKOFF * (attempt + 1)))
     fi
     attempt=$((attempt + 1))
   done
@@ -136,6 +205,8 @@ fi
 cat > "$PROMPTS_DIR/claude-cross-audit-prompt.txt" <<EOF
 You are Claude CLI. Your task is to audit Gemini CLI's review and the shared run status.
 Do not rewrite your source label. Do not edit files.
+Do not call tools, shell commands, file readers, or MCP tools. Use only the provided prompt context.
+Do not penalize an independent review for not evaluating other party outputs; review-stage prompts intentionally hide other party outputs. Cross-audit is the comparison stage.
 Return Chinese output with: Agreement, Disagreement, Risks Gemini missed, Risks Claude may have missed, Final blocking concerns. Keep under 900 Chinese characters.
 
 ## Source Status
@@ -150,6 +221,8 @@ EOF
 cat > "$PROMPTS_DIR/gemini-cross-audit-prompt.txt" <<EOF
 You are Gemini CLI. Your task is to audit Claude CLI's review and the shared run status.
 Do not rewrite your source label. Do not edit files.
+Do not call tools, shell commands, file readers, or MCP tools. Use only the provided prompt context.
+Do not penalize an independent review for not evaluating other party outputs; review-stage prompts intentionally hide other party outputs. Cross-audit is the comparison stage.
 Return Chinese output with: Agreement, Disagreement, Risks Claude missed, Risks Gemini may have missed, Final blocking concerns. Keep under 900 Chinese characters.
 
 ## Source Status
@@ -166,8 +239,13 @@ run_with_retry "$RUN_DIR/claude-cross-audit.md" \
 CLAUDE_CROSS_STATUS="$(status_from_code "$?")"
 
 run_with_retry "$RUN_DIR/gemini-cross-audit.md" \
-  gemini -m "$GEMINI_MODEL" -p "$(cat "$PROMPTS_DIR/gemini-cross-audit-prompt.txt")" --output-format text --skip-trust --allowed-mcp-server-names "$GEMINI_MCP_ALLOWED"
+  env TERM="$GEMINI_TERM" gemini -m "$GEMINI_MODEL" -p "$(cat "$PROMPTS_DIR/gemini-cross-audit-prompt.txt")" --output-format text --skip-trust --approval-mode "$GEMINI_APPROVAL_MODE" --allowed-mcp-server-names "$GEMINI_MCP_ALLOWED" --policy "$GEMINI_POLICY_FILE"
 GEMINI_CROSS_STATUS="$(status_from_code "$?")"
+GEMINI_CROSS_ATTEMPT="$RUN_LAST_ATTEMPT"
+
+GEMINI_CROSS_CAPACITY_EVENTS="$(capacity_event_count "$RUN_DIR/gemini-cross-audit.md")"
+GEMINI_CROSS_TOOL_BLOCK_EVENTS="$(diagnostic_count "$RUN_DIR/gemini-cross-audit.md" 'ignored by configured ignore patterns|Unauthorized tool call|Tool .* not found|Error executing tool')"
+GEMINI_CROSS_SANITIZED=0
 
 if [ "$CLAUDE_CROSS_STATUS" = "Completed" ]; then
   cp "$RUN_DIR/claude-cross-audit.md" "$RAW_DIR/claude-cross-audit.before-metadata.md"
@@ -175,6 +253,10 @@ if [ "$CLAUDE_CROSS_STATUS" = "Completed" ]; then
 fi
 
 if [ "$GEMINI_CROSS_STATUS" = "Completed" ]; then
+  cp "$RUN_DIR/gemini-cross-audit.md" "$RAW_DIR/gemini-cross-audit.before-sanitize.md"
+  if sanitize_gemini_output "$RUN_DIR/gemini-cross-audit.md"; then
+    GEMINI_CROSS_SANITIZED=1
+  fi
   cp "$RUN_DIR/gemini-cross-audit.md" "$RAW_DIR/gemini-cross-audit.before-metadata.md"
   write_artifact_metadata "$RUN_DIR/gemini-cross-audit.md" "Gemini" "Claude review" "gemini-cli"
 fi
@@ -189,15 +271,18 @@ CROSS_STATUS_TMP="$RUN_DIR/cross-audit-status.md.tmp.$$"
 cat > "$CROSS_STATUS_TMP" <<EOF
 # Tri-party Cross-audit Status
 
-| Party | Cross-audit Target | Status | Artifact | SHA256 |
-| --- | --- | --- | --- | --- |
-| Claude | Gemini review | $CLAUDE_CROSS_STATUS | $RUN_DIR/claude-cross-audit.md | $CLAUDE_CROSS_SHA256 |
-| Gemini | Claude review | $GEMINI_CROSS_STATUS | $RUN_DIR/gemini-cross-audit.md | $GEMINI_CROSS_SHA256 |
-| Codex | Final synthesis | Pending in active session | Current Codex session | n/a |
+| Party | Cross-audit Target | Status | Artifact | SHA256 | Diagnostics |
+| --- | --- | --- | --- | --- | --- |
+| Claude | Gemini review | $CLAUDE_CROSS_STATUS | $RUN_DIR/claude-cross-audit.md | $CLAUDE_CROSS_SHA256 | n/a |
+| Gemini | Claude review | $GEMINI_CROSS_STATUS | $RUN_DIR/gemini-cross-audit.md | $GEMINI_CROSS_SHA256 | capacity_events=${GEMINI_CROSS_CAPACITY_EVENTS:-0}; tool_block_events=${GEMINI_CROSS_TOOL_BLOCK_EVENTS:-0}; sanitized=${GEMINI_CROSS_SANITIZED:-0}; final_attempt=${GEMINI_CROSS_ATTEMPT:-0}; sanitizer_version=${GEMINI_SANITIZER_VERSION} |
+| Codex | Final synthesis | Pending in active session | Current Codex session | n/a | n/a |
 
 Generated at: $GENERATED_AT
 Cross timeout: ${CROSS_TIMEOUT}s
 Cross retries: ${CROSS_RETRIES}
+Cross retry backoff: ${CROSS_RETRY_BACKOFF}s
+Gemini approval mode: ${GEMINI_APPROVAL_MODE}
+Gemini policy file: ${GEMINI_POLICY_FILE}
 EOF
 mv "$CROSS_STATUS_TMP" "$RUN_DIR/cross-audit-status.md"
 
@@ -213,6 +298,11 @@ CROSS_ENV_TMP="$RUN_DIR/cross-audit.env.tmp.$$"
 	  printf 'GEMINI_CROSS_SHA256=%q\n' "$GEMINI_CROSS_SHA256"
 	  printf 'GEMINI_CROSS_ERROR_CODE=%q\n' "$GEMINI_CROSS_ERROR_CODE"
 	  printf 'GEMINI_CROSS_PROVENANCE=%q\n' "automated_cli"
+	  printf 'GEMINI_CROSS_ATTEMPT=%q\n' "${GEMINI_CROSS_ATTEMPT:-0}"
+	  printf 'GEMINI_CROSS_CAPACITY_EVENTS=%q\n' "${GEMINI_CROSS_CAPACITY_EVENTS:-0}"
+	  printf 'GEMINI_CROSS_TOOL_BLOCK_EVENTS=%q\n' "${GEMINI_CROSS_TOOL_BLOCK_EVENTS:-0}"
+	  printf 'GEMINI_CROSS_SANITIZED=%q\n' "${GEMINI_CROSS_SANITIZED:-0}"
+	  printf 'GEMINI_CROSS_SANITIZER_VERSION=%q\n' "$GEMINI_SANITIZER_VERSION"
 	} > "$CROSS_ENV_TMP"
 mv "$CROSS_ENV_TMP" "$RUN_DIR/cross-audit.env"
 

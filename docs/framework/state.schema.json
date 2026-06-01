@@ -83,7 +83,7 @@
           "$ref": "#/$defs/external_party_state"
         },
         "gemini": {
-          "$ref": "#/$defs/external_party_state"
+          "$ref": "#/$defs/gemini_party_state"
         }
       }
     },
@@ -97,6 +97,9 @@
       "type": "object",
       "required": [
         "preflight",
+        "preflight_path",
+        "preflight_version",
+        "preflight_binary_sha256",
         "review",
         "review_error_code",
         "review_provenance",
@@ -110,6 +113,15 @@
       ],
       "properties": {
         "preflight": {
+          "type": "string"
+        },
+        "preflight_path": {
+          "type": "string"
+        },
+        "preflight_version": {
+          "type": "string"
+        },
+        "preflight_binary_sha256": {
           "type": "string"
         },
         "review": {
@@ -140,6 +152,49 @@
           "$ref": "#/$defs/provenance_detail"
         },
         "cross_audit_sha256": {
+          "type": "string"
+        }
+      }
+    },
+    "gemini_party_state": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/external_party_state"
+        },
+        {
+          "type": "object",
+          "required": ["preflight_policy_sha256", "review_diagnostics", "cross_audit_diagnostics"],
+          "properties": {
+            "preflight_policy_sha256": {
+              "type": "string"
+            },
+            "review_diagnostics": {
+              "$ref": "#/$defs/gemini_diagnostics"
+            },
+            "cross_audit_diagnostics": {
+              "$ref": "#/$defs/gemini_diagnostics"
+            }
+          }
+        }
+      ]
+    },
+    "gemini_diagnostics": {
+      "type": "object",
+      "required": ["final_attempt", "capacity_events", "tool_block_events", "sanitized", "sanitizer_version"],
+      "properties": {
+        "final_attempt": {
+          "type": "integer"
+        },
+        "capacity_events": {
+          "type": "integer"
+        },
+        "tool_block_events": {
+          "type": "integer"
+        },
+        "sanitized": {
+          "type": "integer"
+        },
+        "sanitizer_version": {
           "type": "string"
         }
       }

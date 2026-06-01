@@ -163,8 +163,34 @@ For repeatable reviews, prefer:
 scripts/triparty.sh run "<question>"
 ```
 
-The unified command creates a timestamped run directory, collects Claude/Gemini reviews, runs cross-audit, runs the merge gate, and writes `state.json`.
+The unified command creates a timestamped run directory, collects Claude/Gemini reviews, runs cross-audit, runs the merge gate, validates release-level state when the merge is ready, and writes `state.json`.
 For manual stage control, use `scripts/triparty.sh review`, `scripts/triparty.sh cross-audit`, `scripts/triparty.sh merge`, and `scripts/triparty.sh status`.
+
+For public release, push, or launch claims, run the release gate after merge:
+
+```bash
+scripts/triparty.sh release-gate docs/framework/runs/review-YYYYMMDD-HHMMSS
+```
+
+The release gate re-runs the merge gate, refreshes `state.json`, validates the state contract, and requires `true_triparty_ready: true`, a ready conclusion, and an empty error list.
+
+For release-level claims, the gate must also verify preflight binary evidence, automated CLI provenance, state/artifact SHA256 agreement, current model-binding hash, Gemini policy hash, capacity-event threshold, and clean runtime-noise scans.
+
+## Gemini CLI Reliability Rules
+
+Automated Gemini CLI calls must use the configured headless policy and disabled MCP allowlist from `docs/framework/model-binding.yaml`.
+
+Required defaults:
+
+- `--approval-mode plan`
+- `--allowed-mcp-server-names __none__`
+- `--policy docs/framework/gemini-headless-policy.toml`
+- Retry/backoff and longer timeouts for review and cross-audit stages.
+- Runtime-noise sanitization before artifacts receive metadata.
+- Diagnostics for capacity events, tool-block events, final attempt, sanitization status, and sanitizer version in `state.json`.
+- Release validation blocks Gemini tool-block events and capacity events above the configured threshold. Set `TRIPARTY_RELEASE_MAX_GEMINI_CAPACITY_EVENTS=0` only when a zero-capacity-event release policy is required.
+
+Unclean runtime noise such as raw `GaxiosError`, `MODEL_CAPACITY_EXHAUSTED`, terminal color warnings, ignored artifact reads, or unauthorized tool calls must remain merge-blocking.
 
 ## Mutual Cross-audit Gate
 
@@ -182,6 +208,8 @@ Default audit pairing:
 
 Cross-audit artifacts must be non-empty, hash-verifiable, and archived in the run directory. Missing, timed-out, failed, empty, mislabeled, or hash-mismatched cross-audits force partial labeling.
 
+Independent reviews are intentionally isolated from other party outputs. A cross-auditor must not treat that isolation as a defect; the cross-audit stage is where party outputs and shared status are compared.
+
 ## Source-status And Merge Gate
 
 Before calling any result a true tri-party conclusion, verify:
@@ -192,6 +220,8 @@ Before calling any result a true tri-party conclusion, verify:
 - Gemini cross-audit status is `Completed`.
 - Codex has synthesized the results in the current session.
 - Each party's source label is preserved.
+- Each external party has preflight path, version, and binary SHA256 evidence in `state.json`.
+- Gemini's headless policy SHA256 is recorded in preflight and rechecked during release validation.
 
 If any party is `Unavailable`, `TimedOut`, `Failed`, `Skipped`, missing a cross-audit, or has an invalid self-label, the final report must be labeled as partial and must list the missing or invalid input.
 

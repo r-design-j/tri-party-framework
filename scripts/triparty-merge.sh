@@ -102,6 +102,22 @@ artifact_metadata_status() {
   printf 'Valid'
 }
 
+artifact_runtime_noise_status() {
+  local file="$1"
+
+  if [ ! -f "$file" ]; then
+    printf 'Missing'
+    return
+  fi
+
+  if grep -Eiq 'GaxiosError|MODEL_CAPACITY_EXHAUSTED|RESOURCE_EXHAUSTED|No capacity available|Warning: True color|Warning: Basic terminal|Warning: 256-color support|Ripgrep is not available|ignored by configured ignore patterns|Error executing tool read_file|Unauthorized tool call|Tool ".*" not found|LocalAgentExecutor.*Blocked call' "$file"; then
+    printf 'Noisy'
+    return
+  fi
+
+  printf 'Clean'
+}
+
 extract_review_status() {
   local party="$1"
   awk -F '|' -v party="$party" '
@@ -158,6 +174,8 @@ CLAUDE_LABEL_STATUS="$(label_contamination_status "Claude" "$CLAUDE_REVIEW_PATH"
 GEMINI_LABEL_STATUS="$(label_contamination_status "Gemini" "$GEMINI_REVIEW_PATH")"
 CLAUDE_METADATA_STATUS="$(artifact_metadata_status "Claude" "review" "TRIPARTY_REVIEW_COMPLETE" "$CLAUDE_REVIEW_PATH")"
 GEMINI_METADATA_STATUS="$(artifact_metadata_status "Gemini" "review" "TRIPARTY_REVIEW_COMPLETE" "$GEMINI_REVIEW_PATH")"
+CLAUDE_NOISE_STATUS="$(artifact_runtime_noise_status "$CLAUDE_REVIEW_PATH")"
+GEMINI_NOISE_STATUS="$(artifact_runtime_noise_status "$GEMINI_REVIEW_PATH")"
 
 CLAUDE_CROSS_STATUS="NotRequired"
 GEMINI_CROSS_STATUS="NotRequired"
@@ -171,6 +189,8 @@ CLAUDE_CROSS_HASH_STATUS="NotRequired"
 GEMINI_CROSS_HASH_STATUS="NotRequired"
 CLAUDE_CROSS_METADATA_STATUS="NotRequired"
 GEMINI_CROSS_METADATA_STATUS="NotRequired"
+CLAUDE_CROSS_NOISE_STATUS="NotRequired"
+GEMINI_CROSS_NOISE_STATUS="NotRequired"
 if [ "$REQUIRE_CROSS_AUDIT" = "1" ]; then
   CROSS_ENV="$RUN_DIR/cross-audit.env"
   if [ -f "$RUN_DIR/status/cross-audit.env" ]; then
@@ -209,6 +229,8 @@ if [ "$REQUIRE_CROSS_AUDIT" = "1" ]; then
 
   CLAUDE_CROSS_METADATA_STATUS="$(artifact_metadata_status "Claude" "cross-audit" "TRIPARTY_CROSS_AUDIT_COMPLETE" "$CLAUDE_CROSS_PATH")"
   GEMINI_CROSS_METADATA_STATUS="$(artifact_metadata_status "Gemini" "cross-audit" "TRIPARTY_CROSS_AUDIT_COMPLETE" "$GEMINI_CROSS_PATH")"
+  CLAUDE_CROSS_NOISE_STATUS="$(artifact_runtime_noise_status "$CLAUDE_CROSS_PATH")"
+  GEMINI_CROSS_NOISE_STATUS="$(artifact_runtime_noise_status "$GEMINI_CROSS_PATH")"
 fi
 
 if [ "$CLAUDE_REVIEW_STATUS" = "Completed" ] \
@@ -219,9 +241,11 @@ if [ "$CLAUDE_REVIEW_STATUS" = "Completed" ] \
   && [ "$GEMINI_SIZE_STATUS" = "NonEmpty" ] \
   && [ "$CLAUDE_METADATA_STATUS" = "Valid" ] \
   && [ "$GEMINI_METADATA_STATUS" = "Valid" ] \
+  && [ "$CLAUDE_NOISE_STATUS" = "Clean" ] \
+  && [ "$GEMINI_NOISE_STATUS" = "Clean" ] \
   && [ "$CLAUDE_LABEL_STATUS" = "Clean" ] \
   && [ "$GEMINI_LABEL_STATUS" = "Clean" ] \
-  && { [ "$REQUIRE_CROSS_AUDIT" != "1" ] || { [ "${CLAUDE_CROSS_STATUS:-Missing}" = "Completed" ] && [ "${GEMINI_CROSS_STATUS:-Missing}" = "Completed" ] && [ "$CLAUDE_CROSS_SIZE_STATUS" = "NonEmpty" ] && [ "$GEMINI_CROSS_SIZE_STATUS" = "NonEmpty" ] && [ "$CLAUDE_CROSS_HASH_STATUS" = "Match" ] && [ "$GEMINI_CROSS_HASH_STATUS" = "Match" ] && [ "$CLAUDE_CROSS_METADATA_STATUS" = "Valid" ] && [ "$GEMINI_CROSS_METADATA_STATUS" = "Valid" ]; }; }; then
+  && { [ "$REQUIRE_CROSS_AUDIT" != "1" ] || { [ "${CLAUDE_CROSS_STATUS:-Missing}" = "Completed" ] && [ "${GEMINI_CROSS_STATUS:-Missing}" = "Completed" ] && [ "$CLAUDE_CROSS_SIZE_STATUS" = "NonEmpty" ] && [ "$GEMINI_CROSS_SIZE_STATUS" = "NonEmpty" ] && [ "$CLAUDE_CROSS_HASH_STATUS" = "Match" ] && [ "$GEMINI_CROSS_HASH_STATUS" = "Match" ] && [ "$CLAUDE_CROSS_METADATA_STATUS" = "Valid" ] && [ "$GEMINI_CROSS_METADATA_STATUS" = "Valid" ] && [ "$CLAUDE_CROSS_NOISE_STATUS" = "Clean" ] && [ "$GEMINI_CROSS_NOISE_STATUS" = "Clean" ]; }; }; then
   CONCLUSION_LABEL="Ready for true tri-party synthesis"
   EXIT_CODE=0
 else
@@ -241,18 +265,18 @@ cat > "$OUT_TMP" <<EOF
 
 ## Artifact Gate
 
-| Party | Non-empty | Hash | Metadata | Label Scan | Artifact |
-| --- | --- | --- | --- | --- | --- |
-| Claude | $CLAUDE_SIZE_STATUS | $CLAUDE_HASH_STATUS | $CLAUDE_METADATA_STATUS | $CLAUDE_LABEL_STATUS | $CLAUDE_REVIEW_PATH |
-| Gemini | $GEMINI_SIZE_STATUS | $GEMINI_HASH_STATUS | $GEMINI_METADATA_STATUS | $GEMINI_LABEL_STATUS | $GEMINI_REVIEW_PATH |
+| Party | Non-empty | Hash | Metadata | Runtime Noise | Label Scan | Artifact |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude | $CLAUDE_SIZE_STATUS | $CLAUDE_HASH_STATUS | $CLAUDE_METADATA_STATUS | $CLAUDE_NOISE_STATUS | $CLAUDE_LABEL_STATUS | $CLAUDE_REVIEW_PATH |
+| Gemini | $GEMINI_SIZE_STATUS | $GEMINI_HASH_STATUS | $GEMINI_METADATA_STATUS | $GEMINI_NOISE_STATUS | $GEMINI_LABEL_STATUS | $GEMINI_REVIEW_PATH |
 
 ## Cross-audit Gate
 
-| Party | Status | Non-empty | Hash | Metadata | Artifact |
-| --- | --- | --- | --- | --- | --- |
-| Claude audits Gemini | ${CLAUDE_CROSS_STATUS:-Missing} | $CLAUDE_CROSS_SIZE_STATUS | $CLAUDE_CROSS_HASH_STATUS | $CLAUDE_CROSS_METADATA_STATUS | $CLAUDE_CROSS_PATH |
-| Gemini audits Claude | ${GEMINI_CROSS_STATUS:-Missing} | $GEMINI_CROSS_SIZE_STATUS | $GEMINI_CROSS_HASH_STATUS | $GEMINI_CROSS_METADATA_STATUS | $GEMINI_CROSS_PATH |
-| Codex final audit | Pending in active session | n/a | n/a | n/a | Current Codex session |
+| Party | Status | Non-empty | Hash | Metadata | Runtime Noise | Artifact |
+| --- | --- | --- | --- | --- | --- | --- |
+| Claude audits Gemini | ${CLAUDE_CROSS_STATUS:-Missing} | $CLAUDE_CROSS_SIZE_STATUS | $CLAUDE_CROSS_HASH_STATUS | $CLAUDE_CROSS_METADATA_STATUS | $CLAUDE_CROSS_NOISE_STATUS | $CLAUDE_CROSS_PATH |
+| Gemini audits Claude | ${GEMINI_CROSS_STATUS:-Missing} | $GEMINI_CROSS_SIZE_STATUS | $GEMINI_CROSS_HASH_STATUS | $GEMINI_CROSS_METADATA_STATUS | $GEMINI_CROSS_NOISE_STATUS | $GEMINI_CROSS_PATH |
+| Codex final audit | Pending in active session | n/a | n/a | n/a | n/a | Current Codex session |
 
 Cross-audit required: $REQUIRE_CROSS_AUDIT
 
@@ -318,6 +342,8 @@ $(cat "$STATUS_FILE")
 - Gemini label status: $GEMINI_LABEL_STATUS
 - Claude metadata status: $CLAUDE_METADATA_STATUS
 - Gemini metadata status: $GEMINI_METADATA_STATUS
+- Claude runtime noise status: $CLAUDE_NOISE_STATUS
+- Gemini runtime noise status: $GEMINI_NOISE_STATUS
 - Claude cross-audit status: ${CLAUDE_CROSS_STATUS:-Missing}
 - Gemini cross-audit status: ${GEMINI_CROSS_STATUS:-Missing}
 - Claude cross-audit hash status: $CLAUDE_CROSS_HASH_STATUS
@@ -326,6 +352,8 @@ $(cat "$STATUS_FILE")
 - Gemini cross-audit size status: $GEMINI_CROSS_SIZE_STATUS
 - Claude cross-audit metadata status: $CLAUDE_CROSS_METADATA_STATUS
 - Gemini cross-audit metadata status: $GEMINI_CROSS_METADATA_STATUS
+- Claude cross-audit runtime noise status: $CLAUDE_CROSS_NOISE_STATUS
+- Gemini cross-audit runtime noise status: $GEMINI_CROSS_NOISE_STATUS
 
 Use any generated handoff prompt in this run directory to collect missing party input.
 If reviews are present but cross-audit is missing, run scripts/triparty-cross-audit.sh with the run directory and then run merge again.
