@@ -4,6 +4,7 @@
 
 - Established the portable tri-party core: preflight, review, cross-audit, merge, state, lint, and regression.
 - Added public launch materials: product README, MIT license, contribution guide, examples, and GitHub issue templates.
+- Added release checklist, security notes, and failure-recovery example for partial tri-party runs.
 - Added `scripts/triparty.sh` as the unified user-facing CLI.
 - Added `state.json` and `docs/framework/state.schema.json` as the machine-readable run state contract.
 - Added mutual audit gating: Claude audits Gemini, Gemini audits Claude, Codex performs final synthesis.

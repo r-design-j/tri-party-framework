@@ -31,3 +31,7 @@ The key field is:
 ```
 
 If this is false, the result must be described as partial.
+
+## 4. Failure Recovery
+
+Use [failure-recovery.md](failure-recovery.md) when a model times out, the provider reports capacity limits, or the merge gate returns `Partial review only`.

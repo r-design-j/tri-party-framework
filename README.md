@@ -190,6 +190,7 @@ See [examples](examples/) for:
 - A ready-to-run review prompt.
 - Offline injection workflow.
 - A sample `state.json` shape.
+- Failure recovery for timeout, capacity, or partial-state runs.
 
 ## Project Map
 
@@ -198,6 +199,8 @@ See [examples](examples/) for:
 - `docs/framework/adapter-contract.md`: rules every external adapter must obey.
 - `docs/framework/model-binding.yaml`: current model-version binding for each role.
 - `docs/framework/state.schema.json`: machine-readable run-state schema.
+- `RELEASE_CHECKLIST.md`: public release readiness gate.
+- `SECURITY.md`: adapter, artifact, and source-truth safety notes.
 - `scripts/triparty.sh`: unified CLI for run, review, cross-audit, merge, status, resume, and archive.
 - `scripts/triparty-preflight.sh`: source availability and connectivity probe.
 - `scripts/triparty-review.sh`: Claude and Gemini independent review runner.

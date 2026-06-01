@@ -25,6 +25,10 @@ scripts/triparty-mcp-smoke.sh
 
 If your change only touches docs, `scripts/triparty-lint.sh` is the minimum required check.
 
+Before a public release, also use [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
+
+Security-sensitive adapter changes should also update [SECURITY.md](SECURITY.md).
+
 ## Useful First Contributions
 
 - Improve examples and screenshots.
