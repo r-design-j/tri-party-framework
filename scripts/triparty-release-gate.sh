@@ -15,7 +15,14 @@ EOF
 }
 
 latest_run_dir() {
-  find "$RUNS_DIR" -maxdepth 1 -type d -name 'review-*' 2>/dev/null | sort | tail -n 1
+  find "$RUNS_DIR" -maxdepth 1 -type d -name 'review-*' 2>/dev/null \
+    | while IFS= read -r candidate; do
+        if [ -f "$candidate/source-status.md" ]; then
+          printf '%s\n' "$candidate"
+        fi
+      done \
+    | sort \
+    | tail -n 1
 }
 
 run_dir="${1:-}"

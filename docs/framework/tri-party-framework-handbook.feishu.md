@@ -513,9 +513,11 @@ https://github.com/r-design-j/tri-party-framework/archive/refs/heads/main.zip
 
 ```text
 AGENTS.md
+CLAUDE.md
 README.md
 VERSION
 CHANGELOG.md
+.claude/
 scripts/
 adapters/
 docs/framework/
@@ -531,6 +533,14 @@ scripts/triparty-lint.sh
 ```
 
 如果 `triparty-lint.sh` 通过，说明 core 文件结构和基本契约是完整的。
+
+然后安装全局发现与触发层：
+
+```bash
+scripts/install-triparty-global-bootstrap.sh
+```
+
+这会写入 Codex 全局 `AGENTS.md`、Claude Code 全局 `CLAUDE.md`、`~/.triparty-framework/config`、`triparty` CLI wrapper，并安装 Claude Code `/triparty` 与 `/tp` slash 入口。
 
 ### 15.3 绑定和验证 Claude/Gemini
 
@@ -640,7 +650,7 @@ python3 /absolute/path/to/adapters/mcp/triparty_mcp_adapter.py
 
 ## 16. 新会话中如何触发调用
 
-新会话里触发三方框架有三种方式：自然语言触发、CLI 触发、Adapter/MCP 触发。
+新会话里触发三方框架有四种方式：自然语言触发、Slash 触发、CLI 触发、Adapter/MCP 触发。
 
 ### 16.1 Codex 新会话自然语言触发
 
@@ -709,7 +719,20 @@ Codex + Claude + Gemini 三方模型协作框架
 | 5 | 读取 `state.json` 和 `merge-status.md` | 判断 true/partial。 |
 | 6 | 最终汇报 run 目录、source status、门禁结果 | 保留可追溯证据。 |
 
-### 16.4 CLI 直接触发
+### 16.4 Slash 直接触发
+
+在 Claude Code 中，安装全局 bootstrap 后可以直接输入：
+
+```text
+/triparty status
+/triparty preflight
+/triparty run "请三方审查当前方案"
+/tp status
+```
+
+`/triparty` 和 `/tp` 不是新的框架核心，只是 agent-specific adapter。它们必须定位并调用已有的 `triparty` CLI 或 `scripts/triparty.sh`，不能重新创建协议文档。
+
+### 16.5 CLI 直接触发
 
 不依赖 Codex 聊天，也可以直接在终端执行：
 
@@ -723,7 +746,7 @@ scripts/triparty.sh run "请三方审查这个方案是否成立" docs/framework
 scripts/triparty.sh status
 ```
 
-### 16.5 HTTP 触发
+### 16.6 HTTP 触发
 
 启动 HTTP adapter 后：
 
@@ -735,7 +758,7 @@ curl -X POST http://127.0.0.1:8765/run \
 
 这适合未来 UI、CI、自动化平台调用。
 
-### 16.6 MCP 触发
+### 16.7 MCP 触发
 
 配置 MCP adapter 后，在支持 MCP 的客户端中调用：
 
@@ -749,7 +772,7 @@ arguments:
 
 MCP 客户端不应自己判断 true/partial，必须读取工具返回的 stdout 或 run 目录里的 `state.json`。
 
-### 16.7 新会话里的人工补交
+### 16.8 新会话里的人工补交
 
 如果新设备或新会话中 Claude/Gemini 某一方不可用，但用户可以从 GUI/Web 拿到真实输出，可以这样补：
 
@@ -765,7 +788,7 @@ scripts/triparty.sh resume <run-dir>
 - `inject` 记录了 provenance。
 - 后续 cross-audit 和 merge gate 通过。
 
-### 16.8 每日汇总触发
+### 16.9 每日汇总触发
 
 如果用户想在新会话里继续“每日总结 + 标准提炼”，可以这样触发：
 

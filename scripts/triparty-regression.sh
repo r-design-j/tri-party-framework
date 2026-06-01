@@ -159,6 +159,12 @@ expect_absent "$RUN_OK/partial-report.md" "merge_success_removes_stale_partial_r
 run_expect pass "unified_status_writes_state_json" "$TRIPARTY" status "$RUN_OK"
 run_expect pass "resume_accepts_already_cross_audited_run" "$TRIPARTY" resume "$RUN_OK"
 run_expect pass "release_gate_accepts_ready_run" "$RELEASE_GATE" "$RUN_OK"
+RUNS_RELEASE_LATEST="$TMP_ROOT/release-latest-runs"
+mkdir -p "$RUNS_RELEASE_LATEST"
+cp -R "$RUN_OK" "$RUNS_RELEASE_LATEST/review-20260601-000001"
+mkdir -p "$RUNS_RELEASE_LATEST/review-20260601-000002/preflight"
+printf 'preflight only\n' > "$RUNS_RELEASE_LATEST/review-20260601-000002/preflight-output.txt"
+run_expect pass "release_gate_skips_incomplete_latest_run" env TRIPARTY_RUNS_DIR="$RUNS_RELEASE_LATEST" "$RELEASE_GATE"
 if grep -q '"true_triparty_ready": true' "$RUN_OK/state.json" && grep -q '"phase": "merged_ready"' "$RUN_OK/state.json"; then
   printf 'PASS: state_json_marks_ready_run\n'
 else
@@ -287,6 +293,14 @@ claude_sha="$(hash_file "$RUN_LABEL_MENTION/claude-review.md")"
 sed -i.bak "s|CLAUDE_REVIEW_SHA256=.*|CLAUDE_REVIEW_SHA256=$claude_sha|" "$RUN_LABEL_MENTION/status.env"
 rm -f "$RUN_LABEL_MENTION/status.env.bak"
 run_expect pass "merge_accepts_descriptive_codex_only_mentions" "$MERGE" "$RUN_LABEL_MENTION"
+
+RUN_DIRECT_CALL_MENTION="$TMP_ROOT/direct-call-mention"
+write_complete_run "$RUN_DIRECT_CALL_MENTION" "Completed" "Completed" "1"
+write_artifact "$RUN_DIRECT_CALL_MENTION/claude-review.md" "Claude" "review" "TRIPARTY_REVIEW_COMPLETE" "This review says the slash adapter must not directly call claude or gemini. It discusses adapter purity, not whether Claude or Gemini participated in this run."
+claude_sha="$(hash_file "$RUN_DIRECT_CALL_MENTION/claude-review.md")"
+sed -i.bak "s|CLAUDE_REVIEW_SHA256=.*|CLAUDE_REVIEW_SHA256=$claude_sha|" "$RUN_DIRECT_CALL_MENTION/status.env"
+rm -f "$RUN_DIRECT_CALL_MENTION/status.env.bak"
+run_expect pass "merge_accepts_descriptive_direct_model_call_mentions" "$MERGE" "$RUN_DIRECT_CALL_MENTION"
 
 RUN_FALSE_SOURCE="$TMP_ROOT/false-source-status"
 write_complete_run "$RUN_FALSE_SOURCE" "Completed" "Completed" "1"

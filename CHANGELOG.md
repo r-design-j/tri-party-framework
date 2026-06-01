@@ -7,6 +7,9 @@
 - Added release checklist, security notes, and failure-recovery example for partial tri-party runs.
 - Added release gate scripts and Gemini CLI stability hardening: headless policy, policy-hash recording, retry/backoff, runtime-noise sanitization, capacity thresholds, sanitizer-version diagnostics in `state.json`, and release-level state validation.
 - Added a global new-session bootstrap installer so fresh Codex and Claude Code sessions can discover the installed framework instead of recreating Markdown protocols.
+- Added Claude Code slash entrypoints `/triparty` and `/tp`, installed as thin adapters over the existing portable core.
+- Refined merge source-label scanning so adapter-purity text about not directly calling `claude` or `gemini` is not misread as missing-party source status.
+- Refined release-gate latest-run resolution so preflight-only `review-*` directories do not block valid pre-push gates.
 - Added `scripts/triparty.sh` as the unified user-facing CLI.
 - Added `state.json`, `docs/framework/state.schema.json`, and `scripts/triparty-validate-state.py` as the machine-readable run state contract and validator.
 - Added mutual audit gating: Claude audits Gemini, Gemini audits Claude, Codex performs final synthesis.

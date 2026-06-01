@@ -22,6 +22,7 @@ Strong triggers:
 
 - The user explicitly names `Codex + Claude + Gemini`.
 - The user says `三方模型协作框架` or `三方模型协议`.
+- The user invokes `/triparty` or `/tp` in an agent runtime that supports slash skills or slash commands.
 - The user asks to run `scripts/triparty.sh`, `triparty_run`, or the `true_triparty_ready` gate.
 - The user asks for source status, independent review, mutual cross-audit, and merge gate in one request.
 
@@ -79,6 +80,7 @@ The installer writes:
 
 - a global Codex `AGENTS.md` bootstrap block;
 - a global Claude Code `~/.claude/CLAUDE.md` bootstrap block;
+- a Claude Code `/triparty` slash skill and `/triparty` plus `/tp` slash command files;
 - `~/.triparty-framework/config` with the installed framework path;
 - a `triparty` wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`.
 
@@ -92,6 +94,30 @@ When triggered in a new session, the agent must locate the existing framework in
 4. ask whether to clone `https://github.com/r-design-j/tri-party-framework`.
 
 If discovery fails, the agent must not create new Markdown files to reconstruct the framework. It must report the discovery failure and ask whether to install or clone the framework.
+
+## Slash Invocation
+
+The portable core remains `scripts/triparty.sh` plus the `triparty` CLI wrapper. Slash invocation is an adapter layer for runtimes that support slash skills or slash commands.
+
+Claude Code entrypoints:
+
+- `/triparty status`
+- `/triparty preflight`
+- `/triparty run "<task>"`
+- `/triparty release-gate <run-dir>`
+- `/tp status`
+
+The `/triparty` skill and command must resolve the existing framework in this order:
+
+1. `triparty` from PATH;
+2. `TRIPARTY_FRAMEWORK_HOME` or `~/.triparty-framework/config`;
+3. the current repository's `scripts/triparty.sh`.
+
+If none are found, the slash entrypoint must report that the framework is not installed or not discoverable. It must not create new protocol Markdown as a substitute.
+
+Other agent ecosystems may expose slash commands differently. They may provide their own thin slash adapter, but must call the same portable core and must not redefine true/partial readiness.
+
+Slash adapters must not call `claude`, `gemini`, provider APIs, or stage scripts such as `triparty-review.sh` directly. They should enter through `triparty` or `scripts/triparty.sh` so preflight, review, cross-audit, merge, state validation, and release-gate behavior remain identical across all entrypoints.
 
 ## Capability Roles
 

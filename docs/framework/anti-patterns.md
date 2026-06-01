@@ -125,3 +125,21 @@
 - Failure: A new agent session cannot discover the installed tri-party framework and creates fresh Markdown files to reconstruct a partial protocol.
 - Risk: The user sees a different framework every session; triggers drift, old fixes disappear, and the agent makes unverifiable claims from improvised docs.
 - Prevention: Install the global bootstrap with `scripts/install-triparty-global-bootstrap.sh`; new sessions must locate `TRIPARTY_FRAMEWORK_HOME`, `~/.triparty-framework/config`, or the installed path before acting. For Claude Code, provide `CLAUDE.md` because Claude Code does not read `AGENTS.md`. If discovery fails, report it and ask whether to clone/install instead of creating ad hoc framework docs.
+
+## AP-022: Slash Trigger Exists Only In Prose
+
+- Failure: Documentation tells users to type `/triparty`, but the runtime has no installed skill or command file behind that slash trigger.
+- Risk: New sessions still fall back to weak natural-language triggers, and users cannot tell whether they invoked the real framework or a freshly improvised workflow.
+- Prevention: Treat slash invocation as a thin adapter with files under `.claude/skills/triparty/` and `.claude/commands/`; install them globally with `scripts/install-triparty-global-bootstrap.sh`, lint for their presence, and keep the `triparty` CLI as the portable fallback.
+
+## AP-023: Adapter Purity Text Misread As Source-status Contamination
+
+- Failure: A party says "the slash adapter must not directly call claude or gemini", and the merge gate treats that as if Claude or Gemini were not called in the current run.
+- Risk: Valid adapter reviews are rejected, encouraging weaker prompts that avoid naming the exact unsafe behavior.
+- Prevention: Source-label scans must reject explicit source-status claims, not ordinary discussion of adapter purity or direct-model-call risks; regression must include a passing case for descriptive "do not call claude/gemini directly" text.
+
+## AP-024: Release Gate Selects An Incomplete Latest Run
+
+- Failure: `triparty-release-gate.sh` is called without a run directory and selects a newer `review-*` directory that only contains preflight artifacts.
+- Risk: Pre-push and release workflows fail even though the latest complete tri-party review is ready, or humans bypass the gate because it appears flaky.
+- Prevention: Default latest-run resolution for release gates must only consider review directories that contain `source-status.md`; incomplete preflight-only directories remain inspectable but are not eligible as release candidates.

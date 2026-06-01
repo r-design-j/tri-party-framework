@@ -43,7 +43,7 @@ label_contamination_status() {
     return
   fi
 
-  if sed -n '1,30p' "$file" | grep -Eiq '来源状态[:：]|Source status[:：]|非真三方结论|not a true tri-party|Codex-only[[:space:]]*上下文|未直接调用[[:space:]]*(Gemini|Claude|Codex)|(Gemini|Claude)[[:space:]]*=[[:space:]]*未调用'; then
+  if sed -n '1,30p' "$file" | grep -Eiq '来源状态[:：]|Source status[:：]|非真三方结论|not a true tri-party|Codex-only[[:space:]]*上下文|(Gemini|Claude|Codex)[[:space:]|:=]+(未调用|未直接调用|not called)'; then
     printf 'Contaminated'
     return
   fi

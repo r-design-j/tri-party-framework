@@ -6,6 +6,11 @@ CODEX_HOME_DIR="${CODEX_HOME:-"$HOME/.codex"}"
 CODEX_AGENTS_FILE="$CODEX_HOME_DIR/AGENTS.md"
 CLAUDE_HOME_DIR="${CLAUDE_CONFIG_DIR:-"$HOME/.claude"}"
 CLAUDE_MEMORY_FILE="$CLAUDE_HOME_DIR/CLAUDE.md"
+CLAUDE_SKILL_DIR="$CLAUDE_HOME_DIR/skills/triparty"
+CLAUDE_COMMANDS_DIR="$CLAUDE_HOME_DIR/commands"
+CLAUDE_SKILL_FILE="$CLAUDE_SKILL_DIR/SKILL.md"
+CLAUDE_TRIPARTY_COMMAND_FILE="$CLAUDE_COMMANDS_DIR/triparty.md"
+CLAUDE_TP_COMMAND_FILE="$CLAUDE_COMMANDS_DIR/tp.md"
 CONFIG_DIR="${TRIPARTY_CONFIG_DIR:-"$HOME/.triparty-framework"}"
 CONFIG_FILE="$CONFIG_DIR/config"
 if [ -n "${TRIPARTY_BIN_DIR:-}" ]; then
@@ -18,7 +23,18 @@ fi
 BIN_FILE="$BIN_DIR/triparty"
 REPO_URL="https://github.com/r-design-j/tri-party-framework.git"
 
-mkdir -p "$CODEX_HOME_DIR" "$CLAUDE_HOME_DIR" "$CONFIG_DIR" "$BIN_DIR"
+install_required_file() {
+  local src="$1"
+  local dest="$2"
+  if [ ! -f "$src" ]; then
+    printf 'Missing required installer source: %s\n' "$src" >&2
+    exit 1
+  fi
+  cp "$src" "$dest.tmp.$$"
+  mv "$dest.tmp.$$" "$dest"
+}
+
+mkdir -p "$CODEX_HOME_DIR" "$CLAUDE_HOME_DIR" "$CLAUDE_SKILL_DIR" "$CLAUDE_COMMANDS_DIR" "$CONFIG_DIR" "$BIN_DIR"
 
 if [ ! -f "$CODEX_AGENTS_FILE" ]; then
   cat > "$CODEX_AGENTS_FILE" <<'EOF'
@@ -36,6 +52,8 @@ cat > "$CONFIG_FILE.tmp.$$" <<EOF
 TRIPARTY_FRAMEWORK_HOME=$ROOT_DIR
 TRIPARTY_REPO_URL=$REPO_URL
 TRIPARTY_CANONICAL_TRIGGER=Codex + Claude + Gemini 三方模型协作框架
+TRIPARTY_SLASH_TRIGGER=/triparty
+TRIPARTY_SLASH_ALIAS=/tp
 EOF
 mv "$CONFIG_FILE.tmp.$$" "$CONFIG_FILE"
 
@@ -45,6 +63,10 @@ exec "$ROOT_DIR/scripts/triparty.sh" "\$@"
 EOF
 chmod +x "$BIN_FILE.tmp.$$"
 mv "$BIN_FILE.tmp.$$" "$BIN_FILE"
+
+install_required_file "$ROOT_DIR/.claude/skills/triparty/SKILL.md" "$CLAUDE_SKILL_FILE"
+install_required_file "$ROOT_DIR/.claude/commands/triparty.md" "$CLAUDE_TRIPARTY_COMMAND_FILE"
+install_required_file "$ROOT_DIR/.claude/commands/tp.md" "$CLAUDE_TP_COMMAND_FILE"
 
 BLOCK_FILE="$(mktemp "${TMPDIR:-/tmp}/triparty-bootstrap-block.XXXXXX")"
 cat > "$BLOCK_FILE" <<EOF
@@ -56,9 +78,11 @@ cat > "$BLOCK_FILE" <<EOF
 - Installed framework home: \`$ROOT_DIR\`.
 - Framework config: \`$CONFIG_FILE\`.
 - Portable CLI wrapper: \`$BIN_FILE\`.
+- Claude Code slash trigger: \`/triparty\` with alias \`/tp\`.
 - Repository: $REPO_URL.
 - In any new Codex session, if the user asks for "Codex + Claude + Gemini", "三方模型协作框架", "三方模型协议", or a same-workstream follow-up to this framework:
   - In Claude Code, this same rule must be loaded from \`$CLAUDE_MEMORY_FILE\` or the repository \`CLAUDE.md\`; Claude Code reads \`CLAUDE.md\`, not \`AGENTS.md\`.
+  - In Claude Code, prefer \`/triparty status\`, \`/triparty preflight\`, \`/triparty run "<task>"\`, or the short alias \`/tp\` when slash commands are available.
   - Do not recreate the framework by inventing new Markdown files.
   - Do not treat standalone "三方框架/三方协议" as a design/registry/runtime audit unless the user explicitly says so.
   - First locate the existing framework via \`TRIPARTY_FRAMEWORK_HOME\`, then \`$CONFIG_FILE\`, then the installed home above.
@@ -95,9 +119,11 @@ cat > "$CLAUDE_BLOCK_FILE" <<EOF
 - Installed framework home: \`$ROOT_DIR\`.
 - Framework config: \`$CONFIG_FILE\`.
 - Portable CLI wrapper: \`$BIN_FILE\`.
+- Slash trigger: \`/triparty\`; short alias: \`/tp\`.
 - Repository: $REPO_URL.
 - Claude Code reads \`CLAUDE.md\`, not \`AGENTS.md\`; this global memory exists so Claude Code sessions can discover the same installed framework.
 - If the user asks for "Codex + Claude + Gemini", "三方模型协作框架", "三方模型协议", or a same-workstream follow-up to this framework:
+  - Prefer the Claude Code slash trigger \`/triparty status\`, \`/triparty preflight\`, \`/triparty run "<task>"\`, or \`/tp\` when slash commands are available.
   - Do not recreate the framework by inventing new Markdown files.
   - Do not treat standalone "三方框架/三方协议" as a design/registry/runtime audit unless the user explicitly says so.
   - First locate the existing framework via \`TRIPARTY_FRAMEWORK_HOME\`, then \`$CONFIG_FILE\`, then the installed home above.
@@ -127,5 +153,8 @@ rm -f "$CLAUDE_TMP" "$CLAUDE_BLOCK_FILE"
 printf 'Installed tri-party global bootstrap.\n'
 printf 'Codex AGENTS: %s\n' "$CODEX_AGENTS_FILE"
 printf 'Claude Code CLAUDE: %s\n' "$CLAUDE_MEMORY_FILE"
+printf 'Claude Code slash skill: %s\n' "$CLAUDE_SKILL_FILE"
+printf 'Claude Code slash command: %s\n' "$CLAUDE_TRIPARTY_COMMAND_FILE"
+printf 'Claude Code slash alias: %s\n' "$CLAUDE_TP_COMMAND_FILE"
 printf 'Config: %s\n' "$CONFIG_FILE"
 printf 'CLI wrapper: %s\n' "$BIN_FILE"

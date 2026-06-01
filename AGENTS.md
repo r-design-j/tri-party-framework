@@ -46,6 +46,7 @@
 - Strong triggers include:
   - The user explicitly says "Codex + Claude + Gemini".
   - The user says "三方模型协作框架" or "三方模型协议".
+  - The user invokes `/triparty` or `/tp` in an agent runtime that supports slash skills or slash commands.
   - The user asks to run `scripts/triparty.sh`, `triparty_run`, or the "true_triparty_ready" gate.
   - The user asks for source status, independent review, mutual cross-audit, and merge gate in one request.
 - Weak triggers include standalone phrases such as "三方框架", "三方协议", or "tri-party framework" without naming Codex, Claude, and Gemini. For weak triggers, first inspect local `AGENTS.md`/`README.md` if available. If the active context could also mean a design-component/registry/runtime audit, a third-party library, or another three-part structure, ask a concise disambiguation question before proceeding.
@@ -60,13 +61,14 @@
 - Use `scripts/install-triparty-global-bootstrap.sh` to install:
   - a global Codex `AGENTS.md` bootstrap block;
   - a global Claude Code `~/.claude/CLAUDE.md` bootstrap block;
+  - a Claude Code `/triparty` slash skill plus `/triparty` and `/tp` slash command files;
   - `~/.triparty-framework/config` with the framework home and repo URL;
   - a portable `triparty` CLI wrapper in a user bin directory already on PATH when possible.
 - The repository should also keep `CLAUDE.md` importing `AGENTS.md`, because Claude Code reads `CLAUDE.md` rather than `AGENTS.md`.
 - In a new session, the agent must first locate the existing framework through `TRIPARTY_FRAMEWORK_HOME`, `~/.triparty-framework/config`, or the installed bootstrap path.
 - The agent must not reconstruct the framework by creating new ad hoc Markdown files when the installed framework cannot be found.
 - If the framework cannot be located, the agent must say it is not installed or not discoverable in the current environment and ask whether to clone or install it.
-- New-session activation should use existing commands (`triparty preflight`, `triparty run`, `triparty status`, or the repository's `scripts/triparty.sh`) rather than inventing a new workflow.
+- New-session activation should use existing commands (`/triparty`, `/tp`, `triparty preflight`, `triparty run`, `triparty status`, or the repository's `scripts/triparty.sh`) rather than inventing a new workflow.
 
 ## Tri-party Collaboration Workflow
 

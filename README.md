@@ -48,7 +48,7 @@ Install the new-session bootstrap once on each machine:
 scripts/install-triparty-global-bootstrap.sh
 ```
 
-This writes global bootstrap blocks for Codex and Claude Code, stores the framework home in `~/.triparty-framework/config`, and creates a `triparty` CLI wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`. New sessions should use this installed framework instead of creating new Markdown files to reconstruct the protocol.
+This writes global bootstrap blocks for Codex and Claude Code, installs Claude Code slash entrypoints `/triparty` and `/tp`, stores the framework home in `~/.triparty-framework/config`, and creates a `triparty` CLI wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`. New sessions should use this installed framework instead of creating new Markdown files to reconstruct the protocol.
 
 Run the full workflow:
 
@@ -148,6 +148,17 @@ triparty status
 triparty run "你的任务"
 ```
 
+The installer also installs Claude Code slash entrypoints, so a new Claude Code session can invoke the framework directly:
+
+```text
+/triparty status
+/triparty preflight
+/triparty run "请用 Codex + Claude + Gemini 三方模型协作框架审查这个方案"
+/tp status
+```
+
+Slash invocation is an adapter surface, not the framework core. If a different agent does not support Claude Code slash skills or slash commands, use the portable `triparty` CLI, HTTP adapter, or MCP adapter instead.
+
 ## Common Commands
 
 Run a source check:
@@ -245,6 +256,8 @@ See [examples](examples/) for:
 
 - `AGENTS.md`: stable working agreements inherited by future Codex sessions.
 - `CLAUDE.md`: Claude Code entrypoint that imports `AGENTS.md`.
+- `.claude/skills/triparty/SKILL.md`: Claude Code `/triparty` slash skill.
+- `.claude/commands/`: fallback Claude Code slash command files, including `/triparty` and `/tp`.
 - `docs/framework/tri-party-protocol.md`: executable protocol and source rules.
 - `docs/framework/adapter-contract.md`: rules every external adapter must obey.
 - `docs/framework/model-binding.yaml`: current model-version binding for each role.
