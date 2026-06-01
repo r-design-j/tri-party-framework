@@ -42,6 +42,14 @@ chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/tripar
 scripts/triparty-lint.sh
 ```
 
+Install the new-session bootstrap once on each machine:
+
+```bash
+scripts/install-triparty-global-bootstrap.sh
+```
+
+This writes a global Codex bootstrap block, stores the framework home in `~/.triparty-framework/config`, and creates a `triparty` CLI wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`. New sessions should use this installed framework instead of creating new Markdown files to reconstruct the protocol.
+
 Run the full workflow:
 
 ```bash
@@ -113,6 +121,12 @@ The framework can still proceed in partial mode when a party is missing, but it 
 
 ## Trigger In A New Session
 
+First make sure the bootstrap has been installed:
+
+```bash
+triparty preflight
+```
+
 Use the canonical phrase when asking an agent to activate the framework:
 
 ```text
@@ -122,6 +136,8 @@ Use the canonical phrase when asking an agent to activate the framework:
 Standalone phrases such as `三方框架` or `三方协议` are weak triggers. If the context also contains design components, registries, runtimes, third-party libraries, or other three-part structures, the agent should ask which one you mean before proceeding.
 
 Within an active Codex + Claude + Gemini workstream, follow-up requests such as "continue", "optimize", "publish", "release", or "fill this in" inherit the tri-party protocol unless the user explicitly asks for Codex-only execution.
+
+If a new session cannot find the installed framework, it must report that discovery failed and ask whether to install or clone the repository. It must not create fresh protocol Markdown files as a substitute for the existing framework.
 
 ## Common Commands
 
@@ -233,6 +249,7 @@ See [examples](examples/) for:
 - `scripts/triparty-release-gate.sh`: public push/release readiness gate backed by `state.json`.
 - `scripts/triparty-validate-state.py`: dependency-free state and release-readiness validator.
 - `scripts/install-triparty-git-hooks.sh`: optional local pre-push hook installer for the release gate.
+- `scripts/install-triparty-global-bootstrap.sh`: installs global new-session discovery, config, and CLI wrapper.
 - `scripts/triparty-lint.sh`: framework consistency checks.
 - `scripts/triparty-regression.sh`: historical failure-mode regression tests.
 - `adapters/http/triparty_http_adapter.py`: local HTTP adapter.

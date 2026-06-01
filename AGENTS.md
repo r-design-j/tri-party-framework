@@ -54,6 +54,18 @@
 - Once a workstream is confirmed as the Codex + Claude + Gemini tri-party model framework, follow-up instructions such as "继续", "补齐", "优化", "发布", "外推", or "记录进去" inherit the tri-party protocol unless the user explicitly says to run Codex-only. Codex may still own implementation work, but public delivery, release, or framework claims must pass preflight, independent reviews, mutual cross-audit, and merge gate before being reported as tri-party-backed.
 - Once the canonical trigger is confirmed, execute the normal workflow: preflight, independent reviews, mutual cross-audit, merge gate, and source-status reporting.
 
+## New-session Bootstrap Contract
+
+- The framework must be installed into the agent's global startup context before it can be reliably triggered outside this repository.
+- Use `scripts/install-triparty-global-bootstrap.sh` to install:
+  - a global Codex `AGENTS.md` bootstrap block;
+  - `~/.triparty-framework/config` with the framework home and repo URL;
+  - a portable `triparty` CLI wrapper in a user bin directory already on PATH when possible.
+- In a new session, the agent must first locate the existing framework through `TRIPARTY_FRAMEWORK_HOME`, `~/.triparty-framework/config`, or the installed bootstrap path.
+- The agent must not reconstruct the framework by creating new ad hoc Markdown files when the installed framework cannot be found.
+- If the framework cannot be located, the agent must say it is not installed or not discoverable in the current environment and ask whether to clone or install it.
+- New-session activation should use existing commands (`triparty preflight`, `triparty run`, `triparty status`, or the repository's `scripts/triparty.sh`) rather than inventing a new workflow.
+
 ## Tri-party Collaboration Workflow
 
 - Step 1: Define the shared question, expected deliverable, and decision boundary.

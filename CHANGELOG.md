@@ -6,6 +6,7 @@
 - Added public launch materials: product README, MIT license, contribution guide, examples, and GitHub issue templates.
 - Added release checklist, security notes, and failure-recovery example for partial tri-party runs.
 - Added release gate scripts and Gemini CLI stability hardening: headless policy, policy-hash recording, retry/backoff, runtime-noise sanitization, capacity thresholds, sanitizer-version diagnostics in `state.json`, and release-level state validation.
+- Added a global new-session bootstrap installer so fresh Codex sessions can discover the installed framework instead of recreating Markdown protocols.
 - Added `scripts/triparty.sh` as the unified user-facing CLI.
 - Added `state.json`, `docs/framework/state.schema.json`, and `scripts/triparty-validate-state.py` as the machine-readable run state contract and validator.
 - Added mutual audit gating: Claude audits Gemini, Gemini audits Claude, Codex performs final synthesis.

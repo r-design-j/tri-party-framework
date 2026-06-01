@@ -65,6 +65,31 @@ These follow-ups must not silently fall back to Codex-only execution just becaus
 
 If the user explicitly asks for a fast Codex-only edit, label the result as Codex-only and do not describe it as tri-party-backed.
 
+## New-session Discovery
+
+The framework is not reliably discoverable in a new session unless either the current workspace has `AGENTS.md` or a global bootstrap points to the installed framework.
+
+Install the global bootstrap once per machine:
+
+```bash
+scripts/install-triparty-global-bootstrap.sh
+```
+
+The installer writes:
+
+- a global Codex `AGENTS.md` bootstrap block;
+- `~/.triparty-framework/config` with the installed framework path;
+- a `triparty` wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`.
+
+When triggered in a new session, the agent must locate the existing framework in this order:
+
+1. `TRIPARTY_FRAMEWORK_HOME`;
+2. `~/.triparty-framework/config`;
+3. current workspace `AGENTS.md` / `README.md`;
+4. ask whether to clone `https://github.com/r-design-j/tri-party-framework`.
+
+If discovery fails, the agent must not create new Markdown files to reconstruct the framework. It must report the discovery failure and ask whether to install or clone the framework.
+
 ## Capability Roles
 
 Use the three parties according to their default strengths:

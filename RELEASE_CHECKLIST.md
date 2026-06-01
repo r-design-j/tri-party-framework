@@ -11,6 +11,7 @@ Use this checklist before creating a GitHub release or promoting the project pub
 - [ ] A current tri-party review run has `true_triparty_ready: true`.
 - [ ] `scripts/triparty.sh release-gate <run-dir>` passes for the run supporting the public release.
 - [ ] `scripts/triparty-validate-state.py --release <run-dir>/state.json` passes.
+- [ ] `scripts/install-triparty-global-bootstrap.sh` has been run on the target machine when new-session natural-language triggering is expected.
 - [ ] Gemini capacity events are within the release threshold, and `tool_block_events=0`.
 - [ ] Gemini headless policy SHA256 in `state.json` matches `docs/framework/gemini-headless-policy.toml`.
 - [ ] The release notes do not claim true tri-party output without a run directory and source status.

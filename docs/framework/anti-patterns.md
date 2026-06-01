@@ -119,3 +119,9 @@
 - Failure: Gemini CLI eventually returns text after internal 429 retries, tool-read failures, disconnected MCP noise, or ignored-artifact errors, and the framework marks the artifact as clean `Completed`.
 - Risk: Claude/Codex audit the runtime error log instead of Gemini's actual opinion, or a capacity-degraded run is reported as fully healthy.
 - Prevention: Use the Gemini headless policy, disabled MCP allowlist, longer timeout/retry/backoff, policy-hash recording, sanitized artifacts, sanitizer-version diagnostics in `state.json`, release capacity thresholds, and merge-blocking runtime-noise scans that include terminal warnings as noise.
+
+## AP-021: New Session Recreates The Framework
+
+- Failure: A new agent session cannot discover the installed tri-party framework and creates fresh Markdown files to reconstruct a partial protocol.
+- Risk: The user sees a different framework every session; triggers drift, old fixes disappear, and the agent makes unverifiable claims from improvised docs.
+- Prevention: Install the global bootstrap with `scripts/install-triparty-global-bootstrap.sh`; new sessions must locate `TRIPARTY_FRAMEWORK_HOME`, `~/.triparty-framework/config`, or the installed path before acting. If discovery fails, report it and ask whether to clone/install instead of creating ad hoc framework docs.
