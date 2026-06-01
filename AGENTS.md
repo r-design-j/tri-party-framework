@@ -51,6 +51,7 @@
 - Weak triggers include standalone phrases such as "三方框架", "三方协议", or "tri-party framework" without naming Codex, Claude, and Gemini. For weak triggers, first inspect local `AGENTS.md`/`README.md` if available. If the active context could also mean a design-component/registry/runtime audit, a third-party library, or another three-part structure, ask a concise disambiguation question before proceeding.
 - Disambiguation question: "你指的是 Codex + Claude + Gemini 三方模型协作框架，还是另一个三方结构？"
 - Do not reinterpret the canonical tri-party model framework as a Figma/component-registry/runtime audit, an external third-party framework, or a generic three-part analysis unless the user explicitly says so.
+- Once a workstream is confirmed as the Codex + Claude + Gemini tri-party model framework, follow-up instructions such as "继续", "补齐", "优化", "发布", "外推", or "记录进去" inherit the tri-party protocol unless the user explicitly says to run Codex-only. Codex may still own implementation work, but public delivery, release, or framework claims must pass preflight, independent reviews, mutual cross-audit, and merge gate before being reported as tri-party-backed.
 - Once the canonical trigger is confirmed, execute the normal workflow: preflight, independent reviews, mutual cross-audit, merge gate, and source-status reporting.
 
 ## Tri-party Collaboration Workflow

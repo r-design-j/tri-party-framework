@@ -117,6 +117,8 @@ Use the canonical phrase when asking an agent to activate the framework:
 
 Standalone phrases such as `三方框架` or `三方协议` are weak triggers. If the context also contains design components, registries, runtimes, third-party libraries, or other three-part structures, the agent should ask which one you mean before proceeding.
 
+Within an active Codex + Claude + Gemini workstream, follow-up requests such as "continue", "optimize", "publish", "release", or "fill this in" inherit the tri-party protocol unless the user explicitly asks for Codex-only execution.
+
 ## Common Commands
 
 Run a source check:

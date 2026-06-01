@@ -45,6 +45,26 @@ When ambiguous, ask:
 
 Do not reinterpret the canonical model framework as another three-part structure unless the user explicitly redirects the meaning.
 
+## Inherited Workstream Rule
+
+After the user confirms the current workstream is the Codex + Claude + Gemini tri-party model framework, later follow-up instructions inherit that protocol when they operate on the same framework, repository, release, docs, adapter, UI, or public launch path.
+
+Inherited triggers include ordinary continuation language such as:
+
+- `继续`
+- `补齐`
+- `优化`
+- `发布`
+- `外推`
+- `记录进去`
+- `continue`
+- `release`
+- `publish`
+
+These follow-ups must not silently fall back to Codex-only execution just because Codex is the implementation owner for code and repository work. Codex may make the edits, but tri-party-backed delivery still requires preflight, independent Claude/Gemini reviews, mutual cross-audit, merge gate, and source-status reporting.
+
+If the user explicitly asks for a fast Codex-only edit, label the result as Codex-only and do not describe it as tri-party-backed.
+
 ## Capability Roles
 
 Use the three parties according to their default strengths:

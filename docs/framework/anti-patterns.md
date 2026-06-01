@@ -107,3 +107,9 @@
 - Failure: A user says "三方框架" or "三方协议", and the agent guesses a local three-part design/registry/runtime structure, a third-party library framework, or another governance model instead of the canonical Codex + Claude + Gemini model framework.
 - Risk: The agent claims to use the framework without running preflight, independent reviews, mutual cross-audit, or the merge gate.
 - Prevention: Treat "Codex + Claude + Gemini 三方模型协作框架" as the canonical strong trigger. Treat standalone "三方框架"/"三方协议" as weak triggers; when context is ambiguous, ask whether the user means the Codex + Claude + Gemini model framework or another three-part structure.
+
+## AP-019: Tri-party Context Drop On Follow-up Execution
+
+- Failure: After the user has established the current workstream as the Codex + Claude + Gemini tri-party model framework, the agent treats a follow-up such as "补齐", "继续", "发布", "外推", or "记录进去" as an ordinary Codex-only implementation task and completes repository or GitHub work without running the tri-party protocol first.
+- Risk: The work is presented as part of the tri-party framework while lacking independent Claude/Gemini review, mutual cross-audit, and merge-gate evidence; public releases can ship without the supervision standard the framework itself requires.
+- Prevention: Treat same-workstream follow-ups as inherited tri-party triggers unless the user explicitly requests Codex-only execution. Codex may own code/repo edits, but tri-party-backed delivery requires preflight, independent reviews, mutual cross-audit, merge gate, and source-status reporting before final claims.
