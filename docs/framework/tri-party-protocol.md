@@ -78,8 +78,11 @@ scripts/install-triparty-global-bootstrap.sh
 The installer writes:
 
 - a global Codex `AGENTS.md` bootstrap block;
+- a global Claude Code `~/.claude/CLAUDE.md` bootstrap block;
 - `~/.triparty-framework/config` with the installed framework path;
 - a `triparty` wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`.
+
+Claude Code reads `CLAUDE.md`, not `AGENTS.md`; this repository keeps `CLAUDE.md` as the Claude entrypoint and imports `AGENTS.md` so both agent families share one protocol.
 
 When triggered in a new session, the agent must locate the existing framework in this order:
 

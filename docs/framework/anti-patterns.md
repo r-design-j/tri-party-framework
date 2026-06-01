@@ -124,4 +124,4 @@
 
 - Failure: A new agent session cannot discover the installed tri-party framework and creates fresh Markdown files to reconstruct a partial protocol.
 - Risk: The user sees a different framework every session; triggers drift, old fixes disappear, and the agent makes unverifiable claims from improvised docs.
-- Prevention: Install the global bootstrap with `scripts/install-triparty-global-bootstrap.sh`; new sessions must locate `TRIPARTY_FRAMEWORK_HOME`, `~/.triparty-framework/config`, or the installed path before acting. If discovery fails, report it and ask whether to clone/install instead of creating ad hoc framework docs.
+- Prevention: Install the global bootstrap with `scripts/install-triparty-global-bootstrap.sh`; new sessions must locate `TRIPARTY_FRAMEWORK_HOME`, `~/.triparty-framework/config`, or the installed path before acting. For Claude Code, provide `CLAUDE.md` because Claude Code does not read `AGENTS.md`. If discovery fails, report it and ask whether to clone/install instead of creating ad hoc framework docs.

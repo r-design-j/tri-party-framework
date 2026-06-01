@@ -4,6 +4,8 @@ set -u
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CODEX_HOME_DIR="${CODEX_HOME:-"$HOME/.codex"}"
 CODEX_AGENTS_FILE="$CODEX_HOME_DIR/AGENTS.md"
+CLAUDE_HOME_DIR="${CLAUDE_CONFIG_DIR:-"$HOME/.claude"}"
+CLAUDE_MEMORY_FILE="$CLAUDE_HOME_DIR/CLAUDE.md"
 CONFIG_DIR="${TRIPARTY_CONFIG_DIR:-"$HOME/.triparty-framework"}"
 CONFIG_FILE="$CONFIG_DIR/config"
 if [ -n "${TRIPARTY_BIN_DIR:-}" ]; then
@@ -16,11 +18,17 @@ fi
 BIN_FILE="$BIN_DIR/triparty"
 REPO_URL="https://github.com/r-design-j/tri-party-framework.git"
 
-mkdir -p "$CODEX_HOME_DIR" "$CONFIG_DIR" "$BIN_DIR"
+mkdir -p "$CODEX_HOME_DIR" "$CLAUDE_HOME_DIR" "$CONFIG_DIR" "$BIN_DIR"
 
 if [ ! -f "$CODEX_AGENTS_FILE" ]; then
   cat > "$CODEX_AGENTS_FILE" <<'EOF'
 # Global Codex Working Agreements
+EOF
+fi
+
+if [ ! -f "$CLAUDE_MEMORY_FILE" ]; then
+  cat > "$CLAUDE_MEMORY_FILE" <<'EOF'
+# Global Claude Code Instructions
 EOF
 fi
 
@@ -50,6 +58,7 @@ cat > "$BLOCK_FILE" <<EOF
 - Portable CLI wrapper: \`$BIN_FILE\`.
 - Repository: $REPO_URL.
 - In any new Codex session, if the user asks for "Codex + Claude + Gemini", "三方模型协作框架", "三方模型协议", or a same-workstream follow-up to this framework:
+  - In Claude Code, this same rule must be loaded from \`$CLAUDE_MEMORY_FILE\` or the repository \`CLAUDE.md\`; Claude Code reads \`CLAUDE.md\`, not \`AGENTS.md\`.
   - Do not recreate the framework by inventing new Markdown files.
   - Do not treat standalone "三方框架/三方协议" as a design/registry/runtime audit unless the user explicitly says so.
   - First locate the existing framework via \`TRIPARTY_FRAMEWORK_HOME\`, then \`$CONFIG_FILE\`, then the installed home above.
@@ -76,7 +85,47 @@ awk '
 mv "$CODEX_AGENTS_FILE.tmp2.$$" "$CODEX_AGENTS_FILE"
 rm -f "$AGENTS_TMP" "$BLOCK_FILE"
 
+CLAUDE_BLOCK_FILE="$(mktemp "${TMPDIR:-/tmp}/triparty-claude-bootstrap-block.XXXXXX")"
+cat > "$CLAUDE_BLOCK_FILE" <<EOF
+<!-- BEGIN TRI-PARTY FRAMEWORK BOOTSTRAP -->
+
+## Tri-party Framework Bootstrap
+
+- Canonical framework: Codex + Claude + Gemini 三方模型协作框架.
+- Installed framework home: \`$ROOT_DIR\`.
+- Framework config: \`$CONFIG_FILE\`.
+- Portable CLI wrapper: \`$BIN_FILE\`.
+- Repository: $REPO_URL.
+- Claude Code reads \`CLAUDE.md\`, not \`AGENTS.md\`; this global memory exists so Claude Code sessions can discover the same installed framework.
+- If the user asks for "Codex + Claude + Gemini", "三方模型协作框架", "三方模型协议", or a same-workstream follow-up to this framework:
+  - Do not recreate the framework by inventing new Markdown files.
+  - Do not treat standalone "三方框架/三方协议" as a design/registry/runtime audit unless the user explicitly says so.
+  - First locate the existing framework via \`TRIPARTY_FRAMEWORK_HOME\`, then \`$CONFIG_FILE\`, then the installed home above.
+  - If located, use the existing CLI: \`triparty preflight\`, \`triparty run "<task>"\`, \`triparty status\`, and \`triparty release-gate <run-dir>\`.
+  - If not located, state that the framework is not installed in the current environment and ask whether to clone $REPO_URL.
+  - If the user only says "三方框架" and the target is ambiguous, ask: "你指的是 Codex + Claude + Gemini 三方模型协作框架，还是另一个三方结构？"
+- Same-workstream follow-ups such as "继续", "补齐", "优化", "发布", "外推", or "记录进去" inherit this tri-party framework unless the user explicitly requests single-agent work.
+
+<!-- END TRI-PARTY FRAMEWORK BOOTSTRAP -->
+EOF
+
+CLAUDE_TMP="$CLAUDE_MEMORY_FILE.tmp.$$"
+awk '
+  /<!-- BEGIN TRI-PARTY FRAMEWORK BOOTSTRAP -->/ { skip = 1; next }
+  /<!-- END TRI-PARTY FRAMEWORK BOOTSTRAP -->/ { skip = 0; next }
+  skip != 1 { print }
+' "$CLAUDE_MEMORY_FILE" > "$CLAUDE_TMP"
+{
+  cat "$CLAUDE_TMP"
+  printf '\n'
+  cat "$CLAUDE_BLOCK_FILE"
+  printf '\n'
+} > "$CLAUDE_MEMORY_FILE.tmp2.$$"
+mv "$CLAUDE_MEMORY_FILE.tmp2.$$" "$CLAUDE_MEMORY_FILE"
+rm -f "$CLAUDE_TMP" "$CLAUDE_BLOCK_FILE"
+
 printf 'Installed tri-party global bootstrap.\n'
 printf 'Codex AGENTS: %s\n' "$CODEX_AGENTS_FILE"
+printf 'Claude Code CLAUDE: %s\n' "$CLAUDE_MEMORY_FILE"
 printf 'Config: %s\n' "$CONFIG_FILE"
 printf 'CLI wrapper: %s\n' "$BIN_FILE"

@@ -59,8 +59,10 @@
 - The framework must be installed into the agent's global startup context before it can be reliably triggered outside this repository.
 - Use `scripts/install-triparty-global-bootstrap.sh` to install:
   - a global Codex `AGENTS.md` bootstrap block;
+  - a global Claude Code `~/.claude/CLAUDE.md` bootstrap block;
   - `~/.triparty-framework/config` with the framework home and repo URL;
   - a portable `triparty` CLI wrapper in a user bin directory already on PATH when possible.
+- The repository should also keep `CLAUDE.md` importing `AGENTS.md`, because Claude Code reads `CLAUDE.md` rather than `AGENTS.md`.
 - In a new session, the agent must first locate the existing framework through `TRIPARTY_FRAMEWORK_HOME`, `~/.triparty-framework/config`, or the installed bootstrap path.
 - The agent must not reconstruct the framework by creating new ad hoc Markdown files when the installed framework cannot be found.
 - If the framework cannot be located, the agent must say it is not installed or not discoverable in the current environment and ask whether to clone or install it.

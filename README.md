@@ -48,7 +48,7 @@ Install the new-session bootstrap once on each machine:
 scripts/install-triparty-global-bootstrap.sh
 ```
 
-This writes a global Codex bootstrap block, stores the framework home in `~/.triparty-framework/config`, and creates a `triparty` CLI wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`. New sessions should use this installed framework instead of creating new Markdown files to reconstruct the protocol.
+This writes global bootstrap blocks for Codex and Claude Code, stores the framework home in `~/.triparty-framework/config`, and creates a `triparty` CLI wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`. New sessions should use this installed framework instead of creating new Markdown files to reconstruct the protocol.
 
 Run the full workflow:
 
@@ -138,6 +138,15 @@ Standalone phrases such as `三方框架` or `三方协议` are weak triggers. I
 Within an active Codex + Claude + Gemini workstream, follow-up requests such as "continue", "optimize", "publish", "release", or "fill this in" inherit the tri-party protocol unless the user explicitly asks for Codex-only execution.
 
 If a new session cannot find the installed framework, it must report that discovery failed and ask whether to install or clone the repository. It must not create fresh protocol Markdown files as a substitute for the existing framework.
+
+## Claude Code
+
+Claude Code reads `CLAUDE.md`, not `AGENTS.md`. This repository includes `CLAUDE.md` to import `AGENTS.md`, and `scripts/install-triparty-global-bootstrap.sh` also writes a global `~/.claude/CLAUDE.md` bootstrap block. In Claude Code, use the same canonical trigger and then run the existing CLI:
+
+```bash
+triparty status
+triparty run "你的任务"
+```
 
 ## Common Commands
 
@@ -235,6 +244,7 @@ See [examples](examples/) for:
 ## Project Map
 
 - `AGENTS.md`: stable working agreements inherited by future Codex sessions.
+- `CLAUDE.md`: Claude Code entrypoint that imports `AGENTS.md`.
 - `docs/framework/tri-party-protocol.md`: executable protocol and source rules.
 - `docs/framework/adapter-contract.md`: rules every external adapter must obey.
 - `docs/framework/model-binding.yaml`: current model-version binding for each role.

@@ -43,6 +43,7 @@ require_text() {
 }
 
 require_file "AGENTS.md"
+require_file "CLAUDE.md"
 require_file "README.md"
 require_file "VERSION"
 require_file "CHANGELOG.md"
@@ -85,6 +86,8 @@ require_text "AGENTS.md" 'Tri-party Trigger Contract' "AGENTS records trigger co
 require_text "AGENTS.md" 'New-session Bootstrap Contract' "AGENTS records new-session bootstrap contract"
 require_text "AGENTS.md" 'Codex.*Claude.*Gemini.*三方模型协作框架' "AGENTS records canonical trigger phrase"
 require_text "AGENTS.md" 'follow-up instructions.*inherit the tri-party protocol' "AGENTS records inherited follow-up trigger"
+require_text "CLAUDE.md" '@AGENTS.md' "CLAUDE imports AGENTS"
+require_text "CLAUDE.md" 'Claude Code' "CLAUDE documents Claude Code entrypoint"
 require_text "README.md" 'triparty-cross-audit\.sh' "README documents cross-audit step"
 require_text "README.md" 'triparty\.sh' "README documents unified CLI"
 require_text "README.md" 'triparty_http_adapter\.py' "README documents HTTP adapter"
@@ -93,6 +96,7 @@ require_text "README.md" 'triparty-release-gate\.sh' "README documents release g
 require_text "README.md" 'Standalone phrases such as `三方框架`' "README documents weak trigger ambiguity"
 require_text "README.md" 'follow-up requests.*inherit the tri-party protocol' "README documents inherited workstream trigger"
 require_text "README.md" 'install-triparty-global-bootstrap\.sh' "README documents global bootstrap installer"
+require_text "README.md" 'Claude Code reads `CLAUDE.md`' "README documents Claude Code bootstrap"
 require_text "docs/framework/adapter-contract.md" 'true_triparty_ready' "adapter contract preserves core truth"
 require_text "docs/framework/adapter-contract.md" 'triparty_resume' "adapter contract documents resume"
 require_text "docs/framework/adapter-contract.md" 'completion_marker' "adapter contract documents artifact completion markers"
@@ -103,6 +107,7 @@ require_text "docs/framework/tri-party-protocol.md" 'Gemini audits Claude' "prot
 require_text "docs/framework/tri-party-protocol.md" 'Activation And Ambiguity Rules' "protocol documents activation ambiguity rules"
 require_text "docs/framework/tri-party-protocol.md" 'Inherited Workstream Rule' "protocol documents inherited workstream rule"
 require_text "docs/framework/tri-party-protocol.md" 'New-session Discovery' "protocol documents new-session discovery"
+require_text "docs/framework/tri-party-protocol.md" 'Claude Code reads `CLAUDE.md`' "protocol documents Claude Code discovery"
 require_text "docs/framework/tri-party-protocol.md" 'Gemini CLI Reliability Rules' "protocol documents Gemini CLI reliability rules"
 require_text "docs/framework/tri-party-protocol.md" 'release-gate' "protocol documents release gate"
 require_text "docs/framework/anti-patterns.md" 'Ambiguous Tri-party Trigger Drift' "anti-patterns document trigger drift"
@@ -136,6 +141,7 @@ require_text "scripts/triparty.sh" 'triparty-validate-state.py' "unified run val
 require_text "scripts/triparty-release-gate.sh" 'triparty-validate-state.py' "release gate validates state schema"
 require_text "scripts/triparty-validate-state.py" 'TRIPARTY_RELEASE_MAX_GEMINI_CAPACITY_EVENTS' "state validator enforces Gemini capacity threshold"
 require_text "scripts/install-triparty-global-bootstrap.sh" '\.triparty-framework' "global bootstrap writes discovery config"
+require_text "scripts/install-triparty-global-bootstrap.sh" '\.claude.*/CLAUDE\.md|CLAUDE_MEMORY_FILE' "global bootstrap writes Claude Code memory"
 
 if [ "$FAILED" -eq 0 ]; then
   printf 'triparty lint passed\n'
