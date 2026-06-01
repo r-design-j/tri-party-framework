@@ -40,6 +40,19 @@
 - When one or more parties are unavailable, proceed only with clearly marked partial analysis and list the missing party inputs needed for a true tri-party review.
 - If a previous response incorrectly described Codex sub-agent output as tri-party output, correct the record immediately and add the failure mode to the daily standard extraction candidates.
 
+## Tri-party Trigger Contract
+
+- Canonical activation phrase: "Codex + Claude + Gemini tri-party model collaboration framework" / "Codex + Claude + Gemini 三方模型协作框架".
+- Strong triggers include:
+  - The user explicitly says "Codex + Claude + Gemini".
+  - The user says "三方模型协作框架" or "三方模型协议".
+  - The user asks to run `scripts/triparty.sh`, `triparty_run`, or the "true_triparty_ready" gate.
+  - The user asks for source status, independent review, mutual cross-audit, and merge gate in one request.
+- Weak triggers include standalone phrases such as "三方框架", "三方协议", or "tri-party framework" without naming Codex, Claude, and Gemini. For weak triggers, first inspect local `AGENTS.md`/`README.md` if available. If the active context could also mean a design-component/registry/runtime audit, a third-party library, or another three-part structure, ask a concise disambiguation question before proceeding.
+- Disambiguation question: "你指的是 Codex + Claude + Gemini 三方模型协作框架，还是另一个三方结构？"
+- Do not reinterpret the canonical tri-party model framework as a Figma/component-registry/runtime audit, an external third-party framework, or a generic three-part analysis unless the user explicitly says so.
+- Once the canonical trigger is confirmed, execute the normal workflow: preflight, independent reviews, mutual cross-audit, merge gate, and source-status reporting.
+
 ## Tri-party Collaboration Workflow
 
 - Step 1: Define the shared question, expected deliverable, and decision boundary.

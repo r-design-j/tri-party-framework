@@ -644,10 +644,16 @@ python3 /absolute/path/to/adapters/mcp/triparty_mcp_adapter.py
 
 ### 16.1 Codex 新会话自然语言触发
 
-只要当前 workspace 根目录有 `AGENTS.md`，Codex 新会话会继承其中的工作约定。为了避免误触发或半触发，建议用户明确说：
+只要当前 workspace 根目录有 `AGENTS.md`，Codex 新会话会继承其中的工作约定。为了避免误触发或半触发，建议用户使用**正式唤醒词**：
 
 ```text
-请读取当前 workspace 的 AGENTS.md 和 README，然后用三方框架处理这个任务：
+Codex + Claude + Gemini 三方模型协作框架
+```
+
+推荐完整触发语：
+
+```text
+请读取当前 workspace 的 AGENTS.md 和 README，然后用 Codex + Claude + Gemini 三方模型协作框架处理这个任务：
 <你的任务>
 
 要求：
@@ -657,10 +663,10 @@ python3 /absolute/path/to/adapters/mcp/triparty_mcp_adapter.py
 4. 最终汇报 source status、run 目录和是否 true_triparty_ready。
 ```
 
-更短的触发语也可以：
+更短的强触发语：
 
 ```text
-用三方框架审查这个问题：<问题>
+用 Codex + Claude + Gemini 三方模型协作框架审查这个问题：<问题>
 ```
 
 ```text
@@ -668,10 +674,29 @@ python3 /absolute/path/to/adapters/mcp/triparty_mcp_adapter.py
 ```
 
 ```text
-调用我们已有三方框架，完成后给我 true/partial 状态和证据链。
+调用我们已有 Codex + Claude + Gemini 三方模型框架，完成后给我 true/partial 状态和证据链。
 ```
 
-### 16.2 Codex 收到触发后应该做什么
+### 16.2 弱触发与歧义反问
+
+单独说“**三方框架**”“**三方协议**”“**tri-party framework**”只能算弱触发。因为这些词在不同项目里可能指向：
+
+| 可能含义 | 示例 |
+| --- | --- |
+| 三方模型协作框架 | Codex + Claude + Gemini |
+| 设计审计三方结构 | Figma / component registry / runtime |
+| 外部第三方框架 | third-party library / SDK / vendor framework |
+| 任意三段式治理结构 | 设计 / 代码 / 运行态 |
+
+如果当前上下文存在歧义，agent 不应该自行猜测，而应该先问：
+
+```text
+你指的是 Codex + Claude + Gemini 三方模型协作框架，还是另一个三方结构？
+```
+
+一旦用户确认是 Codex + Claude + Gemini，才进入 preflight、review、cross-audit、merge gate。
+
+### 16.3 Codex 收到触发后应该做什么
 
 新会话触发后，Codex 应按这个顺序执行：
 
@@ -684,7 +709,7 @@ python3 /absolute/path/to/adapters/mcp/triparty_mcp_adapter.py
 | 5 | 读取 `state.json` 和 `merge-status.md` | 判断 true/partial。 |
 | 6 | 最终汇报 run 目录、source status、门禁结果 | 保留可追溯证据。 |
 
-### 16.3 CLI 直接触发
+### 16.4 CLI 直接触发
 
 不依赖 Codex 聊天，也可以直接在终端执行：
 
@@ -698,7 +723,7 @@ scripts/triparty.sh run "请三方审查这个方案是否成立" docs/framework
 scripts/triparty.sh status
 ```
 
-### 16.4 HTTP 触发
+### 16.5 HTTP 触发
 
 启动 HTTP adapter 后：
 
@@ -710,7 +735,7 @@ curl -X POST http://127.0.0.1:8765/run \
 
 这适合未来 UI、CI、自动化平台调用。
 
-### 16.5 MCP 触发
+### 16.6 MCP 触发
 
 配置 MCP adapter 后，在支持 MCP 的客户端中调用：
 
@@ -724,7 +749,7 @@ arguments:
 
 MCP 客户端不应自己判断 true/partial，必须读取工具返回的 stdout 或 run 目录里的 `state.json`。
 
-### 16.6 新会话里的人工补交
+### 16.7 新会话里的人工补交
 
 如果新设备或新会话中 Claude/Gemini 某一方不可用，但用户可以从 GUI/Web 拿到真实输出，可以这样补：
 
@@ -740,7 +765,7 @@ scripts/triparty.sh resume <run-dir>
 - `inject` 记录了 provenance。
 - 后续 cross-audit 和 merge gate 通过。
 
-### 16.7 每日汇总触发
+### 16.8 每日汇总触发
 
 如果用户想在新会话里继续“每日总结 + 标准提炼”，可以这样触发：
 

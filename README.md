@@ -27,6 +27,16 @@ https://github.com/r-design-j/tri-party-framework/archive/refs/heads/main.zip
 
 ## Quick Start
 
+## Trigger In A New Session
+
+Use the canonical phrase when asking any agent to activate the framework:
+
+```text
+请使用 Codex + Claude + Gemini 三方模型协作框架处理这个任务：<任务>
+```
+
+Standalone phrases such as `三方框架` or `三方协议` are weak triggers. If the context also contains design components, registries, runtimes, third-party libraries, or other three-part structures, the agent should ask which one you mean before proceeding.
+
 Use the unified product entrypoint for a full run:
 
 ```bash

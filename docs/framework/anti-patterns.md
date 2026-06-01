@@ -101,3 +101,9 @@
 - Failure: A future UI directly patches files, invents resume behavior, or interprets partial states instead of calling core commands.
 - Risk: UI and CLI drift, making the same run appear different across surfaces.
 - Prevention: Implement offline injection, resume, errors, runs, stats, archive, and MCP access before UI; the UI must consume these surfaces rather than redefine them.
+
+## AP-018: Ambiguous Tri-party Trigger Drift
+
+- Failure: A user says "三方框架" or "三方协议", and the agent guesses a local three-part design/registry/runtime structure, a third-party library framework, or another governance model instead of the canonical Codex + Claude + Gemini model framework.
+- Risk: The agent claims to use the framework without running preflight, independent reviews, mutual cross-audit, or the merge gate.
+- Prevention: Treat "Codex + Claude + Gemini 三方模型协作框架" as the canonical strong trigger. Treat standalone "三方框架"/"三方协议" as weak triggers; when context is ambiguous, ask whether the user means the Codex + Claude + Gemini model framework or another three-part structure.

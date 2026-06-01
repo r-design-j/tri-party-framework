@@ -10,6 +10,41 @@ The tri-party framework means collaboration among exactly three model parties:
 
 Codex sub-agents are useful for parallel Codex work, but they are not Claude or Gemini and must never be reported as their opinions.
 
+## Activation And Ambiguity Rules
+
+The canonical activation phrase is:
+
+```text
+Codex + Claude + Gemini 三方模型协作框架
+```
+
+Strong triggers:
+
+- The user explicitly names `Codex + Claude + Gemini`.
+- The user says `三方模型协作框架` or `三方模型协议`.
+- The user asks to run `scripts/triparty.sh`, `triparty_run`, or the `true_triparty_ready` gate.
+- The user asks for source status, independent review, mutual cross-audit, and merge gate in one request.
+
+Weak triggers:
+
+- Standalone `三方框架`.
+- Standalone `三方协议`.
+- Standalone `tri-party framework`.
+
+Weak triggers are not enough to assume the canonical model framework when the active context could also mean:
+
+- A design component / registry / runtime audit structure.
+- A generic three-part product, architecture, or governance framework.
+- A third-party library, SDK, or vendor framework.
+
+When ambiguous, ask:
+
+```text
+你指的是 Codex + Claude + Gemini 三方模型协作框架，还是另一个三方结构？
+```
+
+Do not reinterpret the canonical model framework as another three-part structure unless the user explicitly redirects the meaning.
+
 ## Capability Roles
 
 Use the three parties according to their default strengths:
