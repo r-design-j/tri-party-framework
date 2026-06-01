@@ -4,6 +4,14 @@
 本文用于把当前 Codex + Claude + Gemini 三方框架从头到尾串起来：它解决什么问题、三方各自负责什么、一次任务如何执行、如何判断结果可信、失败后如何恢复、为什么先做 UI 前底座，以及后续 UI/产品化应该怎么接。
 </callout>
 
+<callout emoji="rocket" background-color="light-green" border-color="green">
+框架下载地址：
+
+GitHub 仓库：<https://github.com/r-design-j/tri-party-framework>
+
+ZIP 下载：<https://github.com/r-design-j/tri-party-framework/archive/refs/heads/main.zip>
+</callout>
+
 ## 1. 一句话定义
 
 三方框架不是“让一个模型假装成三个专家”，而是让 **Codex、Claude、Gemini 三个可核验来源**围绕同一个任务独立产出、相互审计，最后由 Codex 在当前项目环境中合并为一个可追溯、可复验、可迭代的结果。
