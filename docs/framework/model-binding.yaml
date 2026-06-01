@@ -1,0 +1,47 @@
+version: 2026-06-01
+cross_audit:
+  required_for_true_tri_party: true
+  default_pairs:
+    - reviewer: claude
+      target: gemini
+    - reviewer: gemini
+      target: claude
+    - reviewer: codex
+      target: final_synthesis
+parties:
+  codex:
+    capability_role: implementation_owner
+    current_model: Codex GPT-5.5
+    primary_for:
+      - real project code
+      - repository edits
+      - implementation
+      - tests
+      - debugging
+      - in-worktree execution
+  claude:
+    capability_role: reasoning_autonomy_owner
+    current_model: Claude Opus 4.8 / 4.7
+    primary_for:
+      - complex reasoning
+      - architecture tradeoffs
+      - long-chain agent planning
+      - autonomous multi-step strategy
+  gemini:
+    capability_role: multimodal_google_context_owner
+    current_model: Gemini 3.1 Pro Preview
+    cli_model_name: gemini-3.1-pro-preview
+    default_cli_args:
+      - --skip-trust
+      - --allowed-mcp-server-names
+      - __none__
+    disabled_default_mcp_reason: The configured pencil MCP server has been observed as disconnected and can hang headless calls.
+    primary_for:
+      - PDFs
+      - video
+      - audio
+      - images
+      - Google Search context
+      - Google Maps context
+      - URL context
+      - Google ecosystem synthesis

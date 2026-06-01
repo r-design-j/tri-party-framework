@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Tri-party run state",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "core_version",
+    "generated_at",
+    "run_dir",
+    "phase",
+    "true_triparty_ready",
+    "conclusion",
+    "errors",
+    "parties",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "triparty.state.v1"
+    },
+    "core_version": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "run_dir": {
+      "type": "string"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "created",
+        "review_partial",
+        "review_failed",
+        "reviewed",
+        "cross_audit_failed",
+        "cross_audited",
+        "merged_partial",
+        "merged_ready"
+      ]
+    },
+    "true_triparty_ready": {
+      "type": "boolean"
+    },
+    "conclusion": {
+      "type": "string"
+    },
+    "model_binding_sha256": {
+      "type": "string"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stage", "party", "code", "message"],
+        "properties": {
+          "stage": {
+            "type": "string"
+          },
+          "party": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "parties": {
+      "type": "object",
+      "required": ["codex", "claude", "gemini"],
+      "properties": {
+        "codex": {
+          "type": "object",
+          "required": ["status", "role"]
+        },
+        "claude": {
+          "$ref": "#/$defs/external_party_state"
+        },
+        "gemini": {
+          "$ref": "#/$defs/external_party_state"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "required": ["source_status", "cross_audit_status", "merge_status", "merge_input"]
+    }
+  },
+  "$defs": {
+    "external_party_state": {
+      "type": "object",
+      "required": [
+        "preflight",
+        "review",
+        "review_error_code",
+        "review_provenance",
+        "review_provenance_detail",
+        "review_sha256",
+        "cross_audit",
+        "cross_audit_error_code",
+        "cross_audit_provenance",
+        "cross_audit_provenance_detail",
+        "cross_audit_sha256"
+      ],
+      "properties": {
+        "preflight": {
+          "type": "string"
+        },
+        "review": {
+          "type": "string"
+        },
+        "review_error_code": {
+          "type": "string"
+        },
+        "review_provenance": {
+          "type": "string"
+        },
+        "review_provenance_detail": {
+          "$ref": "#/$defs/provenance_detail"
+        },
+        "review_sha256": {
+          "type": "string"
+        },
+        "cross_audit": {
+          "type": "string"
+        },
+        "cross_audit_error_code": {
+          "type": "string"
+        },
+        "cross_audit_provenance": {
+          "type": "string"
+        },
+        "cross_audit_provenance_detail": {
+          "$ref": "#/$defs/provenance_detail"
+        },
+        "cross_audit_sha256": {
+          "type": "string"
+        }
+      }
+    },
+    "provenance_detail": {
+      "type": "object",
+      "required": ["origin", "injected_at", "source_path", "source_sha256", "artifact_sha256"],
+      "properties": {
+        "origin": {
+          "type": "string",
+          "enum": ["automated_cli", "user_supplied"]
+        },
+        "injected_at": {
+          "type": ["string", "null"]
+        },
+        "source_path": {
+          "type": ["string", "null"]
+        },
+        "source_sha256": {
+          "type": ["string", "null"]
+        },
+        "artifact_sha256": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
