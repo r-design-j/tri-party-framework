@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Project documentation
+    url: https://github.com/r-design-j/tri-party-framework#readme
+    about: Start here for install, commands, examples, and source rules.

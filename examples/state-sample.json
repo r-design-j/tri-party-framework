@@ -1,0 +1,73 @@
+{
+  "schema_version": "triparty.state.v1",
+  "core_version": "0.1.0",
+  "generated_at": "2026-06-01T00:00:00Z",
+  "run_dir": "docs/framework/runs/review-YYYYMMDD-HHMMSS",
+  "phase": "merged_ready",
+  "true_triparty_ready": true,
+  "conclusion": "Ready for true tri-party synthesis",
+  "model_binding_sha256": "example-model-binding-sha256",
+  "errors": [],
+  "parties": {
+    "codex": {
+      "status": "Available",
+      "role": "final_synthesis"
+    },
+    "claude": {
+      "preflight": "Available",
+      "review": "Completed",
+      "review_error_code": "E_OK",
+      "review_provenance": "automated_cli",
+      "review_sha256": "example-claude-review-sha256",
+      "review_provenance_detail": {
+        "origin": "automated_cli",
+        "injected_at": null,
+        "source_path": null,
+        "source_sha256": null,
+        "artifact_sha256": "example-claude-review-sha256"
+      },
+      "cross_audit": "Completed",
+      "cross_audit_error_code": "E_OK",
+      "cross_audit_provenance": "automated_cli",
+      "cross_audit_sha256": "example-claude-cross-audit-sha256",
+      "cross_audit_provenance_detail": {
+        "origin": "automated_cli",
+        "injected_at": null,
+        "source_path": null,
+        "source_sha256": null,
+        "artifact_sha256": "example-claude-cross-audit-sha256"
+      }
+    },
+    "gemini": {
+      "preflight": "Available",
+      "review": "Completed",
+      "review_error_code": "E_OK",
+      "review_provenance": "automated_cli",
+      "review_sha256": "example-gemini-review-sha256",
+      "review_provenance_detail": {
+        "origin": "automated_cli",
+        "injected_at": null,
+        "source_path": null,
+        "source_sha256": null,
+        "artifact_sha256": "example-gemini-review-sha256"
+      },
+      "cross_audit": "Completed",
+      "cross_audit_error_code": "E_OK",
+      "cross_audit_provenance": "automated_cli",
+      "cross_audit_sha256": "example-gemini-cross-audit-sha256",
+      "cross_audit_provenance_detail": {
+        "origin": "automated_cli",
+        "injected_at": null,
+        "source_path": null,
+        "source_sha256": null,
+        "artifact_sha256": "example-gemini-cross-audit-sha256"
+      }
+    }
+  },
+  "artifacts": {
+    "source_status": "docs/framework/runs/review-YYYYMMDD-HHMMSS/source-status.md",
+    "cross_audit_status": "docs/framework/runs/review-YYYYMMDD-HHMMSS/cross-audit-status.md",
+    "merge_status": "docs/framework/runs/review-YYYYMMDD-HHMMSS/merge-status.md",
+    "merge_input": "docs/framework/runs/review-YYYYMMDD-HHMMSS/merge-input.md"
+  }
+}
