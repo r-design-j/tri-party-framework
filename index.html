@@ -745,6 +745,56 @@
         gap: 22px;
       }
 
+      .platform-note {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto 24px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 8px 8px 0 var(--ink);
+        display: grid;
+        grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+        min-width: 0;
+      }
+
+      .platform-note strong {
+        display: grid;
+        align-content: center;
+        padding: 24px;
+        border-right: 1px solid var(--line-strong);
+        font-family: var(--font-display);
+        font-size: clamp(25px, 2.5vw, 38px);
+        font-weight: 950;
+        line-height: 1.05;
+      }
+
+      .platform-note p {
+        margin: 0;
+        padding: 24px;
+        font-size: 17px;
+        font-weight: 850;
+        line-height: 1.52;
+      }
+
+      .platform-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .platform-list span {
+        border: 1px solid var(--ink);
+        background: var(--yellow);
+        padding: 6px 10px;
+        font-size: 12px;
+        font-weight: 950;
+        white-space: nowrap;
+      }
+
+      .platform-list span:last-child {
+        background: var(--gray);
+      }
+
       .agent-card {
         min-height: 430px;
         padding: 28px;
@@ -1000,6 +1050,87 @@
         font-size: 16px;
         line-height: 1.42;
         font-weight: 700;
+      }
+
+      .value-field {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 20px 0 82px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .value-card {
+        min-height: 310px;
+        padding: 24px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 8px 8px 0 var(--ink);
+        display: grid;
+        align-content: space-between;
+        min-width: 0;
+      }
+
+      .value-card.main {
+        grid-column: span 2;
+        background: var(--blue);
+      }
+
+      .value-card:nth-child(2) {
+        background: #ffe2a0;
+        transform: rotate(1deg);
+      }
+
+      .value-card:nth-child(3) {
+        background: var(--mint);
+      }
+
+      .value-card:nth-child(4) {
+        background: var(--pink);
+        color: #fff;
+        transform: rotate(-1deg);
+      }
+
+      .value-card:nth-child(5) {
+        background: #f5f5f5;
+      }
+
+      .role-tag {
+        display: inline-flex;
+        width: fit-content;
+        margin-bottom: 18px;
+        padding: 7px 10px;
+        border: 1px solid currentColor;
+        font-size: 12px;
+        font-weight: 950;
+      }
+
+      .value-card h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(30px, 3vw, 46px);
+        line-height: 1.02;
+      }
+
+      .value-card p {
+        margin: 18px 0 0;
+        font-family: var(--font-display);
+        font-size: 17px;
+        font-weight: 760;
+        line-height: 1.42;
+      }
+
+      .value-proof {
+        margin-top: 22px;
+        min-height: 54px;
+        padding: 12px 14px;
+        display: grid;
+        align-content: center;
+        border: 2px solid currentColor;
+        font-size: 15px;
+        font-weight: 950;
+        line-height: 1.3;
       }
 
       .case-wall {
@@ -1581,6 +1712,8 @@
       .definition-title p,
       .def-card h3,
       .def-card p,
+      .value-card h3,
+      .value-card p,
       .case-main h3,
       .case-main p,
       .detail-title h3,
@@ -1827,7 +1960,9 @@
         .tool-card,
         .checklist,
         .definition,
+        .value-field,
         .agent-handoff,
+        .platform-note,
         .install-guide,
         .playground,
         .contact-panel {
@@ -2014,8 +2149,10 @@
 
         .workspace,
         .definition,
+        .value-field,
         .advanced-shell,
         .agent-handoff,
+        .platform-note,
         .install-guide,
         .case-wall,
         .case-detail-wrap,
@@ -2031,6 +2168,7 @@
         .definition-title,
         .definition-grid,
         .def-card,
+        .value-card,
         .agent-card,
         .install-card,
         .command-card,
@@ -2046,6 +2184,7 @@
 
         .definition-title,
         .def-card,
+        .value-card,
         .play-card,
         .contact-panel > div,
         .check-label,
@@ -2068,6 +2207,34 @@
 
         .def-card h3 {
           font-size: 25px;
+        }
+
+        .value-card.main {
+          grid-column: auto;
+        }
+
+        .value-card:nth-child(n) {
+          transform: none;
+        }
+
+        .value-card h3 {
+          font-size: 28px;
+          word-break: normal;
+          overflow-wrap: anywhere;
+        }
+
+        #benefits h2 {
+          max-width: calc(100vw - 32px);
+          font-size: clamp(38px, 11vw, 46px);
+          white-space: normal;
+          word-break: normal;
+          overflow-wrap: anywhere;
+          line-height: 1.05;
+        }
+
+        .platform-note strong {
+          border-right: 0;
+          border-bottom: 1px solid var(--line-strong);
         }
 
         .contact-panel h2,
@@ -2147,6 +2314,7 @@
           <button class="hero-action" type="button" data-copy="请在这台机器上安装 triparty。
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
+先判断系统环境：macOS / Linux / Windows WSL 按当前流程执行；Windows 原生 PowerShell/CMD 安装方案还在迭代中，不要硬跑 bash 脚本，请先建议使用 WSL 或给出适配方案。
 1. clone 仓库并进入目录。
 2. 补齐必要脚本权限。
 3. 运行项目自检。
@@ -2190,11 +2358,74 @@
         </div>
       </section>
 
+      <section class="section-label" id="benefits">
+        <div class="reveal">
+          <h2>日常工作怎么提效</h2>
+          <div class="note">按场景理解会更直接：triparty 不是多叫两个模型聊天，而是把复核、证据和失败定位变成一套可重复流程。</div>
+        </div>
+      </section>
+
+      <section class="value-field reveal" aria-label="triparty 对日常工作的帮助">
+        <article class="value-card main">
+          <div>
+            <span class="role-tag">方案 / 决策</span>
+            <h3>重要想法先过三遍</h3>
+            <p>一个方案先让 Codex 看能不能落地，让 Claude 梳理逻辑，让 Gemini 补外部视角。适合产品方案、内容选题、发布前检查和复杂决策。</p>
+          </div>
+          <div class="value-proof">减少拍脑袋，降低只听一个模型的盲区。</div>
+        </article>
+        <article class="value-card">
+          <div>
+            <span class="role-tag">运营 / 内容</span>
+            <h3>把选题变成可检查流程</h3>
+            <p>从标题、受众、论点到发布检查，每一步都能留下依据，不用靠聊天记录回忆刚才为什么这么定。</p>
+          </div>
+          <div class="value-proof">少返工，复盘更快。</div>
+        </article>
+        <article class="value-card">
+          <div>
+            <span class="role-tag">设计 / 研究</span>
+            <h3>多视角找问题</h3>
+            <p>让不同模型分别看逻辑、体验、外部资料和风险点，再把结论合并，适合页面上线、竞品分析和调研整理。</p>
+          </div>
+          <div class="value-proof">更容易发现漏项。</div>
+        </article>
+        <article class="value-card">
+          <div>
+            <span class="role-tag">开发 / 自动化</span>
+            <h3>失败会说清楚</h3>
+            <p>没有完成就标 partial，缺模型、缺认证、缺 cross-audit 都会被说出来，不把“跑了一半”包装成“已完成”。</p>
+          </div>
+          <div class="value-proof">定位问题更快。</div>
+        </article>
+        <article class="value-card">
+          <div>
+            <span class="role-tag">个人工作台</span>
+            <h3>重复任务沉淀下来</h3>
+            <p>安装、检查、复核、交接都能变成固定入口。以后遇到类似任务，不用重新解释一遍工作流。</p>
+          </div>
+          <div class="value-proof">把一次经验变成下次可复用。</div>
+        </article>
+      </section>
+
       <section class="section-label" id="install">
         <div class="reveal">
           <h2>复制给 Agent</h2>
           <div class="note">最推荐的用法：复制一段委托话术给你的 AI agent，让它在本机安装并回报结果。</div>
         </div>
+      </section>
+
+      <section class="platform-note reveal" aria-label="系统支持说明">
+        <strong>系统支持说明</strong>
+        <p>
+          当前推荐在 macOS、Linux、Windows WSL 中安装。Windows 原生 PowerShell/CMD 安装方案还在迭代中；遇到 Windows 原生环境时，请先让 Agent 建议使用 WSL 或给出适配方案。
+          <span class="platform-list">
+            <span>macOS 可按当前流程</span>
+            <span>Linux 可按当前流程</span>
+            <span>Windows WSL 推荐</span>
+            <span>Windows 原生迭代中</span>
+          </span>
+        </p>
       </section>
 
       <section class="agent-handoff reveal" aria-label="给 Agent 的安装指令">
@@ -2206,6 +2437,7 @@
             <code>请在这台机器上安装 triparty。
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
+先判断系统环境：macOS / Linux / Windows WSL 按当前流程执行；Windows 原生 PowerShell/CMD 安装方案还在迭代中，不要硬跑 bash 脚本，请先建议使用 WSL 或给出适配方案。
 1. clone 仓库并进入目录。
 2. 补齐必要脚本权限。
 3. 运行项目自检。
@@ -2217,6 +2449,7 @@
           <button class="copy" type="button" data-copy="请在这台机器上安装 triparty。
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
+先判断系统环境：macOS / Linux / Windows WSL 按当前流程执行；Windows 原生 PowerShell/CMD 安装方案还在迭代中，不要硬跑 bash 脚本，请先建议使用 WSL 或给出适配方案。
 1. clone 仓库并进入目录。
 2. 补齐必要脚本权限。
 3. 运行项目自检。
@@ -2229,15 +2462,17 @@
           <div>
             <div class="eyebrow"><span class="mini-square"></span>终端命令</div>
             <h3>让 Agent 执行</h3>
-            <p>如果 agent 支持直接运行 shell，就让它执行这组命令。网页仍然不会自动安装，安装动作必须发生在对方本机。</p>
-            <code>git clone https://github.com/r-design-j/tri-party-framework.git
+            <p>如果 agent 支持直接运行 shell，就让它执行这组命令。当前命令适用于 macOS、Linux 和 Windows WSL；Windows 原生安装方案还在迭代中。</p>
+            <code># 适用 macOS / Linux / Windows WSL；Windows 原生安装方案还在迭代中。
+git clone https://github.com/r-design-j/tri-party-framework.git
 cd tri-party-framework
 chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
 scripts/triparty-lint.sh
 scripts/install-triparty-global-bootstrap.sh
 triparty preflight</code>
           </div>
-          <button class="copy" type="button" data-copy="git clone https://github.com/r-design-j/tri-party-framework.git
+          <button class="copy" type="button" data-copy="# 适用 macOS / Linux / Windows WSL；Windows 原生安装方案还在迭代中。
+git clone https://github.com/r-design-j/tri-party-framework.git
 cd tri-party-framework
 chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
 scripts/triparty-lint.sh
