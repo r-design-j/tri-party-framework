@@ -368,11 +368,20 @@
         display: block;
       }
 
-      .hero-action {
+      .hero-actions {
         position: absolute;
         bottom: 42px;
         left: 50%;
         transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        width: min(620px, calc(100vw - 32px));
+      }
+
+      .hero-action {
         display: inline-flex;
         align-items: center;
         gap: 10px;
@@ -386,6 +395,14 @@
         font-weight: 900;
       }
 
+      .hero-action.secondary {
+        padding: 0 17px 0 9px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        color: var(--ink);
+        box-shadow: 5px 5px 0 var(--ink);
+      }
+
       .hero-action span {
         display: grid;
         place-items: center;
@@ -395,6 +412,10 @@
         color: var(--ink);
         border-radius: 50%;
         font-size: 22px;
+      }
+
+      .hero-action.secondary span {
+        background: var(--yellow);
       }
 
       .section-label {
@@ -664,6 +685,53 @@
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 22px;
+      }
+
+      .install-guide {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 56px 0 110px;
+        display: grid;
+        grid-template-columns: 1.12fr 0.94fr 0.94fr;
+        gap: 22px;
+      }
+
+      .install-card {
+        min-height: 420px;
+        padding: 28px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 8px 8px 0 var(--ink);
+        display: grid;
+        align-content: space-between;
+        min-width: 0;
+      }
+
+      .install-card.primary {
+        background: var(--blue);
+      }
+
+      .install-card:nth-child(2) {
+        background: #ffe2a0;
+      }
+
+      .install-card h3 {
+        margin: 18px 0 14px;
+        font-family: var(--font-display);
+        font-size: clamp(34px, 4vw, 58px);
+        line-height: 0.98;
+      }
+
+      .install-card p {
+        margin: 0 0 20px;
+        font-family: var(--font-display);
+        font-size: 17px;
+        line-height: 1.42;
+        font-weight: 800;
+      }
+
+      .install-card code {
+        min-height: 132px;
       }
 
       .command-card {
@@ -1367,6 +1435,8 @@
       .intro-tool,
       .section-label h2,
       .tool-copy h3,
+      .install-card h3,
+      .install-card p,
       .command-card h3,
       .definition-title h2,
       .definition-title p,
@@ -1479,11 +1549,11 @@
         transform: translate(-50%, 0);
       }
 
-      .hero-action.reveal {
+      .hero-actions.reveal {
         transform: translate(-50%, 30px);
       }
 
-      .hero-action.reveal.in {
+      .hero-actions.reveal.in {
         transform: translate(-50%, 0);
       }
 
@@ -1587,13 +1657,14 @@
           overflow-wrap: normal;
         }
 
-        .hero-action {
+        .hero-actions {
           bottom: 62px;
         }
 
         .tool-card,
         .checklist,
         .definition,
+        .install-guide,
         .playground,
         .contact-panel {
           grid-template-columns: 1fr;
@@ -1695,6 +1766,10 @@
           transform: none;
         }
 
+        .install-card {
+          min-height: 360px;
+        }
+
         .check {
           grid-template-columns: 28px 1fr;
         }
@@ -1728,12 +1803,14 @@
           font-size: 22px;
         }
 
-        .hero-action {
+        .hero-actions {
           bottom: 24px;
+          gap: 10px;
         }
 
         .workspace,
         .definition,
+        .install-guide,
         .case-wall,
         .case-detail-wrap,
         .playground,
@@ -1748,6 +1825,7 @@
         .definition-title,
         .definition-grid,
         .def-card,
+        .install-card,
         .command-card,
         .checklist,
         .checks,
@@ -1811,9 +1889,10 @@
           <span class="mark-symbol"><span></span><span></span><span></span></span>
         </a>
         <a class="nav-item active" href="#home"><span class="ico">⌂</span>首页</a>
-        <a class="nav-item" href="#about"><span class="ico">✱</span>定位</a>
-        <a class="nav-item" href="#cases"><span class="ico">▟</span>案例</a>
-        <a class="nav-item" href="#playground"><span class="ico">▰</span>实验场</a>
+        <a class="nav-item" href="#install"><span class="ico">↓</span>安装</a>
+        <a class="nav-item hide-mobile" href="#about"><span class="ico">✱</span>定位</a>
+        <a class="nav-item hide-mobile" href="#cases"><span class="ico">▟</span>案例</a>
+        <a class="nav-item hide-mobile" href="#playground"><span class="ico">▰</span>实验场</a>
       </nav>
       <div class="nav-right">
         <button class="round" type="button" data-load="true" aria-label="加载真三方状态样例" title="加载真三方状态样例">真</button>
@@ -1843,7 +1922,10 @@
           <span>triparty 网页不是 agent 替身，</span>
           <span>它负责看懂状态、复制命令、定位失败。</span>
         </div>
-        <a class="hero-action reveal" href="#inspect"><span>↘</span>打开工具</a>
+        <div class="hero-actions reveal in">
+          <a class="hero-action" href="#inspect"><span>↘</span>打开工具</a>
+          <a class="hero-action secondary" href="https://r-design-j.github.io/tri-party-framework/"><span>↗</span>公开地址</a>
+        </div>
       </section>
 
       <section class="section-label" id="about">
@@ -1876,6 +1958,47 @@
             <p>不直接调用 Codex、Claude、Gemini，不绕过 CLI、Python、HTTP/MCP adapter。</p>
           </article>
         </div>
+      </section>
+
+      <section class="section-label" id="install">
+        <div class="reveal">
+          <h2>本地安装</h2>
+          <div class="note">网页是说明和检查入口。真正使用 triparty，需要先把框架 clone 到本地，再安装全局 bootstrap 和 CLI wrapper。</div>
+        </div>
+      </section>
+
+      <section class="install-guide reveal">
+        <article class="install-card primary">
+          <div class="eyebrow"><span class="mini-square"></span>安装 01</div>
+          <h3>Clone 框架</h3>
+          <p>把 tri-party-framework 拉到本机，进入仓库后先补执行权限并跑 lint，确认脚本和 adapter 可以使用。</p>
+          <code>git clone https://github.com/r-design-j/tri-party-framework.git
+cd tri-party-framework
+chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
+scripts/triparty-lint.sh</code>
+          <button class="copy" type="button" data-copy="git clone https://github.com/r-design-j/tri-party-framework.git
+cd tri-party-framework
+chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
+scripts/triparty-lint.sh"><span class="ico">↗</span>复制</button>
+        </article>
+        <article class="install-card">
+          <div class="eyebrow"><span class="mini-square"></span>安装 02</div>
+          <h3>安装 bootstrap</h3>
+          <p>这一步会写入 Codex / Claude Code 的全局发现规则，安装 `/triparty`、`/tp` 和可移植 `triparty` CLI wrapper。</p>
+          <code>scripts/install-triparty-global-bootstrap.sh
+triparty preflight</code>
+          <button class="copy" type="button" data-copy="scripts/install-triparty-global-bootstrap.sh
+triparty preflight"><span class="ico">↗</span>复制</button>
+        </article>
+        <article class="install-card">
+          <div class="eyebrow"><span class="mini-square"></span>安装 03</div>
+          <h3>打开工具台</h3>
+          <p>本页可以直接打开，也可以通过本地静态服务访问。真实三方运行仍在 CLI、Codex、Claude Code 和 Gemini CLI 中完成。</p>
+          <code>open web/index.html
+python3 -m http.server 4187 --bind 127.0.0.1 --directory web</code>
+          <button class="copy" type="button" data-copy="open web/index.html
+python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">↗</span>复制</button>
+        </article>
       </section>
 
       <section class="section-label" id="inspect">
@@ -2254,6 +2377,7 @@
             <li>冻结 `state.json` / run manifest 字段，避免 UI 猜测协议。</li>
             <li>补齐 true / partial / auth failed / hash mismatch fixtures。</li>
             <li>把当前静态页面接入 HTTP adapter，只读状态，不直接调用模型。</li>
+            <li>公开访问地址：<a href="https://r-design-j.github.io/tri-party-framework/">https://r-design-j.github.io/tri-party-framework/</a></li>
             <li>保留 triparty 作为产品名；正文、说明、按钮默认中文。</li>
           </ul>
         </div>
@@ -2460,7 +2584,7 @@
           auth: "先运行 `scripts/triparty-gemini-auth-doctor.sh`。如果仍是 interactive-auth-required，先在 Gemini CLI 完成登录，再重新跑 `scripts/triparty.sh preflight`。",
           partial: "不要发布。先打开 run 的 `state.json` 和 `partial-report.md`，确认缺的是 review、cross-audit、auth 还是 errors，再补齐后跑 `scripts/triparty.sh release-gate <run-dir>`。",
           noise: "检查 Gemini artifact 中是否出现 capacity、terminal warning、tool block 等 runtime noise。必要时重新跑该阶段，不能把噪声输出当成完成评审。",
-          hash: "停止合并。重新生成 `state.json`，核对 artifact SHA256；如果 artifact 被改过，必须重新跑 review / cross-audit，再执行 `scripts/triparty.sh release-gate <run-dir>`。"
+          hash: "hash mismatch：停止合并。重新生成 `state.json`，核对 artifact SHA256；如果 artifact 被改过，必须重新跑 review / cross-audit，再执行 `scripts/triparty.sh release-gate <run-dir>`。"
         };
         els.errorAdvice.textContent = map[els.errorSelect.value];
         if (announce) setFloating("恢复建议已更新");

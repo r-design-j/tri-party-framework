@@ -8,6 +8,10 @@ Repository: https://github.com/r-design-j/tri-party-framework
 
 Download ZIP: https://github.com/r-design-j/tri-party-framework/archive/refs/heads/main.zip
 
+公开网页工具：https://r-design-j.github.io/tri-party-framework/
+
+![triparty 工具台首屏](web/assets/triparty-home-first-screen.png)
+
 ## What It Does
 
 - Runs a preflight check for Codex, Claude, and Gemini availability.
@@ -30,6 +34,43 @@ Tri-party Framework makes this explicit:
 - Gemini owns multimodal, URL, Google-context, and broad-context review.
 
 Codex sub-agents do not count as Claude or Gemini.
+
+## 本地安装
+
+先 clone 框架并跑本地检查：
+
+```bash
+git clone https://github.com/r-design-j/tri-party-framework.git
+cd tri-party-framework
+chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
+scripts/triparty-lint.sh
+```
+
+每台机器只需要安装一次全局 bootstrap：
+
+```bash
+scripts/install-triparty-global-bootstrap.sh
+```
+
+然后验证已安装的 CLI wrapper：
+
+```bash
+triparty preflight
+```
+
+本地打开可视化工具台：
+
+```bash
+open web/index.html
+```
+
+也可以通过本地静态服务访问：
+
+```bash
+python3 -m http.server 4187 --bind 127.0.0.1 --directory web
+```
+
+然后访问 `http://127.0.0.1:4187`。
 
 ## Quick Demo
 

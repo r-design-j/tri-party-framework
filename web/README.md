@@ -20,7 +20,21 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web
 
 https://r-design-j.github.io/tri-party-framework/
 
+![triparty 工具台首屏](assets/triparty-home-first-screen.png)
+
 当前阶段页面刻意保持静态。它读取粘贴进来的 `state.json`，按核心契约判断真三方 / 部分结果，并提供 CLI 工作流命令卡片、任务命令生成器、失败恢复路由、案例详情和接入清单。
+
+本地安装：
+
+```bash
+git clone https://github.com/r-design-j/tri-party-framework.git
+cd tri-party-framework
+chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
+scripts/triparty-lint.sh
+scripts/install-triparty-global-bootstrap.sh
+triparty preflight
+open web/index.html
+```
 
 已实现交互：
 
@@ -37,6 +51,7 @@ https://r-design-j.github.io/tri-party-framework/
 
 - 首页：说明 `triparty` 是状态检查、使用说明和操作向导，不是 agent 替身。
 - 产品定位：解释真实执行仍在 Codex、Claude Code、Gemini CLI、HTTP/MCP adapter。
+- 本地安装：提供 clone、lint、global bootstrap、preflight 和打开工具台的可复制命令。
 - Run Inspector：粘贴 `state.json` 后判断 true / partial。
 - Case study：展示 Run Inspector、发布门禁、失败恢复、Adapter 接入四个产品化模块。
 - Case details：按参考站详情页结构展开问题、修法、结果和约束。
