@@ -734,6 +734,63 @@
         min-height: 132px;
       }
 
+      .agent-handoff {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 0 0 34px;
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 22px;
+      }
+
+      .agent-card {
+        min-height: 430px;
+        padding: 28px;
+        border: 3px solid var(--ink);
+        box-shadow: 8px 8px 0 var(--ink);
+        display: grid;
+        align-content: space-between;
+        min-width: 0;
+      }
+
+      .agent-card.prompt {
+        background: var(--ink);
+        color: #fff;
+      }
+
+      .agent-card.command {
+        background: var(--mint);
+      }
+
+      .agent-card h3 {
+        margin: 18px 0 14px;
+        font-family: var(--font-display);
+        font-size: clamp(36px, 4vw, 64px);
+        line-height: 0.98;
+      }
+
+      .agent-card p {
+        margin: 0 0 20px;
+        font-family: var(--font-display);
+        font-size: 17px;
+        line-height: 1.42;
+        font-weight: 800;
+      }
+
+      .agent-card.prompt .eyebrow {
+        color: rgba(255, 255, 255, 0.78);
+      }
+
+      .agent-card.prompt code {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+      }
+
+      .agent-card code {
+        min-height: 190px;
+      }
+
       .command-card {
         background: #fff;
         border: 3px solid var(--ink);
@@ -1664,6 +1721,7 @@
         .tool-card,
         .checklist,
         .definition,
+        .agent-handoff,
         .install-guide,
         .playground,
         .contact-panel {
@@ -1770,6 +1828,10 @@
           min-height: 360px;
         }
 
+        .agent-card {
+          min-height: 360px;
+        }
+
         .check {
           grid-template-columns: 28px 1fr;
         }
@@ -1810,6 +1872,7 @@
 
         .workspace,
         .definition,
+        .agent-handoff,
         .install-guide,
         .case-wall,
         .case-detail-wrap,
@@ -1825,6 +1888,7 @@
         .definition-title,
         .definition-grid,
         .def-card,
+        .agent-card,
         .install-card,
         .command-card,
         .checklist,
@@ -1965,6 +2029,55 @@
           <h2>本地安装</h2>
           <div class="note">网页是说明和检查入口。真正使用 triparty，需要先把框架 clone 到本地，再安装全局 bootstrap 和 CLI wrapper。</div>
         </div>
+      </section>
+
+      <section class="agent-handoff reveal" aria-label="给 Agent 的安装指令">
+        <article class="agent-card prompt">
+          <div>
+            <div class="eyebrow"><span class="mini-square"></span>AI 时代入口</div>
+            <h3>复制给 Agent</h3>
+            <p>用户不用逐条阅读安装步骤。把这段话发给 Codex、Claude Code、Gemini CLI 或其他能操作本机终端的 agent，让它按步骤安装并回报结果。</p>
+            <code>请在这台机器上安装 triparty。
+目标仓库：https://github.com/r-design-j/tri-party-framework
+执行要求：
+1. clone 仓库并进入目录。
+2. 补齐脚本和 adapter 执行权限。
+3. 运行 lint。
+4. 安装全局 bootstrap 和 CLI wrapper。
+5. 运行 triparty preflight 验证。
+6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run 说成 true tri-party。
+完成后告诉我本机安装路径和 preflight 结果。</code>
+          </div>
+          <button class="copy" type="button" data-copy="请在这台机器上安装 triparty。
+目标仓库：https://github.com/r-design-j/tri-party-framework
+执行要求：
+1. clone 仓库并进入目录。
+2. 补齐脚本和 adapter 执行权限。
+3. 运行 lint。
+4. 安装全局 bootstrap 和 CLI wrapper。
+5. 运行 triparty preflight 验证。
+6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run 说成 true tri-party。
+完成后告诉我本机安装路径和 preflight 结果。"><span class="ico">↗</span>复制给 Agent</button>
+        </article>
+        <article class="agent-card command">
+          <div>
+            <div class="eyebrow"><span class="mini-square"></span>终端命令</div>
+            <h3>让 Agent 执行</h3>
+            <p>如果 agent 支持直接运行 shell，就让它执行这组命令。网页仍然不会自动安装，安装动作必须发生在对方本机。</p>
+            <code>git clone https://github.com/r-design-j/tri-party-framework.git
+cd tri-party-framework
+chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
+scripts/triparty-lint.sh
+scripts/install-triparty-global-bootstrap.sh
+triparty preflight</code>
+          </div>
+          <button class="copy" type="button" data-copy="git clone https://github.com/r-design-j/tri-party-framework.git
+cd tri-party-framework
+chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
+scripts/triparty-lint.sh
+scripts/install-triparty-global-bootstrap.sh
+triparty preflight"><span class="ico">↗</span>复制命令</button>
+        </article>
       </section>
 
       <section class="install-guide reveal">

@@ -37,6 +37,21 @@ Codex sub-agents do not count as Claude or Gemini.
 
 ## 本地安装
 
+如果你想让 AI agent 直接处理安装，可以把下面这段话发给 Codex、Claude Code、Gemini CLI 或其他能操作本机终端的 agent：
+
+```text
+请在这台机器上安装 triparty。
+目标仓库：https://github.com/r-design-j/tri-party-framework
+执行要求：
+1. clone 仓库并进入目录。
+2. 补齐脚本和 adapter 执行权限。
+3. 运行 lint。
+4. 安装全局 bootstrap 和 CLI wrapper。
+5. 运行 triparty preflight 验证。
+6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run 说成 true tri-party。
+完成后告诉我本机安装路径和 preflight 结果。
+```
+
 先 clone 框架并跑本地检查：
 
 ```bash
