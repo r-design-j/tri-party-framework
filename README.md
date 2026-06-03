@@ -26,6 +26,21 @@ https://r-design-j.github.io/tri-party-framework/
 
 本地安装：
 
+如果用户不想自己看步骤，可以直接把这段话复制给能操作本机终端的 AI agent：
+
+```text
+请在这台机器上安装 triparty。
+目标仓库：https://github.com/r-design-j/tri-party-framework
+执行要求：
+1. clone 仓库并进入目录。
+2. 补齐脚本和 adapter 执行权限。
+3. 运行 lint。
+4. 安装全局 bootstrap 和 CLI wrapper。
+5. 运行 triparty preflight 验证。
+6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run 说成 true tri-party。
+完成后告诉我本机安装路径和 preflight 结果。
+```
+
 ```bash
 git clone https://github.com/r-design-j/tri-party-framework.git
 cd tri-party-framework
@@ -51,6 +66,7 @@ open web/index.html
 
 - 首页：说明 `triparty` 是状态检查、使用说明和操作向导，不是 agent 替身。
 - 产品定位：解释真实执行仍在 Codex、Claude Code、Gemini CLI、HTTP/MCP adapter。
+- 给 Agent 的安装指令：提供可复制的自然语言安装委托和终端命令。
 - 本地安装：提供 clone、lint、global bootstrap、preflight 和打开工具台的可复制命令。
 - Run Inspector：粘贴 `state.json` 后判断 true / partial。
 - Case study：展示 Run Inspector、发布门禁、失败恢复、Adapter 接入四个产品化模块。
