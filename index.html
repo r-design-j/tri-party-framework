@@ -1,0 +1,2530 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>triparty 工具台</title>
+    <style>
+      :root {
+        --ink: #080808;
+        --paper: #ffffff;
+        --line: rgba(8, 8, 8, 0.08);
+        --line-strong: rgba(8, 8, 8, 0.18);
+        --blue: #38c0e8;
+        --pink: #ff2f73;
+        --yellow: #ffd96a;
+        --mint: #a7e8d0;
+        --green: #2fd08c;
+        --gray: #eeeeee;
+        --shadow: 0 24px 80px rgba(8, 8, 8, 0.12);
+        --font-ui: "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Source Han Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-display: "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Source Han Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-brand: "Avenir Next Condensed", "Arial Black", "PingFang SC", "HarmonyOS Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-mono: "SFMono-Regular", "Cascadia Mono", "Menlo", "Consolas", monospace;
+        font-family: var(--font-ui);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px),
+          var(--paper);
+        background-size: 80px 80px;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      .topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 40;
+        height: 49px;
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line-strong);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav-left,
+      .nav-right {
+        display: flex;
+        align-items: stretch;
+      }
+
+      .mark {
+        width: 68px;
+        display: grid;
+        place-items: center;
+        border-right: 1px solid var(--line-strong);
+      }
+
+      .mark-symbol {
+        width: 31px;
+        height: 23px;
+        position: relative;
+      }
+
+      .mark-symbol span {
+        position: absolute;
+        inset: auto 0 0 0;
+        margin: auto;
+        border: 3px solid var(--ink);
+        border-bottom: 0;
+        border-radius: 999px 999px 0 0;
+      }
+
+      .mark-symbol span:nth-child(1) {
+        width: 31px;
+        height: 19px;
+      }
+
+      .mark-symbol span:nth-child(2) {
+        width: 22px;
+        height: 14px;
+      }
+
+      .mark-symbol span:nth-child(3) {
+        width: 13px;
+        height: 9px;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 49px;
+        padding: 0 19px;
+        border-right: 1px solid var(--line-strong);
+        color: var(--ink);
+        text-decoration: none;
+        text-transform: uppercase;
+        font-weight: 800;
+        font-size: 13px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .nav-item.active {
+        background: var(--blue);
+      }
+
+      .nav-item .ico,
+      .round .ico,
+      .copy .ico {
+        width: 18px;
+        height: 18px;
+        display: inline-grid;
+        place-items: center;
+        font-size: 17px;
+        font-weight: 900;
+      }
+
+      .round {
+        align-self: center;
+        width: 33px;
+        height: 33px;
+        border-radius: 50%;
+        border: 0;
+        background: var(--gray);
+        margin-right: 12px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .contact {
+        align-self: center;
+        height: 33px;
+        margin-right: 16px;
+        padding: 0 15px;
+        border: 1px solid var(--ink);
+        background: #fff;
+        color: var(--ink);
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .ruler {
+        display: none;
+      }
+
+      .ruler::after {
+        content: "0     100     200     300     400     500     600     700     800     900     1000     1100     1200     1300     1400";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 5px;
+        color: rgba(8, 8, 8, 0.34);
+        font-size: 10px;
+        word-spacing: 39px;
+        white-space: nowrap;
+      }
+
+      main {
+        padding-top: 49px;
+      }
+
+      section,
+      footer {
+        scroll-margin-top: 72px;
+      }
+
+      .hero {
+        min-height: 1000px;
+        position: relative;
+        display: grid;
+        place-items: center;
+        padding: 160px 24px 110px;
+      }
+
+      .clock {
+        position: absolute;
+        top: 104px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-weight: 900;
+        font-size: 14px;
+      }
+
+      .hero-stack {
+        width: min(920px, calc(100vw - 36px));
+        position: relative;
+        display: grid;
+        justify-items: center;
+        gap: 22px;
+      }
+
+      .scribble {
+        font-family: var(--font-display);
+        font-size: 21px;
+        font-weight: 700;
+        transform: rotate(-2deg);
+      }
+
+      .display-frame {
+        position: relative;
+        border: 3px solid var(--blue);
+        padding: 22px 32px 20px;
+      }
+
+      .display-frame::before,
+      .display-frame::after,
+      .corner::before,
+      .corner::after {
+        content: "";
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background: var(--blue);
+        border: 2px solid var(--ink);
+      }
+
+      .display-frame::before {
+        top: -10px;
+        left: -10px;
+      }
+
+      .display-frame::after {
+        top: -10px;
+        right: -10px;
+      }
+
+      .corner::before {
+        bottom: -10px;
+        left: -10px;
+      }
+
+      .corner::after {
+        bottom: -10px;
+        right: -10px;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: var(--font-brand);
+        font-size: clamp(56px, 11vw, 148px);
+        line-height: 0.86;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+
+      .wide {
+        letter-spacing: 0;
+      }
+
+      .hero-sub {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        font-weight: 900;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--blue);
+        display: inline-block;
+      }
+
+      .sticker {
+        position: absolute;
+        padding: 15px 24px;
+        min-width: 220px;
+        font-size: 14px;
+        line-height: 1.25;
+        font-weight: 900;
+        border: 0;
+        box-shadow: 0 2px 0 rgba(8, 8, 8, 0.08);
+      }
+
+      .sticker.left {
+        left: 4%;
+        top: 28%;
+        background: var(--mint);
+        transform: rotate(14deg);
+      }
+
+      .sticker.right {
+        right: 3%;
+        top: 31%;
+        background: #ffe2a0;
+        transform: rotate(-8deg);
+      }
+
+      .pill-sticker {
+        position: absolute;
+        border: 3px solid var(--ink);
+        border-radius: 999px;
+        padding: 16px 31px;
+        background: var(--pink);
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: 900;
+        bottom: 250px;
+        right: 13%;
+        transform: rotate(-3deg);
+        box-shadow: 5px 5px 0 var(--ink);
+      }
+
+      .chip-sticker {
+        position: absolute;
+        left: 4%;
+        bottom: 120px;
+        padding: 16px 27px;
+        background: var(--yellow);
+        border: 3px solid var(--ink);
+        border-radius: 999px 999px 999px 22px;
+        font-weight: 900;
+        text-transform: uppercase;
+        box-shadow: 5px 5px 0 var(--ink);
+      }
+
+      .intro-tool {
+        position: absolute;
+        bottom: 118px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        font-family: var(--font-display);
+        font-size: clamp(28px, 2.7vw, 38px);
+        font-weight: 800;
+        line-height: 1.14;
+        width: min(860px, calc(100vw - 32px));
+        word-break: keep-all;
+        overflow-wrap: normal;
+      }
+
+      .intro-tool span {
+        display: block;
+      }
+
+      .hero-action {
+        position: absolute;
+        bottom: 42px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        height: 49px;
+        padding: 0 18px 0 9px;
+        border: 0;
+        background: var(--ink);
+        color: #fff;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-weight: 900;
+      }
+
+      .hero-action span {
+        display: grid;
+        place-items: center;
+        width: 39px;
+        height: 39px;
+        background: var(--blue);
+        color: var(--ink);
+        border-radius: 50%;
+        font-size: 22px;
+      }
+
+      .section-label {
+        min-height: 360px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 64px 24px;
+      }
+
+      .section-label h2 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(56px, 8vw, 118px);
+        line-height: 0.96;
+        letter-spacing: 0;
+        text-transform: none;
+        white-space: nowrap;
+        word-break: keep-all;
+      }
+
+      .note {
+        display: inline-block;
+        background: #ffe4a6;
+        margin-top: 28px;
+        padding: 18px 22px;
+        max-width: 540px;
+        text-align: left;
+        font-family: var(--font-display);
+        font-size: 16px;
+        line-height: 1.48;
+        transform: rotate(-3deg);
+      }
+
+      .workspace {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto;
+        display: grid;
+        gap: 28px;
+        padding: 70px 0 120px;
+      }
+
+      .tool-card {
+        position: relative;
+        min-height: 640px;
+        display: grid;
+        grid-template-columns: minmax(280px, 0.78fr) minmax(380px, 1.22fr);
+        border: 0;
+      }
+
+      .boundary-strip {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 14px;
+        min-height: 58px;
+        padding: 14px 18px;
+        border: 3px solid var(--ink);
+        background: #111;
+        color: #fff;
+        box-shadow: 8px 8px 0 var(--ink);
+        font-weight: 900;
+      }
+
+      .boundary-strip strong {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+        padding: 0 12px;
+        background: var(--blue);
+        color: var(--ink);
+      }
+
+      .boundary-strip span {
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .tool-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 260px;
+        height: 74px;
+        background: var(--blue);
+        clip-path: polygon(0 0, 76% 0, 100% 100%, 0 100%);
+        z-index: 1;
+      }
+
+      .tool-copy {
+        position: relative;
+        background: var(--blue);
+        min-height: 640px;
+        padding: 96px 32px 32px;
+      }
+
+      .tool-copy h3 {
+        margin: 24px 0 18px;
+        font-family: var(--font-display);
+        font-size: clamp(42px, 5.8vw, 78px);
+        line-height: 0.92;
+        letter-spacing: 0;
+      }
+
+      .tool-copy p {
+        max-width: 390px;
+        margin: 0 0 32px;
+        font-family: var(--font-display);
+        font-size: 18px;
+        line-height: 1.38;
+        font-weight: 700;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 14px;
+      }
+
+      .mini-square {
+        width: 16px;
+        height: 16px;
+        background: var(--ink);
+        display: inline-block;
+        clip-path: polygon(45% 0, 100% 0, 100% 100%, 0 100%, 0 55%, 45% 55%);
+      }
+
+      .tool-panel {
+        position: relative;
+        background: #101010;
+        color: #fff;
+        min-height: 640px;
+        padding: 34px;
+        border: 3px solid var(--ink);
+        overflow: hidden;
+      }
+
+      .panel-tag {
+        position: absolute;
+        top: 28px;
+        right: 28px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 15px;
+        background: #111;
+        color: var(--blue);
+        text-transform: uppercase;
+        font-weight: 900;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .panel-tag::before {
+        content: "JSON";
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        background: var(--blue);
+        color: var(--ink);
+        font-size: 10px;
+      }
+
+      .status-board {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 76px;
+      }
+
+      .status-cell {
+        min-height: 116px;
+        padding: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .status-cell strong {
+        display: block;
+        color: #fff;
+        font-size: 27px;
+        line-height: 1;
+        margin-bottom: 13px;
+        font-family: var(--font-display);
+      }
+
+      .status-cell span {
+        color: rgba(255, 255, 255, 0.62);
+        text-transform: uppercase;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .meter {
+        margin: 26px 0 22px;
+        height: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        background:
+          linear-gradient(90deg, var(--green) 0 74%, var(--yellow) 74% 88%, var(--pink) 88% 100%);
+        position: relative;
+      }
+
+      .meter::after {
+        content: "真三方 / 部分结果 / 发布门禁";
+        position: absolute;
+        left: 12px;
+        top: 4px;
+        color: #000;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .drop-zone {
+        width: 100%;
+        min-height: 170px;
+        resize: vertical;
+        color: #fff;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+          rgba(255, 255, 255, 0.04);
+        background-size: 24px 24px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 16px;
+        line-height: 1.45;
+      }
+
+      .tool-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .tool-actions button,
+      .copy {
+        min-height: 42px;
+        border: 1px solid #fff;
+        background: #fff;
+        color: var(--ink);
+        padding: 0 14px;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-weight: 900;
+      }
+
+      .tool-actions button.secondary {
+        background: transparent;
+        color: #fff;
+      }
+
+      .result {
+        min-height: 92px;
+        margin-top: 16px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.86);
+        line-height: 1.45;
+      }
+
+      .command-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+      }
+
+      .command-card {
+        background: #fff;
+        border: 3px solid var(--ink);
+        min-height: 270px;
+        padding: 26px;
+        display: grid;
+        align-content: space-between;
+        box-shadow: 8px 8px 0 var(--ink);
+      }
+
+      .command-card:nth-child(2) {
+        background: #ffe2a0;
+        transform: rotate(1deg);
+      }
+
+      .command-card:nth-child(3) {
+        background: #f5f5f5;
+        transform: rotate(-1deg);
+      }
+
+      .command-card:nth-child(4) {
+        background: #a7e8d0;
+      }
+
+      .command-card h3 {
+        margin: 0 0 18px;
+        font-family: var(--font-display);
+        font-size: 28px;
+      }
+
+      code {
+        display: block;
+        color: #fff;
+        background: #0e0e0e;
+        padding: 14px;
+        line-height: 1.5;
+        min-height: 78px;
+        overflow-wrap: anywhere;
+      }
+
+      .copy {
+        width: max-content;
+        margin-top: 18px;
+      }
+
+      .checklist {
+        display: grid;
+        grid-template-columns: 0.92fr 1.08fr;
+        min-height: 520px;
+        margin-top: 40px;
+      }
+
+      .definition {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 90px 0 60px;
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 28px;
+      }
+
+      .definition-title {
+        background: #fff;
+        border: 3px solid var(--ink);
+        min-height: 520px;
+        padding: 34px;
+        display: grid;
+        align-content: center;
+        box-shadow: 8px 8px 0 var(--ink);
+      }
+
+      .definition-title h2 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(46px, 5.4vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+        word-break: keep-all;
+      }
+
+      .definition-title p {
+        margin: 26px 0 0;
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.28;
+      }
+
+      .definition-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .def-card {
+        min-height: 250px;
+        padding: 24px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        display: grid;
+        align-content: space-between;
+      }
+
+      .def-card:nth-child(2) {
+        background: #ffe2a0;
+        transform: rotate(1deg);
+      }
+
+      .def-card:nth-child(3) {
+        background: var(--mint);
+        transform: rotate(-1deg);
+      }
+
+      .def-card:nth-child(4) {
+        background: #f5f5f5;
+      }
+
+      .def-card h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 28px;
+      }
+
+      .def-card p {
+        margin: 20px 0 0;
+        font-family: var(--font-display);
+        font-size: 16px;
+        line-height: 1.42;
+        font-weight: 700;
+      }
+
+      .case-wall {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 70px 0 90px;
+        display: grid;
+        gap: 44px;
+      }
+
+      .case-row {
+        min-height: 520px;
+        display: grid;
+        grid-template-columns: minmax(420px, 0.92fr) minmax(520px, 1.08fr);
+        align-items: stretch;
+        border: 3px solid var(--ink);
+        background: #101010;
+        box-shadow: 8px 8px 0 var(--ink);
+        min-width: 0;
+        width: 100%;
+        color: #fff;
+        overflow: visible;
+      }
+
+      .case-main {
+        position: relative;
+        padding: 104px 36px 34px;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        align-content: space-between;
+        min-width: 0;
+      }
+
+      .case-kicker {
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        width: min(360px, 86%);
+        min-height: 82px;
+        padding: 0 66px 0 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        background: var(--blue);
+        color: var(--ink);
+        font-weight: 900;
+        clip-path: polygon(0 0, calc(100% - 58px) 0, 100% 100%, 0 100%);
+      }
+
+      .case-body {
+        display: grid;
+        align-content: start;
+        min-width: 0;
+      }
+
+      .case-body small {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.78);
+      }
+
+      .case-body small::before {
+        content: "";
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+      }
+
+      .case-main h3 {
+        margin: 0 0 20px;
+        font-family: var(--font-display);
+        font-size: clamp(50px, 5.9vw, 86px);
+        line-height: 0.96;
+        overflow-wrap: anywhere;
+        color: #fff;
+      }
+
+      .case-main p {
+        margin: 0;
+        max-width: 560px;
+        font-family: var(--font-display);
+        font-size: 19px;
+        line-height: 1.42;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+        color: rgba(255, 255, 255, 0.88);
+      }
+
+      .case-link {
+        width: max-content;
+        margin-top: 30px;
+        padding-bottom: 7px;
+        border-bottom: 1px solid #fff;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 900;
+      }
+
+      .case-link:focus-visible,
+      .contact:focus-visible,
+      .nav-item:focus-visible,
+      .hero-action:focus-visible,
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible {
+        outline: 3px solid var(--blue);
+        outline-offset: 3px;
+      }
+
+      .case-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .case-tags span {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 14px;
+        background: #fff;
+        color: var(--ink);
+        font-weight: 900;
+        clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+      }
+
+      .case-art {
+        border-left: 3px solid var(--ink);
+        background:
+          linear-gradient(135deg, rgba(56, 192, 232, 0.28), rgba(255, 217, 106, 0.12)),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+          linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+          #161616;
+        background-size: auto, 42px 42px, 42px 42px, auto;
+        color: #fff;
+        display: grid;
+        place-items: center start;
+        text-align: left;
+        font-weight: 900;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        position: relative;
+        padding: 34px;
+        min-height: 520px;
+      }
+
+      .case-art::before,
+      .case-art::after {
+        content: "";
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background: var(--blue);
+        border: 2px solid var(--ink);
+      }
+
+      .case-art::before {
+        top: -10px;
+        left: -10px;
+      }
+
+      .case-art::after {
+        bottom: -10px;
+        right: -10px;
+      }
+
+      .media-chip {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 0 14px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .media-chip::before {
+        content: "JPG";
+        display: grid;
+        place-items: center;
+        width: 25px;
+        height: 25px;
+        background: var(--ink);
+        color: #fff;
+        font-size: 9px;
+      }
+
+      .case-art strong {
+        display: block;
+        max-width: 460px;
+        text-align: left;
+        font-family: var(--font-display);
+        font-size: clamp(42px, 6vw, 92px);
+        line-height: 0.92;
+      }
+
+      .case-art em {
+        display: block;
+        margin-top: 16px;
+        color: var(--blue);
+        font-style: normal;
+        font-size: 15px;
+        text-align: left;
+      }
+
+      .case-detail-wrap {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 40px 0 80px;
+        display: grid;
+        gap: 28px;
+      }
+
+      .case-detail {
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 8px 8px 0 var(--ink);
+        min-width: 0;
+        scroll-margin-top: 82px;
+      }
+
+      .case-detail:target {
+        outline: 4px solid var(--blue);
+        outline-offset: 8px;
+      }
+
+      .detail-hero {
+        min-height: 360px;
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        border-bottom: 3px solid var(--ink);
+      }
+
+      .detail-title {
+        padding: 34px;
+        display: grid;
+        align-content: end;
+        background: var(--blue);
+        min-width: 0;
+      }
+
+      .detail-title small {
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .detail-title h3 {
+        margin: 18px 0 14px;
+        font-family: var(--font-display);
+        font-size: clamp(42px, 6vw, 86px);
+        line-height: 0.92;
+        overflow-wrap: anywhere;
+      }
+
+      .detail-title p {
+        margin: 0;
+        max-width: 660px;
+        font-family: var(--font-display);
+        font-size: 20px;
+        line-height: 1.36;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+      }
+
+      .detail-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        border-left: 3px solid var(--ink);
+      }
+
+      .meta-cell {
+        min-height: 180px;
+        padding: 22px;
+        border-bottom: 3px solid var(--ink);
+        border-right: 3px solid var(--ink);
+        display: grid;
+        align-content: space-between;
+        font-weight: 900;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .meta-cell:nth-child(2n) {
+        border-right: 0;
+      }
+
+      .meta-cell:nth-last-child(-n + 2) {
+        border-bottom: 0;
+      }
+
+      .meta-cell span:first-child {
+        color: rgba(8, 8, 8, 0.48);
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+
+      .detail-body {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .detail-section {
+        min-height: 270px;
+        padding: 26px;
+        border-right: 3px solid var(--ink);
+        border-bottom: 3px solid var(--ink);
+        min-width: 0;
+      }
+
+      .detail-section:nth-child(3n) {
+        border-right: 0;
+      }
+
+      .detail-section:nth-last-child(-n + 3) {
+        border-bottom: 0;
+      }
+
+      .detail-section h4 {
+        margin: 0 0 18px;
+        font-family: var(--font-display);
+        font-size: 24px;
+        overflow-wrap: anywhere;
+      }
+
+      .detail-section p {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 16px;
+        line-height: 1.48;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
+
+      .playground {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 70px 0 80px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+
+      .play-card {
+        min-height: 430px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        padding: 28px;
+        box-shadow: 8px 8px 0 var(--ink);
+        min-width: 0;
+      }
+
+      .play-card:nth-child(2) {
+        background: #ffe2a0;
+      }
+
+      .play-card h3 {
+        margin: 0 0 18px;
+        font-family: var(--font-display);
+        font-size: 34px;
+        overflow-wrap: anywhere;
+      }
+
+      .play-card label {
+        display: block;
+        margin: 14px 0 8px;
+        font-weight: 900;
+      }
+
+      .play-card textarea,
+      .play-card select {
+        width: 100%;
+        border: 2px solid var(--ink);
+        padding: 14px;
+        background: #fff;
+      }
+
+      .play-card textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+      .generated {
+        margin-top: 16px;
+        padding: 14px;
+        background: #111;
+        color: #fff;
+        min-height: 76px;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+        min-width: 0;
+      }
+
+      .contact-panel {
+        width: min(1040px, calc(100vw - 32px));
+        margin: 0 auto 120px;
+        min-height: 470px;
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        border: 3px solid var(--ink);
+        box-shadow: 8px 8px 0 var(--ink);
+      }
+
+      .contact-panel > div {
+        padding: 34px;
+      }
+
+      .contact-panel > div:first-child {
+        background: var(--pink);
+        color: #fff;
+      }
+
+      .contact-panel h2 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(56px, 6vw, 92px);
+        line-height: 0.96;
+        word-break: keep-all;
+      }
+
+      .contact-panel ul {
+        margin: 0;
+        padding-left: 22px;
+        font-family: var(--font-display);
+        font-size: 18px;
+        line-height: 1.7;
+        font-weight: 800;
+      }
+
+      .check-label {
+        background: var(--pink);
+        color: #fff;
+        padding: 38px;
+        display: grid;
+        align-content: center;
+      }
+
+      .check-label h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(56px, 6vw, 92px);
+        line-height: 0.96;
+        word-break: keep-all;
+      }
+
+      .checks {
+        background: #fff;
+        border: 3px solid var(--ink);
+        padding: 26px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .check-summary {
+        min-height: 92px;
+        padding: 16px;
+        border: 2px solid var(--ink);
+        background: #f5f5f5;
+        display: grid;
+        align-content: center;
+        gap: 10px;
+        font-weight: 900;
+      }
+
+      .check-summary strong {
+        font-size: 20px;
+      }
+
+      .check-summary span {
+        line-height: 1.35;
+      }
+
+      .check-progress {
+        height: 10px;
+        background: #fff;
+        border: 1px solid var(--ink);
+        overflow: hidden;
+      }
+
+      .check-progress span {
+        display: block;
+        width: 0;
+        height: 100%;
+        background: var(--green);
+        transition: width 0.25s ease;
+      }
+
+      .check {
+        display: grid;
+        grid-template-columns: 28px 1fr auto;
+        align-items: center;
+        gap: 13px;
+        min-height: 54px;
+        border-bottom: 1px solid var(--line-strong);
+        font-weight: 900;
+      }
+
+      .check.completed span:last-child {
+        color: var(--green);
+      }
+
+      .check input {
+        width: 24px;
+        height: 24px;
+        accent-color: var(--blue);
+      }
+
+      .check span:last-child {
+        font-size: 12px;
+        color: rgba(8, 8, 8, 0.48);
+        text-transform: uppercase;
+      }
+
+      .footer {
+        position: relative;
+        min-height: 620px;
+        display: grid;
+        place-items: center;
+        padding: 80px 24px;
+      }
+
+      .footer h2 {
+        margin: 0;
+        text-align: center;
+        font-family: var(--font-display);
+        font-size: clamp(70px, 12vw, 180px);
+        line-height: 0.92;
+        word-break: keep-all;
+      }
+
+      .floating-result {
+        position: fixed;
+        left: 24px;
+        bottom: 22px;
+        z-index: 44;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        max-width: min(480px, calc(100vw - 48px));
+        padding: 11px 14px;
+        background: #fff;
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        box-shadow: var(--shadow);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      body,
+      button,
+      input,
+      textarea,
+      select {
+        font-family: var(--font-ui);
+        font-synthesis-weight: none;
+      }
+
+      .scribble,
+      .intro-tool,
+      .section-label h2,
+      .tool-copy h3,
+      .command-card h3,
+      .definition-title h2,
+      .definition-title p,
+      .def-card h3,
+      .def-card p,
+      .case-main h3,
+      .case-main p,
+      .detail-title h3,
+      .detail-title p,
+      .detail-section h4,
+      .detail-section p,
+      .play-card h3,
+      .contact-panel h2,
+      .contact-panel ul,
+      .check-label h3,
+      .footer h2,
+      .note {
+        font-family: var(--font-display);
+      }
+
+      .nav-item,
+      .contact,
+      .round,
+      .eyebrow,
+      .case-art,
+      .meta-cell,
+      .tool-actions button,
+      .copy,
+      .check,
+      .status-cell strong,
+      .status-cell span {
+        font-family: var(--font-ui);
+      }
+
+      code,
+      .drop-zone,
+      #runCommand {
+        font-family: var(--font-mono);
+        overflow-wrap: anywhere;
+      }
+
+      .generated {
+        font-family: var(--font-ui);
+      }
+
+      .loader {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        background:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px),
+          rgba(255, 255, 255, 0.96);
+        background-size: 80px 80px;
+        display: grid;
+        place-items: center;
+        animation: lift 1.25s ease 1.4s forwards;
+      }
+
+      .loader-badge {
+        min-width: 96px;
+        min-height: 78px;
+        padding: 17px 28px;
+        display: grid;
+        place-items: center;
+        background: var(--blue);
+        border: 3px solid var(--ink);
+        border-radius: 14px;
+        font-family: var(--font-display);
+        font-size: 38px;
+        font-weight: 800;
+        animation: badge 1.2s ease forwards;
+      }
+
+      @keyframes lift {
+        to {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+
+      @keyframes badge {
+        0% {
+          transform: scale(0.9);
+        }
+        45% {
+          transform: scale(1.08);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
+
+      .reveal.in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .intro-tool.reveal {
+        transform: translate(-50%, 30px);
+      }
+
+      .intro-tool.reveal.in {
+        transform: translate(-50%, 0);
+      }
+
+      .hero-action.reveal {
+        transform: translate(-50%, 30px);
+      }
+
+      .hero-action.reveal.in {
+        transform: translate(-50%, 0);
+      }
+
+      .sticker.left.reveal {
+        transform: rotate(14deg) translateY(30px);
+      }
+
+      .sticker.left.reveal.in {
+        transform: rotate(14deg) translateY(0);
+      }
+
+      .sticker.right.reveal {
+        transform: rotate(-8deg) translateY(30px);
+      }
+
+      .sticker.right.reveal.in {
+        transform: rotate(-8deg) translateY(0);
+      }
+
+      .pill-sticker.reveal {
+        transform: rotate(-3deg) translateY(30px);
+      }
+
+      .pill-sticker.reveal.in {
+        transform: rotate(-3deg) translateY(0);
+      }
+
+      @media (max-width: 900px) {
+        .topbar {
+          height: auto;
+          min-height: 49px;
+          align-items: center;
+        }
+
+        .nav-item {
+          padding: 0 12px;
+          font-size: 11px;
+        }
+
+        .nav-item:nth-child(n + 4) {
+          display: none;
+        }
+
+        .round {
+          display: none;
+        }
+
+        .contact {
+          margin-right: 8px;
+          padding: 0 10px;
+        }
+
+        .ruler {
+          display: none;
+        }
+
+        main {
+          padding-top: 49px;
+        }
+
+        .hero {
+          min-height: 850px;
+          padding-top: 120px;
+        }
+
+        .clock {
+          top: 82px;
+        }
+
+        .display-frame {
+          padding: 16px 18px;
+        }
+
+        .sticker {
+          min-width: 150px;
+          padding: 11px 13px;
+          font-size: 11px;
+        }
+
+        .sticker.left {
+          left: 4%;
+          top: 23%;
+        }
+
+        .sticker.right {
+          right: 4%;
+          top: 27%;
+        }
+
+        .pill-sticker,
+        .chip-sticker {
+          display: none;
+        }
+
+        .intro-tool {
+          bottom: 132px;
+          width: min(340px, calc(100vw - 32px));
+          font-size: 24px;
+          line-height: 1.12;
+          word-break: keep-all;
+          overflow-wrap: normal;
+        }
+
+        .hero-action {
+          bottom: 62px;
+        }
+
+        .tool-card,
+        .checklist,
+        .definition,
+        .playground,
+        .contact-panel {
+          grid-template-columns: 1fr;
+        }
+
+        .boundary-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .definition-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .def-card:nth-child(n) {
+          transform: none;
+        }
+
+        .case-row {
+          grid-template-columns: 1fr;
+          min-height: auto;
+        }
+
+        .case-main {
+          min-height: 420px;
+          padding: 98px 24px 26px;
+        }
+
+        .case-kicker {
+          width: min(330px, calc(100vw - 34px));
+          min-height: 72px;
+          padding: 0 58px 0 22px;
+        }
+
+        .case-main h3 {
+          font-size: clamp(42px, 11vw, 58px);
+        }
+
+        .case-main p {
+          font-size: 17px;
+        }
+
+        .case-tags span {
+          min-height: 40px;
+          padding: 0 12px;
+        }
+
+        .detail-hero,
+        .detail-body,
+        .detail-meta {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-meta {
+          border-left: 0;
+        }
+
+        .meta-cell,
+        .meta-cell:nth-child(2n),
+        .detail-section,
+        .detail-section:nth-child(3n) {
+          border-right: 0;
+        }
+
+        .meta-cell:nth-last-child(-n + 2),
+        .detail-section:nth-last-child(-n + 3) {
+          border-bottom: 3px solid var(--ink);
+        }
+
+        .meta-cell:last-child,
+        .detail-section:last-child {
+          border-bottom: 0;
+        }
+
+        .case-art {
+          min-height: 280px;
+          border-left: 0;
+          border-top: 3px solid var(--ink);
+        }
+
+        .case-art strong {
+          font-size: clamp(42px, 13vw, 64px);
+        }
+
+        .tool-copy,
+        .tool-panel {
+          min-height: auto;
+        }
+
+        .tool-copy {
+          padding-top: 86px;
+        }
+
+        .status-board,
+        .command-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .command-card:nth-child(n) {
+          transform: none;
+        }
+
+        .check {
+          grid-template-columns: 28px 1fr;
+        }
+
+        .check span:last-child {
+          grid-column: 2;
+        }
+
+        .floating-result {
+          left: 12px;
+          right: 12px;
+          bottom: 12px;
+          max-width: none;
+          border-radius: 14px;
+          justify-content: flex-start;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .hero {
+          min-height: 760px;
+          padding: 96px 16px 82px;
+        }
+
+        .clock {
+          top: 94px;
+        }
+
+        .intro-tool {
+          bottom: 94px;
+          font-size: 22px;
+        }
+
+        .hero-action {
+          bottom: 24px;
+        }
+
+        .workspace,
+        .definition,
+        .case-wall,
+        .case-detail-wrap,
+        .playground,
+        .contact-panel {
+          width: min(100%, calc(100vw - 32px));
+        }
+
+        .section-label h2 {
+          font-size: clamp(44px, 14vw, 56px);
+        }
+
+        .definition-title,
+        .definition-grid,
+        .def-card,
+        .command-card,
+        .checklist,
+        .checks,
+        .play-card,
+        .case-detail,
+        .contact-panel,
+        .tool-card {
+          min-width: 0;
+          max-width: 100%;
+        }
+
+        .definition-title,
+        .def-card,
+        .play-card,
+        .contact-panel > div,
+        .check-label,
+        .checks {
+          padding: 24px;
+        }
+
+        .definition-title h2 {
+          font-size: clamp(38px, 12vw, 46px);
+          white-space: normal;
+        }
+
+        .def-card h3 {
+          font-size: 25px;
+        }
+
+        .contact-panel h2,
+        .check-label h3 {
+          font-size: clamp(42px, 13vw, 54px);
+          white-space: normal;
+        }
+
+        .footer h2 {
+          font-size: clamp(54px, 17vw, 72px);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loader" aria-hidden="true">
+      <div class="loader-badge">triparty</div>
+    </div>
+
+    <header class="topbar">
+      <nav class="nav-left" aria-label="主导航">
+        <a class="mark" href="#home" aria-label="triparty 首页">
+          <span class="mark-symbol"><span></span><span></span><span></span></span>
+        </a>
+        <a class="nav-item active" href="#home"><span class="ico">⌂</span>首页</a>
+        <a class="nav-item" href="#about"><span class="ico">✱</span>定位</a>
+        <a class="nav-item" href="#cases"><span class="ico">▟</span>案例</a>
+        <a class="nav-item" href="#playground"><span class="ico">▰</span>实验场</a>
+      </nav>
+      <div class="nav-right">
+        <button class="round" type="button" data-load="true" aria-label="加载真三方状态样例" title="加载真三方状态样例">真</button>
+        <button class="round" type="button" data-load="partial" aria-label="加载部分结果状态样例" title="加载部分结果状态样例">偏</button>
+        <a class="contact" href="#contact"><span>♥</span>接入</a>
+      </div>
+    </header>
+    <div class="ruler" aria-hidden="true"></div>
+
+    <main id="home">
+      <section class="hero">
+        <div class="clock" id="clock">10:38:00 AM</div>
+        <div class="hero-stack reveal">
+          <div class="scribble">UI 前产品化基线</div>
+          <div class="display-frame">
+            <span class="corner"></span>
+            <h1>triparty</h1>
+          </div>
+          <div class="hero-sub"><span class="dot"></span>状态检查 · 使用说明 · 操作向导</div>
+        </div>
+
+        <div class="sticker left reveal">Codex 负责代码<br />Claude 审计逻辑</div>
+        <div class="sticker right reveal">Gemini 校验上下文<br />门禁阻断假真三方</div>
+        <div class="pill-sticker reveal">真三方运行：20260603</div>
+        <div class="chip-sticker reveal">可移植核心</div>
+        <div class="intro-tool reveal">
+          <span>triparty 网页不是 agent 替身，</span>
+          <span>它负责看懂状态、复制命令、定位失败。</span>
+        </div>
+        <a class="hero-action reveal" href="#inspect"><span>↘</span>打开工具</a>
+      </section>
+
+      <section class="section-label" id="about">
+        <div class="reveal">
+          <h2>产品定位</h2>
+          <div class="note">真实执行仍在 Codex、Claude Code、Gemini CLI、HTTP/MCP adapter 中。网页只负责可视化、解释和引导。</div>
+        </div>
+      </section>
+
+      <section class="definition reveal">
+        <div class="definition-title">
+          <h2>它到底是什么</h2>
+          <p>triparty UI 是可视化使用说明手册、状态检查器、操作向导和失败恢复导航。它帮助人理解协议，不冒充协议。</p>
+        </div>
+        <div class="definition-grid">
+          <article class="def-card">
+            <h3>是仪表盘</h3>
+            <p>读取 `state.json`、展示 phase、true_triparty_ready、每个模型的 review / cross-audit 状态。</p>
+          </article>
+          <article class="def-card">
+            <h3>是说明手册</h3>
+            <p>把 triparty 的角色分工、发布门禁、partial 规则，用中文讲清楚。</p>
+          </article>
+          <article class="def-card">
+            <h3>是操作向导</h3>
+            <p>根据任务生成 CLI 命令，帮助用户回到真实 agent / terminal 中执行。</p>
+          </article>
+          <article class="def-card">
+            <h3>不是 agent</h3>
+            <p>不直接调用 Codex、Claude、Gemini，不绕过 CLI、Python、HTTP/MCP adapter。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-label" id="inspect">
+        <div class="reveal">
+          <h2>运行检查器</h2>
+          <div class="note">粘贴 `state.json` 文件。页面只读取核心协议结果，判断真三方或部分结果，不自行发明新规则。</div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="boundary-strip reveal" role="note" aria-label="执行边界提示">
+          <strong>只生成命令，不执行模型</strong>
+          <span>本页只读 `state.json` 并生成可复制命令；真实执行请回到 Codex、Claude Code、Gemini CLI、CLI/Python/HTTP/MCP adapter。</span>
+        </div>
+
+        <article class="tool-card reveal">
+          <div class="tool-copy">
+            <div class="eyebrow"><span class="mini-square"></span>模块 01</div>
+            <h3>状态门禁</h3>
+            <p>读取可移植核心输出，保留来源标签，让 UI 判断始终服从 `state.json`。</p>
+            <div class="eyebrow"><span class="dot"></span>当前基线</div>
+          </div>
+
+          <div class="tool-panel">
+            <div class="panel-tag">state.json</div>
+            <div class="status-board" aria-live="polite">
+              <div class="status-cell"><strong id="phase">merged_ready</strong><span>阶段</span></div>
+              <div class="status-cell"><strong id="ready">true</strong><span>真三方</span></div>
+              <div class="status-cell"><strong id="errors">0</strong><span>错误数</span></div>
+            </div>
+            <div class="meter"></div>
+            <textarea id="stateInput" class="drop-zone" spellcheck="false" aria-label="粘贴 state JSON"></textarea>
+            <div class="tool-actions">
+              <button type="button" id="analyze">检查状态</button>
+              <button class="secondary" type="button" id="sampleTrue">加载真三方</button>
+              <button class="secondary" type="button" id="samplePartial">加载部分结果</button>
+            </div>
+            <div class="result" id="result">等待 state.json。UI 只读取核心输出，不自行把部分结果升级为真三方。</div>
+          </div>
+        </article>
+
+        <div class="command-grid reveal" id="commands">
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 01</div>
+              <h3>来源检查</h3>
+              <code>scripts/triparty.sh preflight</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/triparty.sh preflight"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 02</div>
+              <h3>新运行</h3>
+              <code>scripts/triparty.sh run '&lt;task&gt;'</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/triparty.sh run '<task>'"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 03</div>
+              <h3>发布门禁</h3>
+              <code>scripts/triparty.sh release-gate docs/framework/runs/review-YYYYMMDD-HHMMSS</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/triparty.sh release-gate docs/framework/runs/review-YYYYMMDD-HHMMSS"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 04</div>
+              <h3>会话接续</h3>
+              <code>scripts/triparty.sh continuity bootstrap</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/triparty.sh continuity bootstrap"><span class="ico">↗</span>复制</button>
+          </article>
+        </div>
+
+        <section class="checklist reveal" id="checklist">
+          <div class="check-label">
+            <h3>UI 前置</h3>
+          </div>
+          <div class="checks">
+            <div class="check-summary" id="checkSummary" aria-live="polite">
+              <strong id="checkCount">0 / 6 已完成</strong>
+              <span id="checkNext">等待 checklist 状态。</span>
+              <div class="check-progress" aria-hidden="true"><span id="checkProgress"></span></div>
+            </div>
+            <label class="check"><input type="checkbox" checked /><span>已提交 RC 基线</span><span>已完成</span></label>
+            <label class="check"><input type="checkbox" checked /><span>提交后 fresh 真三方运行</span><span>已完成</span></label>
+            <label class="check"><input type="checkbox" checked /><span>fresh run 发布门禁</span><span>已完成</span></label>
+            <label class="check"><input type="checkbox" /><span>冻结 HTTP / MCP 契约</span><span>下一步</span></label>
+            <label class="check"><input type="checkbox" /><span>安装 / 卸载 / doctor 流程</span><span>下一步</span></label>
+            <label class="check"><input type="checkbox" /><span>真三方 / 部分 / 失败 fixtures</span><span>下一步</span></label>
+          </div>
+        </section>
+      </section>
+
+      <section class="section-label" id="cases">
+        <div class="reveal">
+          <h2>案例研究</h2>
+          <div class="note">参考站的 case study 结构被转译为 triparty 的产品化模块，每张卡都是一个真实能力边界。</div>
+        </div>
+      </section>
+
+      <section class="case-wall">
+        <article class="case-row reveal">
+          <div class="case-main">
+            <div class="case-kicker"><span>案例 01</span><span>已实现</span></div>
+            <div class="case-body">
+              <small>2026-06-03</small>
+              <h3>Run Inspector</h3>
+              <p>把 `state.json` 粘进来，页面立即判断真三方或部分结果。它是现在最真实可用的功能。</p>
+              <a class="case-link" href="#detail-run-inspector" data-case="Run Inspector">查看详情 ↗</a>
+            </div>
+            <div class="case-tags"><span>state.json</span><span>true / partial</span></div>
+          </div>
+          <div class="case-art"><span class="media-chip">state view</span><div><strong>state.json</strong><em>可视化状态检查</em></div></div>
+        </article>
+        <article class="case-row reveal">
+          <div class="case-main">
+            <div class="case-kicker"><span>案例 02</span><span>已实现</span></div>
+            <div class="case-body">
+              <small>2026-06-03</small>
+              <h3>发布门禁</h3>
+              <p>把 release-gate 需要检查的内容视觉化：review、cross-audit、Gemini auth、errors、hash/provenance。</p>
+              <a class="case-link" href="#detail-release-gate" data-case="发布门禁">查看详情 ↗</a>
+            </div>
+            <div class="case-tags"><span>release-gate</span><span>evidence</span></div>
+          </div>
+          <div class="case-art"><span class="media-chip">gate view</span><div><strong>gate ready</strong><em>发布门禁解释</em></div></div>
+        </article>
+        <article class="case-row reveal">
+          <div class="case-main">
+            <div class="case-kicker"><span>案例 03</span><span>已实现</span></div>
+            <div class="case-body">
+              <small>2026-06-03</small>
+              <h3>失败恢复</h3>
+              <p>把 `E_GEMINI_INTERACTIVE_AUTH_REQUIRED`、runtime noise、hash mismatch 映射成中文解释和下一条命令。</p>
+              <a class="case-link" href="#detail-failure-recovery" data-case="失败恢复">查看详情 ↗</a>
+            </div>
+            <div class="case-tags"><span>error map</span><span>doctor</span></div>
+          </div>
+          <div class="case-art"><span class="media-chip">route view</span><div><strong>error map</strong><em>失败恢复路由</em></div></div>
+        </article>
+        <article class="case-row reveal">
+          <div class="case-main">
+            <div class="case-kicker"><span>案例 04</span><span>下一步</span></div>
+            <div class="case-body">
+              <small>2026-06-03</small>
+              <h3>Adapter 接入</h3>
+              <p>HTTP/MCP adapter 负责真实连接，UI 负责展示 contract、复制请求、解释返回结果。</p>
+              <a class="case-link" href="#detail-adapter" data-case="Adapter 接入">查看详情 ↗</a>
+            </div>
+            <div class="case-tags"><span>HTTP/MCP</span><span>contract</span></div>
+          </div>
+          <div class="case-art"><span class="media-chip">adapter view</span><div><strong>HTTP/MCP</strong><em>只读接入边界</em></div></div>
+        </article>
+      </section>
+
+      <section class="section-label" id="case-details">
+        <div class="reveal">
+          <h2>案例详情</h2>
+          <div class="note">参考站的项目详情页被转译为四个 triparty 产品模块：问题、修法、发生了什么、结果、约束和下一步。</div>
+        </div>
+      </section>
+
+      <section class="case-detail-wrap">
+        <article class="case-detail reveal" id="detail-run-inspector">
+          <div class="detail-hero">
+            <div class="detail-title">
+              <small>案例 01 · 已实现</small>
+              <h3>Run Inspector</h3>
+              <p>面向第一次使用 triparty 的人，把一次 run 的结果从命令行文件变成可读、可检查、可解释的页面。</p>
+            </div>
+            <div class="detail-meta">
+              <div class="meta-cell"><span>角色</span><span>状态解释器</span></div>
+              <div class="meta-cell"><span>数据源</span><span>state.json</span></div>
+              <div class="meta-cell"><span>平台</span><span>静态 Web</span></div>
+              <div class="meta-cell"><span>状态</span><span>已可体验</span></div>
+            </div>
+          </div>
+          <div class="detail-body">
+            <div class="detail-section">
+              <h4>真实问题</h4>
+              <p>用户看见一堆 run artifact 时，不知道哪些字段代表“真三方”，哪些只是 probe 成功，容易把 partial run 误读为完整结论。</p>
+            </div>
+            <div class="detail-section">
+              <h4>怎么修</h4>
+              <p>只读取 `true_triparty_ready`、party review、cross-audit、Gemini auth、errors 等核心字段。UI 不新增协议规则。</p>
+            </div>
+            <div class="detail-section">
+              <h4>发生了什么</h4>
+              <p>点击“加载真三方”或“加载部分结果”，页面会改写状态卡片和底部提示，让用户马上看到门禁差异。</p>
+            </div>
+            <div class="detail-section">
+              <h4>结果</h4>
+              <p>它已经不只是说明文字，而是能解析 JSON 的前端检查器。真实运行时只需要把 run 目录里的 `state.json` 粘贴进来。</p>
+            </div>
+            <div class="detail-section">
+              <h4>约束</h4>
+              <p>它不会直接读取本机文件，也不会直接调用模型；这样避免把浏览器页面变成未经审计的执行入口。</p>
+            </div>
+            <div class="detail-section">
+              <h4>下一步</h4>
+              <p>冻结 run manifest schema 后，可以把粘贴输入升级为 HTTP adapter 只读加载，仍然不直接执行 agent。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="case-detail reveal" id="detail-release-gate">
+          <div class="detail-hero">
+            <div class="detail-title">
+              <small>案例 02 · 已实现</small>
+              <h3>发布门禁</h3>
+              <p>把 release-gate 的判断变成可解释界面：为什么能发、为什么不能发、缺哪一方证据。</p>
+            </div>
+            <div class="detail-meta">
+              <div class="meta-cell"><span>角色</span><span>发布前检查</span></div>
+              <div class="meta-cell"><span>数据源</span><span>release-gate + state.json</span></div>
+              <div class="meta-cell"><span>平台</span><span>CLI 生成 / Web 展示</span></div>
+              <div class="meta-cell"><span>状态</span><span>已可体验</span></div>
+            </div>
+          </div>
+          <div class="detail-body">
+            <div class="detail-section">
+              <h4>真实问题</h4>
+              <p>“能不能发布”不能靠聊天结论，必须依赖文件证据、hash、来源标签和 completion marker。</p>
+            </div>
+            <div class="detail-section">
+              <h4>怎么修</h4>
+              <p>页面把发布前命令、状态摘要和 partial 阻断语放在同一视图里，用户可以复制命令回 terminal 执行。</p>
+            </div>
+            <div class="detail-section">
+              <h4>发生了什么</h4>
+              <p>真三方样例会显示可支持发布声明；partial 样例会明确写出不能升级为真三方。</p>
+            </div>
+            <div class="detail-section">
+              <h4>结果</h4>
+              <p>产品化价值在于降低判断成本，而不是绕过 release-gate。真正的 gate 仍由脚本执行。</p>
+            </div>
+            <div class="detail-section">
+              <h4>约束</h4>
+              <p>页面不会把 Codex 行渲染成“已完成 review”。Codex 在三方结论中负责当前会话 synthesis。</p>
+            </div>
+            <div class="detail-section">
+              <h4>下一步</h4>
+              <p>补全 artifact SHA256、sanitizer_version、retry/timeout 的可视字段，让门禁解释更完整。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="case-detail reveal" id="detail-failure-recovery">
+          <div class="detail-hero">
+            <div class="detail-title">
+              <small>案例 03 · 已实现</small>
+              <h3>失败恢复</h3>
+              <p>把最常见的 triparty 失败变成中文恢复路线，而不是让用户在 stderr 和日志里猜。</p>
+            </div>
+            <div class="detail-meta">
+              <div class="meta-cell"><span>角色</span><span>排障向导</span></div>
+              <div class="meta-cell"><span>数据源</span><span>错误码映射</span></div>
+              <div class="meta-cell"><span>平台</span><span>Web + CLI</span></div>
+              <div class="meta-cell"><span>状态</span><span>已可体验</span></div>
+            </div>
+          </div>
+          <div class="detail-body">
+            <div class="detail-section">
+              <h4>真实问题</h4>
+              <p>Gemini auth、runtime noise、hash mismatch、partial run 是不同问题，混在一起会导致错误修复路径。</p>
+            </div>
+            <div class="detail-section">
+              <h4>怎么修</h4>
+              <p>Playground 提供错误码下拉选择，输出对应中文解释和下一条命令，避免把 partial 说成 true。</p>
+            </div>
+            <div class="detail-section">
+              <h4>发生了什么</h4>
+              <p>选择错误码后，页面会立即给出 doctor、preflight、release-gate 或重跑 review 的建议。</p>
+            </div>
+            <div class="detail-section">
+              <h4>结果</h4>
+              <p>这是可体验功能，不是纯文档。它让新用户知道下一步该回到哪个真实执行面。</p>
+            </div>
+            <div class="detail-section">
+              <h4>约束</h4>
+              <p>恢复建议不会自动执行，避免误触发模型、网络或文件写入。</p>
+            </div>
+            <div class="detail-section">
+              <h4>下一步</h4>
+              <p>把映射表从内联 JS 抽到稳定 JSON，并由 regression 覆盖错误码文案。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="case-detail reveal" id="detail-adapter">
+          <div class="detail-hero">
+            <div class="detail-title">
+              <small>案例 04 · 待接入</small>
+              <h3>Adapter 接入</h3>
+              <p>真正的产品化不是让网页直接变 agent，而是让 UI 清楚展示 CLI、Python、HTTP/MCP adapter 的边界。</p>
+            </div>
+            <div class="detail-meta">
+              <div class="meta-cell"><span>角色</span><span>接入说明</span></div>
+              <div class="meta-cell"><span>数据源</span><span>HTTP/MCP adapter</span></div>
+              <div class="meta-cell"><span>平台</span><span>本地服务</span></div>
+              <div class="meta-cell"><span>状态</span><span>下一阶段</span></div>
+            </div>
+          </div>
+          <div class="detail-body">
+            <div class="detail-section">
+              <h4>真实问题</h4>
+              <p>如果网页看起来像能一键调用三模型，用户会误以为浏览器就是执行层，反而破坏可信边界。</p>
+            </div>
+            <div class="detail-section">
+              <h4>怎么修</h4>
+              <p>UI 只展示 contract、复制请求、解释返回。真实调用仍在 CLI、Python、HTTP/MCP adapter。</p>
+            </div>
+            <div class="detail-section">
+              <h4>发生了什么</h4>
+              <p>当前页面已经把接入清单写清楚：冻结状态字段、补 fixtures、只读接入 adapter。</p>
+            </div>
+            <div class="detail-section">
+              <h4>结果</h4>
+              <p>它能承接产品化演示和外部接入沟通，但不越权承诺浏览器端能完成三方运行。</p>
+            </div>
+            <div class="detail-section">
+              <h4>约束</h4>
+              <p>HTTP adapter 默认 loopback，本地服务也不能被 UI 文案包装成公网 SaaS。</p>
+            </div>
+            <div class="detail-section">
+              <h4>下一步</h4>
+              <p>补 `ui-scope.md`、`surface-binding.yaml` 或等价文档，再接入只读 API。</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-label" id="playground">
+        <div class="reveal">
+          <h2>实验场</h2>
+          <div class="note">参考站 Playground 被改造成真实可用的小工具：命令生成器和失败恢复路由。</div>
+        </div>
+      </section>
+
+      <section class="playground reveal">
+        <article class="play-card">
+          <h3>任务命令生成器</h3>
+          <label for="taskInput">输入这次要交给 triparty 的任务</label>
+          <textarea id="taskInput">审查 UI 前产品化基线，确认是否可以进入 contract / doctor / fixtures 阶段。</textarea>
+          <div class="tool-actions">
+            <button type="button" id="buildRun">生成命令文本</button>
+            <button class="secondary" type="button" id="copyRun">复制到 CLI</button>
+          </div>
+          <div class="generated" id="runCommand">scripts/triparty.sh run '审查 UI 前产品化基线，确认是否可以进入 contract / doctor / fixtures 阶段。'</div>
+        </article>
+        <article class="play-card">
+          <h3>失败恢复路由</h3>
+          <label for="errorSelect">选择错误码</label>
+          <select id="errorSelect">
+            <option value="auth">E_GEMINI_INTERACTIVE_AUTH_REQUIRED</option>
+            <option value="partial">true_triparty_ready=false</option>
+            <option value="noise">runtime noise</option>
+            <option value="hash">hash mismatch</option>
+          </select>
+          <div class="tool-actions">
+            <button type="button" id="explainError">生成恢复建议</button>
+          </div>
+          <div class="generated" id="errorAdvice">先运行 `scripts/triparty-gemini-auth-doctor.sh`。如果仍是 interactive-auth-required，先在 Gemini CLI 完成登录，再重新跑 `scripts/triparty.sh preflight`。</div>
+        </article>
+      </section>
+
+      <section class="contact-panel reveal" id="contact">
+        <div>
+          <h2>接下来接入</h2>
+        </div>
+        <div>
+          <ul>
+            <li>冻结 `state.json` / run manifest 字段，避免 UI 猜测协议。</li>
+            <li>补齐 true / partial / auth failed / hash mismatch fixtures。</li>
+            <li>把当前静态页面接入 HTTP adapter，只读状态，不直接调用模型。</li>
+            <li>保留 triparty 作为产品名；正文、说明、按钮默认中文。</li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="reveal">
+          <h2>准备发布</h2>
+          <div class="note">下一阶段：冻结 contract、生成 fixtures，再把这个页面接到 HTTP adapter。</div>
+        </div>
+      </footer>
+    </main>
+
+    <div class="floating-result" id="floating" role="status" aria-live="polite"><span class="dot"></span>基线干净。粘贴 state.json 开始检查。</div>
+
+    <script>
+      const trueState = {
+        schema_version: "triparty.state.v1",
+        core_version: "0.1.0",
+        generated_at: "2026-06-03T02:37:01Z",
+        runs_dir: "docs/framework/runs",
+        run_dir: "docs/framework/runs/review-20260603-103438",
+        phase: "merged_ready",
+        true_triparty_ready: true,
+        conclusion: "Ready for true tri-party synthesis",
+        errors: [],
+        parties: {
+          codex: { status: "Available", role: "final_synthesis" },
+          claude: { preflight: "Available", review: "Completed", cross_audit: "Completed" },
+          gemini: {
+            preflight: "Available",
+            auth_doctor: { status: "authenticated" },
+            review: "Completed",
+            review_diagnostics: { capacity_events: 0, tool_block_events: 0, sanitized: 1 },
+            cross_audit: "Completed",
+            cross_audit_diagnostics: { capacity_events: 0, tool_block_events: 0, sanitized: 1 }
+          }
+        }
+      };
+
+      const partialState = {
+        schema_version: "triparty.state.v1",
+        phase: "review_partial",
+        true_triparty_ready: false,
+        conclusion: "部分结果：Gemini 需要登录认证",
+        errors: [{ stage: "preflight", party: "gemini", code: "E_GEMINI_INTERACTIVE_AUTH_REQUIRED", message: "需要交互式认证" }],
+        parties: {
+          codex: { status: "Available", role: "final_synthesis" },
+          claude: { preflight: "Available", review: "Completed", cross_audit: "Missing" },
+          gemini: { preflight: "Unavailable", auth_doctor: { status: "interactive-auth-required" }, review: "Missing", cross_audit: "Missing" }
+        }
+      };
+
+      const els = {
+        input: document.getElementById("stateInput"),
+        analyze: document.getElementById("analyze"),
+        sampleTrue: document.getElementById("sampleTrue"),
+        samplePartial: document.getElementById("samplePartial"),
+        taskInput: document.getElementById("taskInput"),
+        buildRun: document.getElementById("buildRun"),
+        copyRun: document.getElementById("copyRun"),
+        runCommand: document.getElementById("runCommand"),
+        errorSelect: document.getElementById("errorSelect"),
+        explainError: document.getElementById("explainError"),
+        errorAdvice: document.getElementById("errorAdvice"),
+        phase: document.getElementById("phase"),
+        ready: document.getElementById("ready"),
+        errors: document.getElementById("errors"),
+        result: document.getElementById("result"),
+        floating: document.getElementById("floating"),
+        clock: document.getElementById("clock"),
+        checkCount: document.getElementById("checkCount"),
+        checkNext: document.getElementById("checkNext"),
+        checkProgress: document.getElementById("checkProgress")
+      };
+      const checkItems = Array.from(document.querySelectorAll(".check input"));
+
+      function setClock() {
+        const now = new Date();
+        els.clock.textContent = now.toLocaleTimeString("zh-CN", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      }
+
+      function setFloating(text, color = "var(--blue)") {
+        els.floating.innerHTML = `<span class="dot" style="background:${color}"></span>${text}`;
+      }
+
+      function updateChecklist(announce = false) {
+        const total = checkItems.length;
+        const done = checkItems.filter((input) => input.checked).length;
+        const next = checkItems.find((input) => !input.checked);
+
+        checkItems.forEach((input) => {
+          const row = input.closest(".check");
+          const status = row.querySelector("span:last-child");
+          row.classList.toggle("completed", input.checked);
+          status.textContent = input.checked ? "已完成" : "下一步";
+        });
+
+        els.checkCount.textContent = `${done} / ${total} 已完成`;
+        els.checkProgress.style.width = `${Math.round((done / total) * 100)}%`;
+        if (next) {
+          const nextText = next.closest(".check").querySelector("span:nth-of-type(1)").textContent;
+          els.checkNext.textContent = `下一步：${nextText}`;
+        } else {
+          els.checkNext.textContent = "UI 前置项已全部完成。";
+        }
+
+        if (announce) {
+          setFloating(next ? `checklist 已更新：${done}/${total}，下一步已刷新` : "checklist 已全部完成", next ? "var(--blue)" : "var(--green)");
+        }
+      }
+
+      function summarize(state) {
+        const claude = state.parties?.claude || {};
+        const gemini = state.parties?.gemini || {};
+        const geminiAuth = gemini.auth_doctor?.status || "unknown";
+        const errors = Array.isArray(state.errors) ? state.errors : [];
+        const trueReady = state.true_triparty_ready === true;
+        const allExternal =
+          claude.review === "Completed" &&
+          claude.cross_audit === "Completed" &&
+          gemini.review === "Completed" &&
+          gemini.cross_audit === "Completed";
+        const authOk = geminiAuth === "authenticated";
+        const releaseReady = trueReady && allExternal && authOk && errors.length === 0;
+
+        els.phase.textContent = state.phase || "unknown";
+        els.ready.textContent = String(Boolean(state.true_triparty_ready));
+        els.errors.textContent = String(errors.length);
+
+        if (releaseReady) {
+          return {
+            ok: true,
+            text: `真三方：${state.run_dir || "run"} 可以支持发布声明。Claude/Gemini 评审与交叉审计已完成，Gemini auth=${geminiAuth}。`
+          };
+        }
+
+        const missing = [];
+        if (!trueReady) missing.push("true_triparty_ready=false");
+        if (!allExternal) missing.push("review/cross-audit 未完整");
+        if (!authOk) missing.push(`Gemini auth=${geminiAuth}`);
+        if (errors.length) missing.push(`${errors.length} 个 error`);
+        return {
+          ok: false,
+          text: `部分结果：不能升级为真三方。原因：${missing.join("，")}。`
+        };
+      }
+
+      function analyzeInput() {
+        try {
+          const state = JSON.parse(els.input.value);
+          const summary = summarize(state);
+          els.result.textContent = summary.text;
+          setFloating(summary.ok ? "真三方已就绪" : "部分结果被拦截", summary.ok ? "var(--green)" : "var(--pink)");
+        } catch (error) {
+          els.result.textContent = `JSON 解析失败：${error.message}`;
+          setFloating("JSON 无效", "var(--pink)");
+        }
+      }
+
+      function loadState(state) {
+        els.input.value = JSON.stringify(state, null, 2);
+        analyzeInput();
+      }
+
+      function shellQuote(value) {
+        return `'${String(value).replace(/'/g, "'\\''")}'`;
+      }
+
+      async function copyText(text, successText, fallbackText) {
+        try {
+          await navigator.clipboard.writeText(text);
+          setFloating(successText);
+          return true;
+        } catch {
+          const scratch = document.createElement("textarea");
+          scratch.value = text;
+          scratch.setAttribute("readonly", "");
+          scratch.style.position = "fixed";
+          scratch.style.left = "-9999px";
+          document.body.appendChild(scratch);
+          scratch.select();
+          try {
+            const copied = document.execCommand("copy");
+            setFloating(copied ? successText : fallbackText, copied ? "var(--blue)" : "var(--pink)");
+            return copied;
+          } catch {
+            setFloating(fallbackText, "var(--pink)");
+            return false;
+          } finally {
+            document.body.removeChild(scratch);
+          }
+        }
+      }
+
+      function buildRunCommand(announce = false) {
+        const task = els.taskInput.value.trim() || "审查当前 triparty 工作流";
+        els.runCommand.textContent = `scripts/triparty.sh run ${shellQuote(task)}`;
+        if (announce) setFloating("run 命令文本已生成");
+      }
+
+      function explainErrorCode(announce = false) {
+        const map = {
+          auth: "先运行 `scripts/triparty-gemini-auth-doctor.sh`。如果仍是 interactive-auth-required，先在 Gemini CLI 完成登录，再重新跑 `scripts/triparty.sh preflight`。",
+          partial: "不要发布。先打开 run 的 `state.json` 和 `partial-report.md`，确认缺的是 review、cross-audit、auth 还是 errors，再补齐后跑 `scripts/triparty.sh release-gate <run-dir>`。",
+          noise: "检查 Gemini artifact 中是否出现 capacity、terminal warning、tool block 等 runtime noise。必要时重新跑该阶段，不能把噪声输出当成完成评审。",
+          hash: "停止合并。重新生成 `state.json`，核对 artifact SHA256；如果 artifact 被改过，必须重新跑 review / cross-audit，再执行 `scripts/triparty.sh release-gate <run-dir>`。"
+        };
+        els.errorAdvice.textContent = map[els.errorSelect.value];
+        if (announce) setFloating("恢复建议已更新");
+      }
+
+      els.analyze.addEventListener("click", analyzeInput);
+      els.sampleTrue.addEventListener("click", () => loadState(trueState));
+      els.samplePartial.addEventListener("click", () => loadState(partialState));
+      els.buildRun.addEventListener("click", () => buildRunCommand(true));
+      els.copyRun.addEventListener("click", async () => {
+        buildRunCommand();
+        await copyText(els.runCommand.textContent, "run 命令已复制", "复制失败，请从实验场手动复制");
+      });
+      els.explainError.addEventListener("click", () => explainErrorCode(true));
+      els.errorSelect.addEventListener("change", () => explainErrorCode(true));
+      document.querySelector('[data-load="true"]').addEventListener("click", () => loadState(trueState));
+      document.querySelector('[data-load="partial"]').addEventListener("click", () => loadState(partialState));
+      checkItems.forEach((input) => input.addEventListener("change", () => updateChecklist(true)));
+
+      document.querySelectorAll("[data-copy]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const text = button.getAttribute("data-copy");
+          await copyText(text, "命令已复制", "复制失败，请从卡片手动复制");
+        });
+      });
+
+      const navLinks = Array.from(document.querySelectorAll('.nav-item[href^="#"]'));
+      function setActiveNav(hash) {
+        navLinks.forEach((item) => item.classList.toggle("active", item.getAttribute("href") === hash));
+      }
+
+      navLinks.forEach((link) => {
+        link.addEventListener("click", () => setActiveNav(link.getAttribute("href")));
+      });
+      document.querySelector(".mark").addEventListener("click", () => setActiveNav("#home"));
+      document.querySelectorAll(".case-link").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          const targetHash = link.getAttribute("href");
+          const target = document.querySelector(targetHash);
+          if (target) {
+            history.pushState(null, "", targetHash);
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+          setFloating(`已跳到 ${link.dataset.case} 详情`);
+        });
+      });
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add("in");
+          });
+        },
+        { threshold: 0.18 }
+      );
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+      setClock();
+      setInterval(setClock, 1000);
+      buildRunCommand();
+      explainErrorCode();
+      updateChecklist();
+      loadState(trueState);
+    </script>
+  </body>
+</html>
