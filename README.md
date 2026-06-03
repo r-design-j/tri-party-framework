@@ -44,11 +44,11 @@ Codex sub-agents do not count as Claude or Gemini.
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
 1. clone 仓库并进入目录。
-2. 补齐脚本和 adapter 执行权限。
-3. 运行 lint。
-4. 安装全局 bootstrap 和 CLI wrapper。
+2. 补齐必要脚本权限。
+3. 运行项目自检。
+4. 安装全局发现规则和 triparty 命令。
 5. 运行 triparty preflight 验证。
-6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run 说成 true tri-party。
+6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run / 未完成协作说成 true tri-party / 完整三方。
 完成后告诉我本机安装路径和 preflight 结果。
 ```
 
@@ -358,7 +358,7 @@ See [examples](examples/) for:
 - `scripts/triparty-regression.sh`: historical failure-mode regression tests.
 - `adapters/http/triparty_http_adapter.py`: local HTTP adapter.
 - `adapters/mcp/triparty_mcp_adapter.py`: stdio MCP adapter.
-- `web/index.html`: triparty UI 前静态网页工具，用于 `state.json` 检查、命令生成、失败恢复、案例详情和接入清单。
+- `web/index.html`: triparty 可视化网页工具，默认提供面向普通用户的 Agent 安装委托，并把状态检查、命令生成、失败恢复、证据详情和开发接入折叠到高级工具区。
 - `docs/daily/`: daily summaries and reusable standard extraction.
 
 直接打开 triparty 工具台：
