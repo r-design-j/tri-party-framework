@@ -16,6 +16,10 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web
 
 然后访问 `http://127.0.0.1:4187`。
 
+公开访问地址：
+
+https://r-design-j.github.io/tri-party-framework/
+
 当前阶段页面刻意保持静态。它读取粘贴进来的 `state.json`，按核心契约判断真三方 / 部分结果，并提供 CLI 工作流命令卡片、任务命令生成器、失败恢复路由、案例详情和接入清单。
 
 已实现交互：
