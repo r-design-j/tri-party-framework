@@ -1552,11 +1552,13 @@
 
       .footer h2 {
         margin: 0;
+        max-width: min(100%, 1240px);
         text-align: center;
         font-family: var(--font-display);
-        font-size: clamp(70px, 12vw, 180px);
+        font-size: clamp(56px, 9vw, 136px);
         line-height: 0.92;
-        word-break: keep-all;
+        word-break: normal;
+        overflow-wrap: anywhere;
       }
 
       .floating-result {
@@ -2914,9 +2916,18 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
 
       const navLinks = Array.from(document.querySelectorAll('.nav-item[href^="#"]'));
       const advanced = document.getElementById("advanced");
+      function revealAdvancedContent() {
+        if (!advanced?.open) return;
+        advanced.classList.add("in");
+        advanced.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
+      }
+
       function openAdvancedForHash(hash) {
         if (!advanced || !hash) return;
-        if (hash === "#advanced" || advanced.querySelector(hash)) advanced.open = true;
+        if (hash === "#advanced" || advanced.querySelector(hash)) {
+          advanced.open = true;
+          revealAdvancedContent();
+        }
       }
 
       function setActiveNav(hash) {
@@ -2931,6 +2942,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
         });
       });
       document.querySelector(".mark").addEventListener("click", () => setActiveNav("#home"));
+      advanced?.addEventListener("toggle", revealAdvancedContent);
       window.addEventListener("hashchange", () => openAdvancedForHash(window.location.hash));
       document.querySelectorAll(".case-link").forEach((link) => {
         link.addEventListener("click", (event) => {
