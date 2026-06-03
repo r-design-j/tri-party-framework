@@ -302,7 +302,14 @@ See [examples](examples/) for:
 - `scripts/triparty-regression.sh`: historical failure-mode regression tests.
 - `adapters/http/triparty_http_adapter.py`: local HTTP adapter.
 - `adapters/mcp/triparty_mcp_adapter.py`: stdio MCP adapter.
+- `web/index.html`: triparty UI 前静态网页工具，用于 `state.json` 检查、命令生成、失败恢复、案例详情和接入清单。
 - `docs/daily/`: daily summaries and reusable standard extraction.
+
+直接打开 triparty 工具台：
+
+```bash
+open web/index.html
+```
 
 ## Good For
 
