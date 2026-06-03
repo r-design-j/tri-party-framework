@@ -118,7 +118,7 @@
         border-right: 1px solid var(--line-strong);
         color: var(--ink);
         text-decoration: none;
-        text-transform: uppercase;
+        text-transform: none;
         font-weight: 800;
         font-size: 13px;
         line-height: 1;
@@ -165,7 +165,7 @@
         align-items: center;
         gap: 9px;
         text-decoration: none;
-        text-transform: uppercase;
+        text-transform: none;
         font-size: 12px;
         font-weight: 900;
       }
@@ -196,16 +196,16 @@
       }
 
       .hero {
-        min-height: min(840px, calc(100svh - 49px));
+        min-height: min(760px, calc(100svh - 118px));
         position: relative;
         display: grid;
         place-items: center;
-        padding: 68px 24px 112px;
+        padding: 54px 24px 96px;
       }
 
       .clock {
         position: absolute;
-        top: 86px;
+        top: 72px;
         left: 50%;
         transform: translateX(-50%);
         font-weight: 900;
@@ -309,14 +309,14 @@
 
       .sticker.left {
         left: 9%;
-        top: 30%;
+        top: 26%;
         background: var(--mint);
         transform: rotate(14deg);
       }
 
       .sticker.right {
         right: 8%;
-        top: 31%;
+        top: 28%;
         background: #ffe2a0;
         transform: rotate(-8deg);
       }
@@ -328,10 +328,10 @@
         padding: 16px 31px;
         background: var(--pink);
         color: #fff;
-        text-transform: uppercase;
+        text-transform: none;
         font-weight: 900;
-        bottom: 160px;
-        right: 15%;
+        bottom: 214px;
+        right: 9%;
         transform: rotate(-3deg);
         box-shadow: 5px 5px 0 var(--ink);
       }
@@ -345,7 +345,7 @@
         border: 3px solid var(--ink);
         border-radius: 999px 999px 999px 22px;
         font-weight: 900;
-        text-transform: uppercase;
+        text-transform: none;
         box-shadow: 5px 5px 0 var(--ink);
       }
 
@@ -391,8 +391,9 @@
         background: var(--ink);
         color: #fff;
         text-decoration: none;
-        text-transform: uppercase;
+        text-transform: none;
         font-weight: 900;
+        cursor: pointer;
       }
 
       .hero-action.secondary {
@@ -424,6 +425,11 @@
         place-items: center;
         text-align: center;
         padding: 64px 24px;
+      }
+
+      .section-label#about {
+        place-items: start center;
+        padding-top: 0;
       }
 
       .section-label h2 {
@@ -535,7 +541,7 @@
         align-items: center;
         gap: 11px;
         font-weight: 900;
-        text-transform: uppercase;
+        text-transform: none;
         font-size: 14px;
       }
 
@@ -567,7 +573,7 @@
         padding: 12px 15px;
         background: #111;
         color: var(--blue);
-        text-transform: uppercase;
+        text-transform: none;
         font-weight: 900;
         border: 1px solid rgba(255, 255, 255, 0.2);
       }
@@ -662,7 +668,7 @@
         color: var(--ink);
         padding: 0 14px;
         cursor: pointer;
-        text-transform: uppercase;
+        text-transform: none;
         font-weight: 900;
       }
 
@@ -734,6 +740,20 @@
         min-height: 132px;
       }
 
+      .plain-step {
+        margin-top: 22px;
+        padding: 16px;
+        min-height: 88px;
+        display: grid;
+        align-content: center;
+        background: rgba(8, 8, 8, 0.08);
+        border: 2px solid var(--ink);
+        font-family: var(--font-display);
+        font-size: 18px;
+        line-height: 1.36;
+        font-weight: 900;
+      }
+
       .agent-handoff {
         width: min(1240px, calc(100vw - 32px));
         margin: 0 auto;
@@ -789,6 +809,84 @@
 
       .agent-card code {
         min-height: 190px;
+      }
+
+      .advanced-shell {
+        width: min(1240px, calc(100vw - 32px));
+        margin: 28px auto 120px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 8px 8px 0 var(--ink);
+      }
+
+      .advanced-shell > summary {
+        min-height: 280px;
+        padding: 34px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 28px;
+        align-items: end;
+        cursor: pointer;
+        list-style: none;
+        background: var(--yellow);
+      }
+
+      .advanced-shell > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .advanced-shell h2 {
+        margin: 18px 0 14px;
+        font-family: var(--font-display);
+        font-size: clamp(48px, 7vw, 104px);
+        line-height: 0.94;
+      }
+
+      .advanced-shell p {
+        margin: 0;
+        max-width: 760px;
+        font-family: var(--font-display);
+        font-size: 20px;
+        line-height: 1.36;
+        font-weight: 800;
+      }
+
+      .summary-action {
+        min-width: 104px;
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 5px 5px 0 var(--ink);
+        font-weight: 900;
+      }
+
+      .advanced-shell[open] .summary-action {
+        background: var(--ink);
+        color: #fff;
+      }
+
+      .advanced-shell[open] .summary-action::before {
+        content: "收起";
+      }
+
+      .advanced-shell[open] .summary-action {
+        font-size: 0;
+      }
+
+      .advanced-shell[open] .summary-action::before {
+        font-size: 14px;
+      }
+
+      .advanced-content {
+        border-top: 3px solid var(--ink);
+        background:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px),
+          #fff;
+        background-size: 80px 80px;
       }
 
       .command-card {
@@ -1550,7 +1648,8 @@
         background-size: 80px 80px;
         display: grid;
         place-items: center;
-        animation: lift 1.25s ease 1.4s forwards;
+        pointer-events: none;
+        animation: lift 0.45s ease 0.55s forwards;
       }
 
       .loader-badge {
@@ -1565,7 +1664,7 @@
         font-family: var(--font-display);
         font-size: 38px;
         font-weight: 800;
-        animation: badge 1.2s ease forwards;
+        animation: badge 0.7s ease forwards;
       }
 
       @keyframes lift {
@@ -1638,6 +1737,29 @@
         transform: rotate(-3deg) translateY(0);
       }
 
+      @media (max-width: 1120px) {
+        .sticker {
+          min-width: 188px;
+          padding: 12px 16px;
+          font-size: 12px;
+        }
+
+        .sticker.left {
+          left: 4%;
+          top: 22%;
+        }
+
+        .sticker.right {
+          right: 4%;
+          top: 24%;
+        }
+
+        .pill-sticker,
+        .chip-sticker {
+          display: none;
+        }
+      }
+
       @media (max-width: 900px) {
         .topbar {
           height: auto;
@@ -1672,7 +1794,7 @@
         }
 
         .hero {
-          min-height: 760px;
+          min-height: min(700px, calc(100svh - 92px));
           padding-top: 96px;
         }
 
@@ -1832,6 +1954,20 @@
           min-height: 360px;
         }
 
+        .advanced-shell > summary {
+          min-height: 240px;
+          grid-template-columns: 1fr;
+          align-items: start;
+        }
+
+        .advanced-shell h2 {
+          font-size: clamp(42px, 10vw, 72px);
+        }
+
+        .advanced-shell p {
+          font-size: 18px;
+        }
+
         .check {
           grid-template-columns: 28px 1fr;
         }
@@ -1851,9 +1987,17 @@
       }
 
       @media (max-width: 480px) {
+        .nav-right .contact {
+          display: none;
+        }
+
         .hero {
-          min-height: 760px;
+          min-height: min(680px, calc(100svh - 90px));
           padding: 96px 16px 82px;
+        }
+
+        .sticker {
+          display: none;
         }
 
         .clock {
@@ -1861,17 +2005,32 @@
         }
 
         .intro-tool {
-          bottom: 94px;
-          font-size: 22px;
+          bottom: 158px;
+          width: min(300px, calc(100vw - 32px));
+          font-size: 20px;
+          word-break: normal;
+          overflow-wrap: anywhere;
+        }
+
+        .intro-tool span {
+          word-break: normal;
+          overflow-wrap: anywhere;
         }
 
         .hero-actions {
           bottom: 24px;
           gap: 10px;
+          width: min(288px, calc(100vw - 32px));
+        }
+
+        .hero-action {
+          height: 46px;
+          padding-right: 14px;
         }
 
         .workspace,
         .definition,
+        .advanced-shell,
         .agent-handoff,
         .install-guide,
         .case-wall,
@@ -1913,6 +2072,14 @@
         .definition-title h2 {
           font-size: clamp(38px, 12vw, 46px);
           white-space: normal;
+          word-break: normal;
+          overflow-wrap: anywhere;
+        }
+
+        .definition-title p {
+          font-size: 18px;
+          word-break: normal;
+          overflow-wrap: anywhere;
         }
 
         .def-card h3 {
@@ -1926,7 +2093,15 @@
         }
 
         .footer h2 {
-          font-size: clamp(54px, 17vw, 72px);
+          font-size: clamp(42px, 14vw, 56px);
+          word-break: normal;
+          overflow-wrap: anywhere;
+        }
+
+        .note {
+          width: 100%;
+          max-width: 100%;
+          transform: none;
         }
       }
 
@@ -1953,15 +2128,13 @@
           <span class="mark-symbol"><span></span><span></span><span></span></span>
         </a>
         <a class="nav-item active" href="#home"><span class="ico">⌂</span>首页</a>
-        <a class="nav-item" href="#install"><span class="ico">↓</span>安装</a>
-        <a class="nav-item hide-mobile" href="#about"><span class="ico">✱</span>定位</a>
-        <a class="nav-item hide-mobile" href="#cases"><span class="ico">▟</span>案例</a>
-        <a class="nav-item hide-mobile" href="#playground"><span class="ico">▰</span>实验场</a>
+        <a class="nav-item" href="#install"><span class="ico">↓</span>交给 Agent</a>
+        <a class="nav-item hide-mobile" href="#flow"><span class="ico">✱</span>三步说明</a>
+        <a class="nav-item hide-mobile" href="#advanced"><span class="ico">▟</span>高级工具</a>
+        <a class="nav-item hide-mobile" href="https://github.com/r-design-j/tri-party-framework"><span class="ico">↗</span>GitHub</a>
       </nav>
       <div class="nav-right">
-        <button class="round" type="button" data-load="true" aria-label="加载真三方状态样例" title="加载真三方状态样例">真</button>
-        <button class="round" type="button" data-load="partial" aria-label="加载部分结果状态样例" title="加载部分结果状态样例">偏</button>
-        <a class="contact" href="#contact"><span>♥</span>接入</a>
+        <a class="contact" href="https://github.com/r-design-j/tri-party-framework"><span>♥</span>GitHub</a>
       </div>
     </header>
     <div class="ruler" aria-hidden="true"></div>
@@ -1970,64 +2143,73 @@
       <section class="hero">
         <div class="clock" id="clock">10:38:00 AM</div>
         <div class="hero-stack reveal">
-          <div class="scribble">UI 前产品化基线</div>
+          <div class="scribble">把三模型协作交给你的 AI agent</div>
           <div class="display-frame">
             <span class="corner"></span>
             <h1>triparty</h1>
           </div>
-          <div class="hero-sub"><span class="dot"></span>状态检查 · 使用说明 · 操作向导</div>
+          <div class="hero-sub"><span class="dot"></span>复制指令 · 本机安装 · 自动回报结果</div>
         </div>
 
-        <div class="sticker left reveal">Codex 负责代码<br />Claude 审计逻辑</div>
-        <div class="sticker right reveal">Gemini 校验上下文<br />门禁阻断假真三方</div>
-        <div class="pill-sticker reveal">真三方运行：20260603</div>
-        <div class="chip-sticker reveal">可移植核心</div>
+        <div class="sticker left reveal">用户不用读命令<br />直接复制给 Agent</div>
+        <div class="sticker right reveal">Agent 在本机安装<br />并回报检查结果</div>
+        <div class="pill-sticker reveal">不会把未完成说成完成</div>
+        <div class="chip-sticker reveal">本机可安装</div>
         <div class="intro-tool reveal">
-          <span>triparty 网页不是 agent 替身，</span>
-          <span>它负责看懂状态、复制命令、定位失败。</span>
+          <span>triparty 帮你把 Codex、Claude、Gemini</span>
+          <span>组织成一套可检查的本机协作流程。</span>
         </div>
         <div class="hero-actions reveal in">
-          <a class="hero-action" href="#inspect"><span>↘</span>打开工具</a>
-          <a class="hero-action secondary" href="https://r-design-j.github.io/tri-party-framework/"><span>↗</span>公开地址</a>
+          <button class="hero-action" type="button" data-copy="请在这台机器上安装 triparty。
+目标仓库：https://github.com/r-design-j/tri-party-framework
+执行要求：
+1. clone 仓库并进入目录。
+2. 补齐必要脚本权限。
+3. 运行项目自检。
+4. 安装全局发现规则和 triparty 命令。
+5. 运行 triparty preflight 验证。
+6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run / 未完成协作说成 true tri-party / 完整三方。
+完成后告诉我本机安装路径和 preflight 结果。" data-copy-success="安装指令已复制"><span>↘</span>复制给 Agent</button>
+          <a class="hero-action secondary" href="#flow"><span>↗</span>看三步说明</a>
         </div>
       </section>
 
       <section class="section-label" id="about">
         <div class="reveal">
-          <h2>产品定位</h2>
-          <div class="note">真实执行仍在 Codex、Claude Code、Gemini CLI、HTTP/MCP adapter 中。网页只负责可视化、解释和引导。</div>
+          <h2>不用自己装</h2>
+          <div class="note">这个页面不是让用户学习一堆命令，而是给你一段可以直接丢给 AI agent 的安装委托。</div>
         </div>
       </section>
 
       <section class="definition reveal">
         <div class="definition-title">
-          <h2>它到底是什么</h2>
-          <p>triparty UI 是可视化使用说明手册、状态检查器、操作向导和失败恢复导航。它帮助人理解协议，不冒充协议。</p>
+          <h2>普通用户怎么理解</h2>
+          <p>triparty 是一套本机协作框架。你把安装任务交给 agent，它负责拉取项目、安装规则、检查环境，再把结果告诉你。</p>
         </div>
         <div class="definition-grid">
           <article class="def-card">
-            <h3>是仪表盘</h3>
-            <p>读取 `state.json`、展示 phase、true_triparty_ready、每个模型的 review / cross-audit 状态。</p>
+            <h3>你只要复制</h3>
+            <p>点击“复制给 Agent”，把那段话发给能操作本机终端的 AI agent。</p>
           </article>
           <article class="def-card">
-            <h3>是说明手册</h3>
-            <p>把 triparty 的角色分工、发布门禁、partial 规则，用中文讲清楚。</p>
+            <h3>Agent 去安装</h3>
+            <p>agent 会 clone GitHub 项目、补权限、安装 bootstrap，并运行检查。</p>
           </article>
           <article class="def-card">
-            <h3>是操作向导</h3>
-            <p>根据任务生成 CLI 命令，帮助用户回到真实 agent / terminal 中执行。</p>
+            <h3>结果会回报</h3>
+            <p>安装后它会告诉你路径、检查结果，以及缺少 Claude、Gemini 或认证时该补什么。</p>
           </article>
           <article class="def-card">
-            <h3>不是 agent</h3>
-            <p>不直接调用 Codex、Claude、Gemini，不绕过 CLI、Python、HTTP/MCP adapter。</p>
+            <h3>网页不越权</h3>
+            <p>网页不会偷偷写你的电脑。真正安装必须由你授权的本机 agent 或终端完成。</p>
           </article>
         </div>
       </section>
 
       <section class="section-label" id="install">
         <div class="reveal">
-          <h2>本地安装</h2>
-          <div class="note">网页是说明和检查入口。真正使用 triparty，需要先把框架 clone 到本地，再安装全局 bootstrap 和 CLI wrapper。</div>
+          <h2>复制给 Agent</h2>
+          <div class="note">最推荐的用法：复制一段委托话术给你的 AI agent，让它在本机安装并回报结果。</div>
         </div>
       </section>
 
@@ -2041,22 +2223,22 @@
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
 1. clone 仓库并进入目录。
-2. 补齐脚本和 adapter 执行权限。
-3. 运行 lint。
-4. 安装全局 bootstrap 和 CLI wrapper。
+2. 补齐必要脚本权限。
+3. 运行项目自检。
+4. 安装全局发现规则和 triparty 命令。
 5. 运行 triparty preflight 验证。
-6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run 说成 true tri-party。
+6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run / 未完成协作说成 true tri-party / 完整三方。
 完成后告诉我本机安装路径和 preflight 结果。</code>
           </div>
           <button class="copy" type="button" data-copy="请在这台机器上安装 triparty。
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
 1. clone 仓库并进入目录。
-2. 补齐脚本和 adapter 执行权限。
-3. 运行 lint。
-4. 安装全局 bootstrap 和 CLI wrapper。
+2. 补齐必要脚本权限。
+3. 运行项目自检。
+4. 安装全局发现规则和 triparty 命令。
 5. 运行 triparty preflight 验证。
-6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run 说成 true tri-party。
+6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run / 未完成协作说成 true tri-party / 完整三方。
 完成后告诉我本机安装路径和 preflight 结果。"><span class="ico">↗</span>复制给 Agent</button>
         </article>
         <article class="agent-card command">
@@ -2080,44 +2262,41 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
         </article>
       </section>
 
-      <section class="install-guide reveal">
+      <section class="install-guide reveal" id="flow">
         <article class="install-card primary">
-          <div class="eyebrow"><span class="mini-square"></span>安装 01</div>
-          <h3>Clone 框架</h3>
-          <p>把 tri-party-framework 拉到本机，进入仓库后先补执行权限并跑 lint，确认脚本和 adapter 可以使用。</p>
-          <code>git clone https://github.com/r-design-j/tri-party-framework.git
-cd tri-party-framework
-chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
-scripts/triparty-lint.sh</code>
-          <button class="copy" type="button" data-copy="git clone https://github.com/r-design-j/tri-party-framework.git
-cd tri-party-framework
-chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
-scripts/triparty-lint.sh"><span class="ico">↗</span>复制</button>
+          <div class="eyebrow"><span class="mini-square"></span>会发生 01</div>
+          <h3>拉取项目</h3>
+          <p>Agent 会从 GitHub 拉取 triparty，并在本机建立一个可重复使用的框架目录。</p>
+          <div class="plain-step">你不需要手动下载 ZIP，也不需要逐条复制命令。</div>
         </article>
         <article class="install-card">
-          <div class="eyebrow"><span class="mini-square"></span>安装 02</div>
-          <h3>安装 bootstrap</h3>
-          <p>这一步会写入 Codex / Claude Code 的全局发现规则，安装 `/triparty`、`/tp` 和可移植 `triparty` CLI wrapper。</p>
-          <code>scripts/install-triparty-global-bootstrap.sh
-triparty preflight</code>
-          <button class="copy" type="button" data-copy="scripts/install-triparty-global-bootstrap.sh
-triparty preflight"><span class="ico">↗</span>复制</button>
+          <div class="eyebrow"><span class="mini-square"></span>会发生 02</div>
+          <h3>写入规则</h3>
+          <p>Agent 会安装全局发现规则，让之后的新会话也能找到 triparty，不需要每次重新解释。</p>
+          <div class="plain-step">Claude Code 会有 `/triparty` 和 `/tp`，Codex 可用 `triparty` 命令。</div>
         </article>
         <article class="install-card">
-          <div class="eyebrow"><span class="mini-square"></span>安装 03</div>
-          <h3>打开工具台</h3>
-          <p>本页可以直接打开，也可以通过本地静态服务访问。真实三方运行仍在 CLI、Codex、Claude Code 和 Gemini CLI 中完成。</p>
-          <code>open web/index.html
-python3 -m http.server 4187 --bind 127.0.0.1 --directory web</code>
-          <button class="copy" type="button" data-copy="open web/index.html
-python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">↗</span>复制</button>
+          <div class="eyebrow"><span class="mini-square"></span>会发生 03</div>
+          <h3>回报结果</h3>
+          <p>Agent 会运行安装检查，并告诉你是否可用；如果缺少 Claude、Gemini 或登录认证，它会明确报出来。</p>
+          <div class="plain-step">重点是知道“装好了没有”，而不是让用户自己猜。</div>
         </article>
       </section>
 
+      <details class="advanced-shell reveal" id="advanced">
+        <summary>
+          <div>
+            <div class="eyebrow"><span class="mini-square"></span>给 Agent / 高级用户</div>
+            <h2>高级工具与排查台</h2>
+            <p>普通用户通常不需要读这里。安装失败、需要验证三方是否真的完成、或开发者接入时，再展开这些工具。</p>
+          </div>
+          <span class="summary-action">展开</span>
+        </summary>
+        <div class="advanced-content">
       <section class="section-label" id="inspect">
         <div class="reveal">
-          <h2>运行检查器</h2>
-          <div class="note">粘贴 `state.json` 文件。页面只读取核心协议结果，判断真三方或部分结果，不自行发明新规则。</div>
+          <h2>安装后检查</h2>
+          <div class="note">如果 Agent 回报失败，可以把运行状态文件粘到这里，确认是完成协作、未完成协作，还是登录/环境问题。</div>
         </div>
       </section>
 
@@ -2130,26 +2309,26 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
         <article class="tool-card reveal">
           <div class="tool-copy">
             <div class="eyebrow"><span class="mini-square"></span>模块 01</div>
-            <h3>状态门禁</h3>
-            <p>读取可移植核心输出，保留来源标签，让 UI 判断始终服从 `state.json`。</p>
+            <h3>状态检查</h3>
+            <p>给 Agent 和高级用户看的核验区：只读运行状态，不把未完成协作说成完成。</p>
             <div class="eyebrow"><span class="dot"></span>当前基线</div>
           </div>
 
           <div class="tool-panel">
-            <div class="panel-tag">state.json</div>
+            <div class="panel-tag">运行状态文件</div>
             <div class="status-board" aria-live="polite">
-              <div class="status-cell"><strong id="phase">merged_ready</strong><span>阶段</span></div>
-              <div class="status-cell"><strong id="ready">true</strong><span>真三方</span></div>
+              <div class="status-cell"><strong id="phase">merged_ready</strong><span>协作阶段</span></div>
+              <div class="status-cell"><strong id="ready">true</strong><span>是否完成</span></div>
               <div class="status-cell"><strong id="errors">0</strong><span>错误数</span></div>
             </div>
             <div class="meter"></div>
             <textarea id="stateInput" class="drop-zone" spellcheck="false" aria-label="粘贴 state JSON"></textarea>
             <div class="tool-actions">
               <button type="button" id="analyze">检查状态</button>
-              <button class="secondary" type="button" id="sampleTrue">加载真三方</button>
-              <button class="secondary" type="button" id="samplePartial">加载部分结果</button>
+              <button class="secondary" type="button" id="sampleTrue">加载完成样例</button>
+              <button class="secondary" type="button" id="samplePartial">加载未完成样例</button>
             </div>
-            <div class="result" id="result">等待 state.json。UI 只读取核心输出，不自行把部分结果升级为真三方。</div>
+            <div class="result" id="result">等待运行状态文件。页面只读结果，不自行把未完成协作升级为完成协作。</div>
           </div>
         </article>
 
@@ -2157,7 +2336,7 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <article class="command-card">
             <div>
               <div class="eyebrow"><span class="mini-square"></span>命令 01</div>
-              <h3>来源检查</h3>
+              <h3>检查本机</h3>
               <code>scripts/triparty.sh preflight</code>
             </div>
             <button class="copy" type="button" data-copy="scripts/triparty.sh preflight"><span class="ico">↗</span>复制</button>
@@ -2165,7 +2344,7 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <article class="command-card">
             <div>
               <div class="eyebrow"><span class="mini-square"></span>命令 02</div>
-              <h3>新运行</h3>
+              <h3>发起协作</h3>
               <code>scripts/triparty.sh run '&lt;task&gt;'</code>
             </div>
             <button class="copy" type="button" data-copy="scripts/triparty.sh run '<task>'"><span class="ico">↗</span>复制</button>
@@ -2173,7 +2352,7 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <article class="command-card">
             <div>
               <div class="eyebrow"><span class="mini-square"></span>命令 03</div>
-              <h3>发布门禁</h3>
+              <h3>发布前检查</h3>
               <code>scripts/triparty.sh release-gate docs/framework/runs/review-YYYYMMDD-HHMMSS</code>
             </div>
             <button class="copy" type="button" data-copy="scripts/triparty.sh release-gate docs/framework/runs/review-YYYYMMDD-HHMMSS"><span class="ico">↗</span>复制</button>
@@ -2181,7 +2360,7 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <article class="command-card">
             <div>
               <div class="eyebrow"><span class="mini-square"></span>命令 04</div>
-              <h3>会话接续</h3>
+              <h3>恢复上下文</h3>
               <code>scripts/triparty.sh continuity bootstrap</code>
             </div>
             <button class="copy" type="button" data-copy="scripts/triparty.sh continuity bootstrap"><span class="ico">↗</span>复制</button>
@@ -2198,20 +2377,20 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
               <span id="checkNext">等待 checklist 状态。</span>
               <div class="check-progress" aria-hidden="true"><span id="checkProgress"></span></div>
             </div>
-            <label class="check"><input type="checkbox" checked /><span>已提交 RC 基线</span><span>已完成</span></label>
-            <label class="check"><input type="checkbox" checked /><span>提交后 fresh 真三方运行</span><span>已完成</span></label>
-            <label class="check"><input type="checkbox" checked /><span>fresh run 发布门禁</span><span>已完成</span></label>
-            <label class="check"><input type="checkbox" /><span>冻结 HTTP / MCP 契约</span><span>下一步</span></label>
-            <label class="check"><input type="checkbox" /><span>安装 / 卸载 / doctor 流程</span><span>下一步</span></label>
-            <label class="check"><input type="checkbox" /><span>真三方 / 部分 / 失败 fixtures</span><span>下一步</span></label>
+            <label class="check"><input type="checkbox" checked /><span>已提交公开版本基线</span><span>已完成</span></label>
+            <label class="check"><input type="checkbox" checked /><span>提交后完成一次三方检查</span><span>已完成</span></label>
+            <label class="check"><input type="checkbox" checked /><span>发布前检查通过</span><span>已完成</span></label>
+            <label class="check"><input type="checkbox" /><span>冻结本地服务接入字段</span><span>下一步</span></label>
+            <label class="check"><input type="checkbox" /><span>补齐安装 / 卸载 / 认证检查流程</span><span>下一步</span></label>
+            <label class="check"><input type="checkbox" /><span>补齐完成 / 未完成 / 失败样例</span><span>下一步</span></label>
           </div>
         </section>
       </section>
 
       <section class="section-label" id="cases">
         <div class="reveal">
-          <h2>案例研究</h2>
-          <div class="note">参考站的 case study 结构被转译为 triparty 的产品化模块，每张卡都是一个真实能力边界。</div>
+          <h2>可信证据</h2>
+          <div class="note">这些内容不是给普通用户必读，而是说明 triparty 为什么能判断“完成 / 未完成 / 失败原因”。</div>
         </div>
       </section>
 
@@ -2221,13 +2400,13 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
             <div class="case-kicker"><span>案例 01</span><span>已实现</span></div>
             <div class="case-body">
               <small>2026-06-03</small>
-              <h3>Run Inspector</h3>
-              <p>把 `state.json` 粘进来，页面立即判断真三方或部分结果。它是现在最真实可用的功能。</p>
-              <a class="case-link" href="#detail-run-inspector" data-case="Run Inspector">查看详情 ↗</a>
+              <h3>运行状态检查</h3>
+              <p>把运行状态粘进来，页面立即判断协作完成、未完成或失败原因。</p>
+              <a class="case-link" href="#detail-run-inspector" data-case="运行状态检查">查看详情 ↗</a>
             </div>
-            <div class="case-tags"><span>state.json</span><span>true / partial</span></div>
+            <div class="case-tags"><span>运行状态</span><span>完成 / 未完成</span></div>
           </div>
-          <div class="case-art"><span class="media-chip">state view</span><div><strong>state.json</strong><em>可视化状态检查</em></div></div>
+          <div class="case-art"><span class="media-chip">state view</span><div><strong>status</strong><em>可视化状态检查</em></div></div>
         </article>
         <article class="case-row reveal">
           <div class="case-main">
@@ -2235,10 +2414,10 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
             <div class="case-body">
               <small>2026-06-03</small>
               <h3>发布门禁</h3>
-              <p>把 release-gate 需要检查的内容视觉化：review、cross-audit、Gemini auth、errors、hash/provenance。</p>
-              <a class="case-link" href="#detail-release-gate" data-case="发布门禁">查看详情 ↗</a>
+              <p>把发布前需要检查的证据视觉化：谁参与了、是否完成、有没有错误。</p>
+              <a class="case-link" href="#detail-release-gate" data-case="发布前检查">查看详情 ↗</a>
             </div>
-            <div class="case-tags"><span>release-gate</span><span>evidence</span></div>
+            <div class="case-tags"><span>发布前检查</span><span>证据</span></div>
           </div>
           <div class="case-art"><span class="media-chip">gate view</span><div><strong>gate ready</strong><em>发布门禁解释</em></div></div>
         </article>
@@ -2248,10 +2427,10 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
             <div class="case-body">
               <small>2026-06-03</small>
               <h3>失败恢复</h3>
-              <p>把 `E_GEMINI_INTERACTIVE_AUTH_REQUIRED`、runtime noise、hash mismatch 映射成中文解释和下一条命令。</p>
+              <p>把登录失败、运行噪声、文件不一致等问题映射成中文解释和下一步。</p>
               <a class="case-link" href="#detail-failure-recovery" data-case="失败恢复">查看详情 ↗</a>
             </div>
-            <div class="case-tags"><span>error map</span><span>doctor</span></div>
+            <div class="case-tags"><span>错误说明</span><span>恢复建议</span></div>
           </div>
           <div class="case-art"><span class="media-chip">route view</span><div><strong>error map</strong><em>失败恢复路由</em></div></div>
         </article>
@@ -2260,20 +2439,20 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
             <div class="case-kicker"><span>案例 04</span><span>下一步</span></div>
             <div class="case-body">
               <small>2026-06-03</small>
-              <h3>Adapter 接入</h3>
-              <p>HTTP/MCP adapter 负责真实连接，UI 负责展示 contract、复制请求、解释返回结果。</p>
-              <a class="case-link" href="#detail-adapter" data-case="Adapter 接入">查看详情 ↗</a>
+              <h3>开发接入</h3>
+              <p>开发者可以接入本地服务，让 UI 展示结果，但网页仍不直接替用户执行模型。</p>
+              <a class="case-link" href="#detail-adapter" data-case="开发接入">查看详情 ↗</a>
             </div>
-            <div class="case-tags"><span>HTTP/MCP</span><span>contract</span></div>
+            <div class="case-tags"><span>本地服务</span><span>开发说明</span></div>
           </div>
-          <div class="case-art"><span class="media-chip">adapter view</span><div><strong>HTTP/MCP</strong><em>只读接入边界</em></div></div>
+          <div class="case-art"><span class="media-chip">api view</span><div><strong>API</strong><em>只读接入边界</em></div></div>
         </article>
       </section>
 
       <section class="section-label" id="case-details">
         <div class="reveal">
-          <h2>案例详情</h2>
-          <div class="note">参考站的项目详情页被转译为四个 triparty 产品模块：问题、修法、发生了什么、结果、约束和下一步。</div>
+          <h2>证据详情</h2>
+          <div class="note">这里解释每个高级工具解决什么问题、为什么不能只靠聊天结论判断安装成功。</div>
         </div>
       </section>
 
@@ -2282,12 +2461,12 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <div class="detail-hero">
             <div class="detail-title">
               <small>案例 01 · 已实现</small>
-              <h3>Run Inspector</h3>
-              <p>面向第一次使用 triparty 的人，把一次 run 的结果从命令行文件变成可读、可检查、可解释的页面。</p>
+              <h3>运行状态检查</h3>
+              <p>把一次协作运行的结果变成可读、可检查、可解释的页面。</p>
             </div>
             <div class="detail-meta">
               <div class="meta-cell"><span>角色</span><span>状态解释器</span></div>
-              <div class="meta-cell"><span>数据源</span><span>state.json</span></div>
+              <div class="meta-cell"><span>数据源</span><span>运行状态文件</span></div>
               <div class="meta-cell"><span>平台</span><span>静态 Web</span></div>
               <div class="meta-cell"><span>状态</span><span>已可体验</span></div>
             </div>
@@ -2295,19 +2474,19 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <div class="detail-body">
             <div class="detail-section">
               <h4>真实问题</h4>
-              <p>用户看见一堆 run artifact 时，不知道哪些字段代表“真三方”，哪些只是 probe 成功，容易把 partial run 误读为完整结论。</p>
+              <p>用户或 agent 看到一堆运行文件时，容易把“部分完成”误读成“已经完成”。</p>
             </div>
             <div class="detail-section">
               <h4>怎么修</h4>
-              <p>只读取 `true_triparty_ready`、party review、cross-audit、Gemini auth、errors 等核心字段。UI 不新增协议规则。</p>
+              <p>只读取核心状态字段。页面负责解释，不自己发明成功标准。</p>
             </div>
             <div class="detail-section">
               <h4>发生了什么</h4>
-              <p>点击“加载真三方”或“加载部分结果”，页面会改写状态卡片和底部提示，让用户马上看到门禁差异。</p>
+              <p>点击“加载完成样例”或“加载未完成样例”，页面会改写状态卡片和底部提示。</p>
             </div>
             <div class="detail-section">
               <h4>结果</h4>
-              <p>它已经不只是说明文字，而是能解析 JSON 的前端检查器。真实运行时只需要把 run 目录里的 `state.json` 粘贴进来。</p>
+              <p>它不是纯说明文字，而是能解析运行状态的前端检查器。</p>
             </div>
             <div class="detail-section">
               <h4>约束</h4>
@@ -2315,7 +2494,7 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
             </div>
             <div class="detail-section">
               <h4>下一步</h4>
-              <p>冻结 run manifest schema 后，可以把粘贴输入升级为 HTTP adapter 只读加载，仍然不直接执行 agent。</p>
+              <p>冻结运行状态格式后，可以把粘贴输入升级为本地只读加载，仍然不直接执行 agent。</p>
             </div>
           </div>
         </article>
@@ -2324,12 +2503,12 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <div class="detail-hero">
             <div class="detail-title">
               <small>案例 02 · 已实现</small>
-              <h3>发布门禁</h3>
-              <p>把 release-gate 的判断变成可解释界面：为什么能发、为什么不能发、缺哪一方证据。</p>
+              <h3>发布前检查</h3>
+              <p>把发布前判断变成可解释界面：为什么能发、为什么不能发、缺哪一方证据。</p>
             </div>
             <div class="detail-meta">
               <div class="meta-cell"><span>角色</span><span>发布前检查</span></div>
-              <div class="meta-cell"><span>数据源</span><span>release-gate + state.json</span></div>
+              <div class="meta-cell"><span>数据源</span><span>发布检查 + 状态文件</span></div>
               <div class="meta-cell"><span>平台</span><span>CLI 生成 / Web 展示</span></div>
               <div class="meta-cell"><span>状态</span><span>已可体验</span></div>
             </div>
@@ -2337,23 +2516,23 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <div class="detail-body">
             <div class="detail-section">
               <h4>真实问题</h4>
-              <p>“能不能发布”不能靠聊天结论，必须依赖文件证据、hash、来源标签和 completion marker。</p>
+              <p>“能不能发布”不能靠聊天结论，必须依赖文件证据、hash 和完成标记。</p>
             </div>
             <div class="detail-section">
               <h4>怎么修</h4>
-              <p>页面把发布前命令、状态摘要和 partial 阻断语放在同一视图里，用户可以复制命令回 terminal 执行。</p>
+              <p>页面把发布前命令、状态摘要和“未完成协作”的阻断语放在同一视图里。</p>
             </div>
             <div class="detail-section">
               <h4>发生了什么</h4>
-              <p>真三方样例会显示可支持发布声明；partial 样例会明确写出不能升级为真三方。</p>
+              <p>完成样例会显示可支持发布声明；未完成样例会明确写出不能升级为完整协作。</p>
             </div>
             <div class="detail-section">
               <h4>结果</h4>
-              <p>产品化价值在于降低判断成本，而不是绕过 release-gate。真正的 gate 仍由脚本执行。</p>
+              <p>产品化价值在于降低判断成本，而不是绕过真正的发布前检查。</p>
             </div>
             <div class="detail-section">
               <h4>约束</h4>
-              <p>页面不会把 Codex 行渲染成“已完成 review”。Codex 在三方结论中负责当前会话 synthesis。</p>
+              <p>页面不会把单方输出包装成三方完成。缺证据时必须阻断。</p>
             </div>
             <div class="detail-section">
               <h4>下一步</h4>
@@ -2379,15 +2558,15 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <div class="detail-body">
             <div class="detail-section">
               <h4>真实问题</h4>
-              <p>Gemini auth、runtime noise、hash mismatch、partial run 是不同问题，混在一起会导致错误修复路径。</p>
+              <p>登录认证、运行噪声、文件不一致、未完成协作是不同问题，混在一起会导致错误修复路径。</p>
             </div>
             <div class="detail-section">
               <h4>怎么修</h4>
-              <p>Playground 提供错误码下拉选择，输出对应中文解释和下一条命令，避免把 partial 说成 true。</p>
+              <p>排查工具提供错误码下拉选择，输出对应中文解释和下一条命令。</p>
             </div>
             <div class="detail-section">
               <h4>发生了什么</h4>
-              <p>选择错误码后，页面会立即给出 doctor、preflight、release-gate 或重跑 review 的建议。</p>
+              <p>选择错误码后，页面会立即给出认证检查、环境检查、发布前检查或重跑建议。</p>
             </div>
             <div class="detail-section">
               <h4>结果</h4>
@@ -2408,12 +2587,12 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           <div class="detail-hero">
             <div class="detail-title">
               <small>案例 04 · 待接入</small>
-              <h3>Adapter 接入</h3>
-              <p>真正的产品化不是让网页直接变 agent，而是让 UI 清楚展示 CLI、Python、HTTP/MCP adapter 的边界。</p>
+              <h3>开发接入</h3>
+              <p>真正的产品化不是让网页直接变 agent，而是让 UI 清楚展示本地执行层的边界。</p>
             </div>
             <div class="detail-meta">
               <div class="meta-cell"><span>角色</span><span>接入说明</span></div>
-              <div class="meta-cell"><span>数据源</span><span>HTTP/MCP adapter</span></div>
+              <div class="meta-cell"><span>数据源</span><span>本地服务</span></div>
               <div class="meta-cell"><span>平台</span><span>本地服务</span></div>
               <div class="meta-cell"><span>状态</span><span>下一阶段</span></div>
             </div>
@@ -2425,11 +2604,11 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
             </div>
             <div class="detail-section">
               <h4>怎么修</h4>
-              <p>UI 只展示 contract、复制请求、解释返回。真实调用仍在 CLI、Python、HTTP/MCP adapter。</p>
+              <p>UI 只展示约定、复制请求、解释返回。真实调用仍在本机执行层。</p>
             </div>
             <div class="detail-section">
               <h4>发生了什么</h4>
-              <p>当前页面已经把接入清单写清楚：冻结状态字段、补 fixtures、只读接入 adapter。</p>
+              <p>当前页面已经把接入清单写清楚：冻结状态字段、补样例、只读接入本地服务。</p>
             </div>
             <div class="detail-section">
               <h4>结果</h4>
@@ -2437,7 +2616,7 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
             </div>
             <div class="detail-section">
               <h4>约束</h4>
-              <p>HTTP adapter 默认 loopback，本地服务也不能被 UI 文案包装成公网 SaaS。</p>
+              <p>本地服务默认只在本机运行，不能被 UI 文案包装成公网 SaaS。</p>
             </div>
             <div class="detail-section">
               <h4>下一步</h4>
@@ -2449,8 +2628,8 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
 
       <section class="section-label" id="playground">
         <div class="reveal">
-          <h2>实验场</h2>
-          <div class="note">参考站 Playground 被改造成真实可用的小工具：命令生成器和失败恢复路由。</div>
+          <h2>排查工具</h2>
+          <div class="note">给 agent 和高级用户使用：生成命令、解释失败原因、确认下一步。</div>
         </div>
       </section>
 
@@ -2458,12 +2637,12 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
         <article class="play-card">
           <h3>任务命令生成器</h3>
           <label for="taskInput">输入这次要交给 triparty 的任务</label>
-          <textarea id="taskInput">审查 UI 前产品化基线，确认是否可以进入 contract / doctor / fixtures 阶段。</textarea>
+          <textarea id="taskInput">检查 triparty 是否安装成功，并说明下一步该做什么。</textarea>
           <div class="tool-actions">
             <button type="button" id="buildRun">生成命令文本</button>
-            <button class="secondary" type="button" id="copyRun">复制到 CLI</button>
+            <button class="secondary" type="button" id="copyRun">复制命令</button>
           </div>
-          <div class="generated" id="runCommand">scripts/triparty.sh run '审查 UI 前产品化基线，确认是否可以进入 contract / doctor / fixtures 阶段。'</div>
+          <div class="generated" id="runCommand">scripts/triparty.sh run '检查 triparty 是否安装成功，并说明下一步该做什么。'</div>
         </article>
         <article class="play-card">
           <h3>失败恢复路由</h3>
@@ -2483,13 +2662,13 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
 
       <section class="contact-panel reveal" id="contact">
         <div>
-          <h2>接下来接入</h2>
+          <h2>开发者接入</h2>
         </div>
         <div>
           <ul>
-            <li>冻结 `state.json` / run manifest 字段，避免 UI 猜测协议。</li>
-            <li>补齐 true / partial / auth failed / hash mismatch fixtures。</li>
-            <li>把当前静态页面接入 HTTP adapter，只读状态，不直接调用模型。</li>
+            <li>冻结运行状态字段，避免 UI 猜测协议。</li>
+            <li>补齐完成、未完成、认证失败、文件不一致等样例。</li>
+            <li>把当前静态页面接入本地只读服务，不直接调用模型。</li>
             <li>公开访问地址：<a href="https://r-design-j.github.io/tri-party-framework/">https://r-design-j.github.io/tri-party-framework/</a></li>
             <li>保留 triparty 作为产品名；正文、说明、按钮默认中文。</li>
           </ul>
@@ -2498,13 +2677,15 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
 
       <footer class="footer">
         <div class="reveal">
-          <h2>准备发布</h2>
-          <div class="note">下一阶段：冻结 contract、生成 fixtures，再把这个页面接到 HTTP adapter。</div>
+          <h2>技术说明到这里</h2>
+          <div class="note">普通用户只需要上面的“复制给 Agent”。这里保留给安装失败、状态核验和开发接入。</div>
         </div>
       </footer>
+        </div>
+      </details>
     </main>
 
-    <div class="floating-result" id="floating" role="status" aria-live="polite"><span class="dot"></span>基线干净。粘贴 state.json 开始检查。</div>
+    <div class="floating-result" id="floating" role="status" aria-live="polite"><span class="dot"></span>复制安装指令给 Agent 开始。</div>
 
     <script>
       const trueState = {
@@ -2666,13 +2847,21 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
           setFloating(successText);
           return true;
         } catch {
+          window.focus();
           const scratch = document.createElement("textarea");
           scratch.value = text;
           scratch.setAttribute("readonly", "");
           scratch.style.position = "fixed";
-          scratch.style.left = "-9999px";
+          scratch.style.top = "0";
+          scratch.style.left = "0";
+          scratch.style.width = "1px";
+          scratch.style.height = "1px";
+          scratch.style.opacity = "0";
+          scratch.style.pointerEvents = "none";
           document.body.appendChild(scratch);
+          scratch.focus({ preventScroll: true });
           scratch.select();
+          scratch.setSelectionRange(0, scratch.value.length);
           try {
             const copied = document.execCommand("copy");
             setFloating(copied ? successText : fallbackText, copied ? "var(--blue)" : "var(--pink)");
@@ -2709,30 +2898,40 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
       els.buildRun.addEventListener("click", () => buildRunCommand(true));
       els.copyRun.addEventListener("click", async () => {
         buildRunCommand();
-        await copyText(els.runCommand.textContent, "run 命令已复制", "复制失败，请从实验场手动复制");
+        await copyText(els.runCommand.textContent, "run 命令已复制", "复制失败，请从排查工具手动复制");
       });
       els.explainError.addEventListener("click", () => explainErrorCode(true));
       els.errorSelect.addEventListener("change", () => explainErrorCode(true));
-      document.querySelector('[data-load="true"]').addEventListener("click", () => loadState(trueState));
-      document.querySelector('[data-load="partial"]').addEventListener("click", () => loadState(partialState));
       checkItems.forEach((input) => input.addEventListener("change", () => updateChecklist(true)));
 
       document.querySelectorAll("[data-copy]").forEach((button) => {
         button.addEventListener("click", async () => {
           const text = button.getAttribute("data-copy");
-          await copyText(text, "命令已复制", "复制失败，请从卡片手动复制");
+          const successText = button.getAttribute("data-copy-success") || "命令已复制";
+          await copyText(text, successText, "复制失败，请从卡片手动复制");
         });
       });
 
       const navLinks = Array.from(document.querySelectorAll('.nav-item[href^="#"]'));
+      const advanced = document.getElementById("advanced");
+      function openAdvancedForHash(hash) {
+        if (!advanced || !hash) return;
+        if (hash === "#advanced" || advanced.querySelector(hash)) advanced.open = true;
+      }
+
       function setActiveNav(hash) {
         navLinks.forEach((item) => item.classList.toggle("active", item.getAttribute("href") === hash));
       }
 
       navLinks.forEach((link) => {
-        link.addEventListener("click", () => setActiveNav(link.getAttribute("href")));
+        link.addEventListener("click", () => {
+          const targetHash = link.getAttribute("href");
+          openAdvancedForHash(targetHash);
+          setActiveNav(targetHash);
+        });
       });
       document.querySelector(".mark").addEventListener("click", () => setActiveNav("#home"));
+      window.addEventListener("hashchange", () => openAdvancedForHash(window.location.hash));
       document.querySelectorAll(".case-link").forEach((link) => {
         link.addEventListener("click", (event) => {
           event.preventDefault();
@@ -2761,7 +2960,10 @@ python3 -m http.server 4187 --bind 127.0.0.1 --directory web"><span class="ico">
       buildRunCommand();
       explainErrorCode();
       updateChecklist();
-      loadState(trueState);
+      els.input.value = JSON.stringify(trueState, null, 2);
+      els.result.textContent = summarize(trueState).text;
+      setFloating("复制安装指令给 Agent 开始。");
+      openAdvancedForHash(window.location.hash);
     </script>
   </body>
 </html>
