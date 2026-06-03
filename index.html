@@ -84,34 +84,11 @@
         border-right: 1px solid var(--line-strong);
       }
 
-      .mark-symbol {
-        width: 31px;
-        height: 23px;
-        position: relative;
-      }
-
-      .mark-symbol span {
-        position: absolute;
-        inset: auto 0 0 0;
-        margin: auto;
-        border: 3px solid var(--ink);
-        border-bottom: 0;
-        border-radius: 999px 999px 0 0;
-      }
-
-      .mark-symbol span:nth-child(1) {
-        width: 31px;
-        height: 19px;
-      }
-
-      .mark-symbol span:nth-child(2) {
-        width: 22px;
-        height: 14px;
-      }
-
-      .mark-symbol span:nth-child(3) {
-        width: 13px;
-        height: 9px;
+      .mark-icon {
+        width: 36px;
+        height: 36px;
+        display: block;
+        object-fit: contain;
       }
 
       .nav-item {
@@ -2132,7 +2109,7 @@
     <header class="topbar">
       <nav class="nav-left" aria-label="主导航">
         <a class="mark" href="#home" aria-label="triparty 首页">
-          <span class="mark-symbol"><span></span><span></span><span></span></span>
+          <img class="mark-icon" src="assets/favicon-32.png" srcset="assets/favicon-32.png 1x, assets/apple-touch-icon.png 2x" width="36" height="36" alt="" />
         </a>
         <a class="nav-item active" href="#home"><span class="ico">⌂</span>首页</a>
         <a class="nav-item" href="#install"><span class="ico">↓</span>交给 Agent</a>
