@@ -66,7 +66,12 @@ write_complete_run() {
     printf 'GEMINI_BIN_SHA256=%q\n' "$test_cli_sha"
     printf 'GEMINI_POLICY_SHA256=%q\n' "$policy_sha"
     printf 'GEMINI_ERROR_CODE=%q\n' "E_OK"
+    printf 'GEMINI_AUTH_STATUS=%q\n' "authenticated"
+    printf 'GEMINI_AUTH_OUTPUT=%q\n' "$run_dir/preflight/gemini-auth-doctor.txt"
+    printf 'GEMINI_AUTH_TIMEOUT=%q\n' "12"
+    printf 'GEMINI_AUTH_DOCTOR_CODE=%q\n' "0"
   } > "$run_dir/preflight/status.env"
+  printf 'GEMINI_AUTH_OK\n' > "$run_dir/preflight/gemini-auth-doctor.txt"
 
   local claude_sha
   local gemini_sha
@@ -173,6 +178,53 @@ else
   FAILED=1
 fi
 
+CONTINUITY_DIR="$TMP_ROOT/continuity"
+run_expect pass "continuity_checkpoint_writes_handoff" "$TRIPARTY" continuity checkpoint --out-dir "$CONTINUITY_DIR" --workstream "regression" --goal "regression continuity goal" --run-dir "$RUN_OK"
+if [ -f "$CONTINUITY_DIR/current.yml" ] && [ -f "$CONTINUITY_DIR/handoff.md" ] && [ -f "$CONTINUITY_DIR/bootstrap.md" ] && [ -f "$CONTINUITY_DIR/manifest.json" ]; then
+  printf 'PASS: continuity_files_created\n'
+else
+  printf 'FAIL: continuity_files_created\n' >&2
+  find "$CONTINUITY_DIR" -maxdepth 2 -type f 2>/dev/null >&2 || true
+  FAILED=1
+fi
+run_expect pass "continuity_bootstrap_verifies_manifest" "$TRIPARTY" continuity bootstrap --out-dir "$CONTINUITY_DIR"
+printf 'tampered\n' >> "$CONTINUITY_DIR/current.yml"
+run_expect fail "continuity_bootstrap_rejects_hash_mismatch" "$TRIPARTY" continuity bootstrap --out-dir "$CONTINUITY_DIR"
+
+CODEX_CONTINUITY_DIR="$TMP_ROOT/codex-continuity"
+mkdir -p "$CODEX_CONTINUITY_DIR"
+printf 'schema: codex-session-continuity/v1\n' > "$CODEX_CONTINUITY_DIR/current.yml"
+printf '# Session Continuity Handoff\n' > "$CODEX_CONTINUITY_DIR/handoff.md"
+printf '# Resume This Codex Workstream\n' > "$CODEX_CONTINUITY_DIR/bootstrap.md"
+printf '{"generated_at":"2026-06-01T00:00:00Z","event":"checkpoint"}\n' > "$CODEX_CONTINUITY_DIR/events.jsonl"
+cat > "$CODEX_CONTINUITY_DIR/manifest.json" <<EOF
+{
+  "schema": "codex-session-continuity/v1",
+  "generated_at": "2026-06-01T00:00:00Z",
+  "root": "$TMP_ROOT",
+  "revision": 1,
+  "files": {
+    "current.yml": {
+      "sha256": "$(hash_file "$CODEX_CONTINUITY_DIR/current.yml")",
+      "bytes": 38
+    },
+    "handoff.md": {
+      "sha256": "$(hash_file "$CODEX_CONTINUITY_DIR/handoff.md")",
+      "bytes": 29
+    },
+    "bootstrap.md": {
+      "sha256": "$(hash_file "$CODEX_CONTINUITY_DIR/bootstrap.md")",
+      "bytes": 31
+    },
+    "events.jsonl": {
+      "sha256": "$(hash_file "$CODEX_CONTINUITY_DIR/events.jsonl")",
+      "bytes": 66
+    }
+  }
+}
+EOF
+run_expect pass "continuity_bootstrap_accepts_codex_session_manifest" "$TRIPARTY" continuity bootstrap --out-dir "$CODEX_CONTINUITY_DIR"
+
 RUN_INJECT="$TMP_ROOT/inject"
 write_complete_run "$RUN_INJECT" "TimedOut" "Completed" "0"
 printf 'Injected Claude review.\n' > "$TMP_ROOT/injected-claude.md"
@@ -212,6 +264,55 @@ write_complete_run "$RUNS_FAKE/review-000001" "Completed" "Completed" "1"
 run_expect pass "runs_lists_recent_runs" env TRIPARTY_RUNS_DIR="$RUNS_FAKE" "$TRIPARTY" runs 5
 run_expect pass "stats_summarizes_runs" env TRIPARTY_RUNS_DIR="$RUNS_FAKE" "$TRIPARTY" stats
 run_expect pass "archive_dry_run" env TRIPARTY_RUNS_DIR="$RUNS_FAKE" "$TRIPARTY" archive --keep 1 --dry-run
+
+RUNS_FALLBACK_DEFAULT="$TMP_ROOT/default-runs-unwritable"
+RUNS_FALLBACK_TARGET="$TMP_ROOT/fallback-runs"
+FAKE_OK_BIN="$TMP_ROOT/fake-ok-bin"
+mkdir -p "$FAKE_OK_BIN"
+cat > "$FAKE_OK_BIN/claude" <<'EOF'
+#!/usr/bin/env bash
+if [ "${1:-}" = "--version" ]; then
+  printf 'fake-claude 1.0\n'
+  exit 0
+fi
+printf 'CLAUDE_OK\n'
+EOF
+cat > "$FAKE_OK_BIN/gemini" <<'EOF'
+#!/usr/bin/env bash
+if [ "${1:-}" = "--version" ]; then
+  printf 'fake-gemini 1.0\n'
+  exit 0
+fi
+printf 'GEMINI_AUTH_OK\nGEMINI_OK\n'
+EOF
+chmod +x "$FAKE_OK_BIN/claude" "$FAKE_OK_BIN/gemini"
+mkdir -p "$RUNS_FALLBACK_DEFAULT"
+chmod 500 "$RUNS_FALLBACK_DEFAULT"
+run_expect pass "preflight_falls_back_when_default_runs_unwritable" env PATH="$FAKE_OK_BIN:$PATH" TRIPARTY_REPO_RUNS_DIR="$RUNS_FALLBACK_DEFAULT" TRIPARTY_RUNS_FALLBACK_DIR="$RUNS_FALLBACK_TARGET" TRIPARTY_PROBE_TIMEOUT=1 TRIPARTY_PROBE_RETRIES=0 TRIPARTY_GEMINI_AUTH_TIMEOUT=1 "$TRIPARTY" preflight
+chmod 700 "$RUNS_FALLBACK_DEFAULT"
+if find "$RUNS_FALLBACK_TARGET" -maxdepth 1 -type d -name 'preflight-*' | grep -q .; then
+  printf 'PASS: fallback_preflight_dir_created\n'
+else
+  printf 'FAIL: fallback_preflight_dir_created\n' >&2
+  FAILED=1
+fi
+
+GEMINI_FAKE_BIN="$TMP_ROOT/fake-bin"
+GEMINI_FAKE_OUT="$TMP_ROOT/fake-gemini-auth.txt"
+mkdir -p "$GEMINI_FAKE_BIN"
+cat > "$GEMINI_FAKE_BIN/gemini" <<'EOF'
+#!/usr/bin/env bash
+printf 'Please sign in with a browser to continue.\n' >&2
+exit 1
+EOF
+chmod +x "$GEMINI_FAKE_BIN/gemini"
+run_expect fail "gemini_auth_doctor_reports_interactive_auth" env PATH="$GEMINI_FAKE_BIN:$PATH" TRIPARTY_GEMINI_AUTH_TIMEOUT=2 "$ROOT_DIR/scripts/triparty-gemini-auth-doctor.sh" "$GEMINI_FAKE_OUT"
+if env PATH="$GEMINI_FAKE_BIN:$PATH" TRIPARTY_GEMINI_AUTH_TIMEOUT=2 "$ROOT_DIR/scripts/triparty-gemini-auth-doctor.sh" "$GEMINI_FAKE_OUT" 2>/dev/null | grep -q 'status=interactive-auth-required'; then
+  printf 'PASS: gemini_auth_doctor_status_interactive_auth_required\n'
+else
+  printf 'FAIL: gemini_auth_doctor_status_interactive_auth_required\n' >&2
+  FAILED=1
+fi
 
 RUN_MISSING_CROSS="$TMP_ROOT/missing-cross"
 write_complete_run "$RUN_MISSING_CROSS" "Completed" "Completed" "0"

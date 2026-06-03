@@ -173,6 +173,14 @@ scripts/triparty-preflight.sh
 ```
 
 The script records source status under `docs/framework/runs/` and exits non-zero when Claude or Gemini is unavailable, timed out, or failed.
+If `docs/framework/runs/` is not writable, the script falls back to `${TMPDIR:-/tmp}/triparty-runs` and records the actual run directory in `state.json` and `status`.
+
+Gemini availability has two gates:
+
+- `scripts/triparty-gemini-auth-doctor.sh` reports `authenticated`, `interactive-auth-required`, `binary-missing`, or `timeout`.
+- Only `authenticated` proceeds to the normal Gemini content probe, review, or cross-audit.
+
+`interactive-auth-required`, `binary-missing`, or `timeout` must be reported as partial and must not enter a long review flow.
 
 ## Valid And Invalid Substitutions
 
@@ -218,6 +226,15 @@ scripts/triparty.sh run "<question>"
 ```
 
 The unified command creates a timestamped run directory, collects Claude/Gemini reviews, runs cross-audit, runs the merge gate, validates release-level state when the merge is ready, and writes `state.json`.
+
+A true tri-party result requires all four external artifacts to be complete and valid:
+
+- Claude independent review.
+- Gemini independent review.
+- Claude cross-audit of Gemini.
+- Gemini cross-audit of Claude.
+
+If any one is missing, skipped, timed out, failed, empty, metadata-invalid, hash-mismatched, label-contaminated, or runtime-noisy, the run is partial even if the other party completed successfully.
 For manual stage control, use `scripts/triparty.sh review`, `scripts/triparty.sh cross-audit`, `scripts/triparty.sh merge`, and `scripts/triparty.sh status`.
 
 For public release, push, or launch claims, run the release gate after merge:

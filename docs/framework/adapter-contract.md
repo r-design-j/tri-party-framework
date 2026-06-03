@@ -9,6 +9,7 @@ Adapters connect external environments to the portable core without changing cor
 - The portable core remains the source of truth.
 - Adapters must call `scripts/triparty.sh` or read artifacts created by it.
 - Adapters must preserve run directories, source labels, review artifacts, cross-audit artifacts, hashes, and error codes.
+- Adapters must read the actual `runs_dir` / `run_dir` from core output or `state.json`; the repo-local `docs/framework/runs` path is only the preferred default and may fall back to `${TMPDIR:-/tmp}/triparty-runs`.
 - Adapters must preserve provenance details for user-supplied artifacts: origin, injected timestamp, source path, source hash, and copied artifact hash.
 - Adapters must preserve runner-written artifact metadata and completion markers. Missing metadata, party/stage mismatch, marker mismatch, hash drift, or source-label contamination must remain merge-blocking.
 - Core status writers should publish state/status files through temp-file-and-rename atomic writes so adapters never trust partially written JSON or env files.

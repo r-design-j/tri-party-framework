@@ -25,6 +25,9 @@
     "generated_at": {
       "type": "string"
     },
+    "runs_dir": {
+      "type": "string"
+    },
     "run_dir": {
       "type": "string"
     },
@@ -167,6 +170,25 @@
           "properties": {
             "preflight_policy_sha256": {
               "type": "string"
+            },
+            "auth_doctor": {
+              "type": "object",
+              "required": ["status", "output", "timeout_seconds", "exit_code"],
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["authenticated", "interactive-auth-required", "binary-missing", "timeout", "unknown"]
+                },
+                "output": {
+                  "type": "string"
+                },
+                "timeout_seconds": {
+                  "type": "integer"
+                },
+                "exit_code": {
+                  "type": "integer"
+                }
+              }
             },
             "review_diagnostics": {
               "$ref": "#/$defs/gemini_diagnostics"

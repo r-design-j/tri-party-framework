@@ -112,6 +112,24 @@ def validate_gemini_diagnostics(errors: list[str], value: object, label: str) ->
         fail(errors, f"{label}.sanitizer_version must be non-empty string")
 
 
+def validate_gemini_auth_doctor(errors: list[str], value: object, label: str) -> None:
+    if not require_type(errors, value, dict, label):
+        return
+    if value.get("status") not in {
+        "authenticated",
+        "interactive-auth-required",
+        "binary-missing",
+        "timeout",
+        "unknown",
+    }:
+        fail(errors, f"{label}.status is invalid")
+    if not isinstance(value.get("output"), str):
+        fail(errors, f"{label}.output must be string")
+    for key in ["timeout_seconds", "exit_code"]:
+        if not isinstance(value.get(key), int):
+            fail(errors, f"{label}.{key} must be integer")
+
+
 def validate_state_shape(errors: list[str], state: object) -> None:
     if not require_type(errors, state, dict, "state"):
         return
@@ -164,6 +182,8 @@ def validate_state_shape(errors: list[str], state: object) -> None:
     if isinstance(parties.get("gemini"), dict):
         if not isinstance(parties["gemini"].get("preflight_policy_sha256"), str):
             fail(errors, "parties.gemini.preflight_policy_sha256 must be string")
+        if "auth_doctor" in parties["gemini"]:
+            validate_gemini_auth_doctor(errors, parties["gemini"].get("auth_doctor"), "parties.gemini.auth_doctor")
         validate_gemini_diagnostics(errors, parties["gemini"].get("review_diagnostics"), "parties.gemini.review_diagnostics")
         validate_gemini_diagnostics(errors, parties["gemini"].get("cross_audit_diagnostics"), "parties.gemini.cross_audit_diagnostics")
 
@@ -231,6 +251,8 @@ def validate_release(errors: list[str], state: dict, repo_root: Path) -> None:
                 fail(errors, f"{path} contains runtime noise")
 
     gemini = parties.get("gemini", {})
+    if isinstance(gemini.get("auth_doctor"), dict) and gemini["auth_doctor"].get("status") != "authenticated":
+        fail(errors, "parties.gemini.auth_doctor.status must be authenticated for release")
     if gemini_policy.exists() and gemini.get("preflight_policy_sha256") != sha256(gemini_policy):
         fail(errors, "parties.gemini.preflight_policy_sha256 does not match docs/framework/gemini-headless-policy.toml")
     for label in ["review_diagnostics", "cross_audit_diagnostics"]:

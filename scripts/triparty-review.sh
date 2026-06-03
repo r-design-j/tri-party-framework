@@ -2,8 +2,11 @@
 set -u
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=scripts/triparty-runs-dir.sh
+. "$ROOT_DIR/scripts/triparty-runs-dir.sh"
+RUNS_DIR="$(triparty_resolve_runs_dir "$ROOT_DIR")" || exit $?
 STAMP="$(date '+%Y%m%d-%H%M%S')"
-RUN_DIR="${TRIPARTY_RUN_DIR:-"$ROOT_DIR/docs/framework/runs/review-$STAMP"}"
+RUN_DIR="${TRIPARTY_RUN_DIR:-"$RUNS_DIR/review-$STAMP"}"
 REVIEW_TIMEOUT="${TRIPARTY_REVIEW_TIMEOUT:-180}"
 REVIEW_RETRIES="${TRIPARTY_REVIEW_RETRIES:-2}"
 REVIEW_RETRY_BACKOFF="${TRIPARTY_REVIEW_RETRY_BACKOFF:-10}"

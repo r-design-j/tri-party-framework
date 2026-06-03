@@ -11,13 +11,15 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
-RUNS_DIR = ROOT_DIR / "docs" / "framework" / "runs"
+REPO_RUNS_DIR = Path(os.environ.get("TRIPARTY_REPO_RUNS_DIR", ROOT_DIR / "docs" / "framework" / "runs"))
+FALLBACK_RUNS_DIR = Path(os.environ.get("TRIPARTY_RUNS_FALLBACK_DIR", Path(tempfile.gettempdir()) / "triparty-runs"))
 TRIPARTY = ROOT_DIR / "scripts" / "triparty.sh"
 VERSION_FILE = ROOT_DIR / "VERSION"
 MAX_BODY_BYTES = 1024 * 1024
@@ -29,10 +31,46 @@ def version() -> str:
     return "0.0.0-dev"
 
 
+def is_writable_dir(path: Path) -> bool:
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+        probe = path / f".triparty-write-test.{os.getpid()}"
+        probe.write_text("", encoding="utf-8")
+        probe.unlink(missing_ok=True)
+        return True
+    except OSError:
+        return False
+
+
+def resolve_runs_dir() -> Path:
+    preferred = Path(os.environ.get("TRIPARTY_RUNS_DIR", str(REPO_RUNS_DIR)))
+    if is_writable_dir(preferred):
+        return preferred.resolve()
+    if is_writable_dir(FALLBACK_RUNS_DIR):
+        return FALLBACK_RUNS_DIR.resolve()
+    return preferred.resolve()
+
+
+RUNS_DIR = resolve_runs_dir()
+
+
+def candidate_runs_dirs() -> list[Path]:
+    if os.environ.get("TRIPARTY_RUNS_DIR"):
+        return [RUNS_DIR]
+    candidates = [RUNS_DIR, REPO_RUNS_DIR.resolve(), FALLBACK_RUNS_DIR.resolve()]
+    unique: list[Path] = []
+    for candidate in candidates:
+        if candidate not in unique:
+            unique.append(candidate)
+    return unique
+
+
 def latest_run_dir() -> Path | None:
-    if not RUNS_DIR.exists():
-        return None
-    runs = sorted(path for path in RUNS_DIR.glob("review-*") if path.is_dir())
+    runs: list[Path] = []
+    for runs_dir in candidate_runs_dirs():
+        if runs_dir.exists():
+            runs.extend(path for path in runs_dir.glob("review-*") if path.is_dir())
+    runs = sorted(set(runs), key=lambda path: path.name)
     if not runs:
         return None
     return runs[-1]
@@ -46,6 +84,16 @@ def ensure_under(path: Path, parent: Path) -> Path:
     raise ValueError(f"path outside allowed root: {path}")
 
 
+def ensure_under_any(path: Path, parents: list[Path]) -> Path:
+    resolved = path.resolve()
+    for parent in parents:
+        parent_resolved = parent.resolve()
+        if resolved == parent_resolved or parent_resolved in resolved.parents:
+            return resolved
+    allowed = ", ".join(str(parent) for parent in parents)
+    raise ValueError(f"path outside allowed roots: {path}; allowed={allowed}")
+
+
 def resolve_run_dir(value: str | None) -> Path:
     if not value:
         latest = latest_run_dir()
@@ -56,7 +104,7 @@ def resolve_run_dir(value: str | None) -> Path:
     path = Path(value)
     if not path.is_absolute():
         path = ROOT_DIR / path
-    resolved = ensure_under(path, RUNS_DIR)
+    resolved = ensure_under_any(path, candidate_runs_dirs())
     if not resolved.is_dir():
         raise ValueError(f"run directory does not exist: {value}")
     return resolved
@@ -186,7 +234,7 @@ def attach_state_from_stdout(result: dict) -> dict:
         if not state_path.is_absolute():
             state_path = ROOT_DIR / state_path
         try:
-            safe_state = ensure_under(state_path, RUNS_DIR)
+            safe_state = ensure_under_any(state_path, candidate_runs_dirs())
             state = read_json_file(safe_state)
             if state is not None:
                 result["state"] = state
@@ -277,13 +325,18 @@ class Handler(BaseHTTPRequestHandler):
                         "adapter": "triparty-http",
                         "version": version(),
                         "root_dir": str(ROOT_DIR),
+                        "runs_dir": str(RUNS_DIR),
                     },
                 )
                 return
 
             if path == "/runs":
                 limit = int(query.get("limit", ["20"])[0])
-                runs = sorted(path for path in RUNS_DIR.glob("review-*") if path.is_dir())[-limit:]
+                runs = []
+                for runs_dir in candidate_runs_dirs():
+                    if runs_dir.exists():
+                        runs.extend(path for path in runs_dir.glob("review-*") if path.is_dir())
+                runs = sorted(set(runs), key=lambda path: path.name)[-limit:]
                 payload = []
                 for run_dir in runs:
                     state = load_state(run_dir)
@@ -395,7 +448,7 @@ class Handler(BaseHTTPRequestHandler):
                     out_path = Path(out_dir)
                     if not out_path.is_absolute():
                         out_path = ROOT_DIR / out_path
-                    args.append(str(ensure_under(out_path, RUNS_DIR)))
+                    args.append(str(ensure_under_any(out_path, candidate_runs_dirs())))
                 result = run_command(args, timeout=min(timeout, 300))
                 self._send(200 if result["ok"] else 500, result)
                 return

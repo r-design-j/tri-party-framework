@@ -71,6 +71,8 @@ Expected output is written under:
 docs/framework/runs/review-YYYYMMDD-HHMMSS/
 ```
 
+If the default `docs/framework/runs` directory is not writable, the portable core automatically falls back to `${TMPDIR:-/tmp}/triparty-runs`. `status` and `state.json` record the actual `run_dir` and `runs_dir`; do not infer location from the default path.
+
 The important artifacts are:
 
 ```text
@@ -118,6 +120,8 @@ flowchart LR
 - A direct Gemini CLI/tool/API result, connector result, or user-provided Gemini transcript.
 
 The framework can still proceed in partial mode when a party is missing, but it must report the missing party and cannot claim `true_triparty_ready`.
+
+Gemini preflight includes a separate headless auth doctor before any long review call. It reports one of `authenticated`, `interactive-auth-required`, `binary-missing`, or `timeout`; only `authenticated` proceeds to the normal Gemini probe.
 
 ## Trigger In A New Session
 
@@ -167,6 +171,12 @@ Run a source check:
 scripts/triparty.sh preflight
 ```
 
+Run only the Gemini auth doctor:
+
+```bash
+scripts/triparty-gemini-auth-doctor.sh
+```
+
 Run independent reviews:
 
 ```bash
@@ -191,11 +201,22 @@ Run the release gate before public push/release claims:
 scripts/triparty.sh release-gate docs/framework/runs/review-YYYYMMDD-HHMMSS
 ```
 
+The release gate is conservative: a run is partial unless both Claude and Gemini have complete independent review artifacts and complete cross-audit artifacts with valid metadata, hashes, completion markers, and clean runtime output.
+
 Validate a state file directly:
 
 ```bash
 scripts/triparty-validate-state.py --release docs/framework/runs/review-YYYYMMDD-HHMMSS/state.json
 ```
+
+Create and verify a local cross-session handoff:
+
+```bash
+scripts/triparty.sh continuity checkpoint --run-dir docs/framework/runs/review-YYYYMMDD-HHMMSS
+scripts/triparty.sh continuity bootstrap
+```
+
+The continuity checkpoint writes `.agent/continuity/current.yml`, `handoff.md`, `bootstrap.md`, `manifest.json`, and redaction rules. The bootstrap command verifies manifest hashes before printing the handoff; it does not upgrade a partial run into a true tri-party conclusion.
 
 Optional local pre-push hook:
 
@@ -266,11 +287,15 @@ See [examples](examples/) for:
 - `SECURITY.md`: adapter, artifact, and source-truth safety notes.
 - `scripts/triparty.sh`: unified CLI for run, review, cross-audit, merge, status, resume, and archive.
 - `scripts/triparty-preflight.sh`: source availability and connectivity probe.
+- `scripts/triparty-runs-dir.sh`: writable run-directory resolver with temp fallback.
+- `scripts/triparty-gemini-auth-doctor.sh`: fast Gemini headless-auth classifier.
 - `scripts/triparty-review.sh`: Claude and Gemini independent review runner.
 - `scripts/triparty-cross-audit.sh`: mutual Claude/Gemini audit runner.
 - `scripts/triparty-merge.sh`: merge gate for source status, artifact metadata, completion markers, and hashes.
 - `scripts/triparty-release-gate.sh`: public push/release readiness gate backed by `state.json`.
 - `scripts/triparty-validate-state.py`: dependency-free state and release-readiness validator.
+- `scripts/triparty-continuity-checkpoint.sh`: local cross-session handoff writer.
+- `scripts/triparty-continuity-bootstrap.sh`: manifest-verified handoff bootstrap printer.
 - `scripts/install-triparty-git-hooks.sh`: optional local pre-push hook installer for the release gate.
 - `scripts/install-triparty-global-bootstrap.sh`: installs global new-session discovery, config, and CLI wrapper.
 - `scripts/triparty-lint.sh`: framework consistency checks.

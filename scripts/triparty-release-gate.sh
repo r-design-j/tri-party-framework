@@ -2,7 +2,9 @@
 set -u
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RUNS_DIR="${TRIPARTY_RUNS_DIR:-"$ROOT_DIR/docs/framework/runs"}"
+# shellcheck source=scripts/triparty-runs-dir.sh
+. "$ROOT_DIR/scripts/triparty-runs-dir.sh"
+RUNS_DIR="$(triparty_resolve_runs_dir "$ROOT_DIR")" || exit $?
 
 usage() {
   cat <<'EOF'
@@ -15,14 +17,18 @@ EOF
 }
 
 latest_run_dir() {
-  find "$RUNS_DIR" -maxdepth 1 -type d -name 'review-*' 2>/dev/null \
+  triparty_candidate_runs_dirs "$ROOT_DIR" "$RUNS_DIR" \
+    | while IFS= read -r candidate_dir; do
+        find "$candidate_dir" -maxdepth 1 -type d -name 'review-*' 2>/dev/null
+      done \
     | while IFS= read -r candidate; do
         if [ -f "$candidate/source-status.md" ]; then
-          printf '%s\n' "$candidate"
+          printf '%s\t%s\n' "$(basename "$candidate")" "$candidate"
         fi
       done \
-    | sort \
-    | tail -n 1
+    | sort -k1,1 \
+    | tail -n 1 \
+    | cut -f2-
 }
 
 run_dir="${1:-}"

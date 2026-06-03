@@ -41,6 +41,13 @@ parties:
       - docs/framework/gemini-headless-policy.toml
     disabled_default_mcp_reason: The configured pencil MCP server has been observed as disconnected and can hang headless calls.
     reliability_defaults:
+      auth_doctor_statuses:
+        - authenticated
+        - interactive-auth-required
+        - binary-missing
+        - timeout
+      auth_doctor_timeout_seconds: 12
+      runs_dir_fallback: "${TMPDIR:-/tmp}/triparty-runs"
       probe_timeout_seconds: 40
       review_timeout_seconds: 180
       cross_audit_timeout_seconds: 240

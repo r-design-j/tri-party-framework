@@ -143,3 +143,15 @@
 - Failure: `triparty-release-gate.sh` is called without a run directory and selects a newer `review-*` directory that only contains preflight artifacts.
 - Risk: Pre-push and release workflows fail even though the latest complete tri-party review is ready, or humans bypass the gate because it appears flaky.
 - Prevention: Default latest-run resolution for release gates must only consider review directories that contain `source-status.md`; incomplete preflight-only directories remain inspectable but are not eligible as release candidates.
+
+## AP-025: Default Runs Directory Assumed Writable
+
+- Failure: The core assumes `docs/framework/runs` can always be created and written.
+- Risk: `run`, `status`, and adapters disagree about where evidence lives, or fail before writing usable partial-state artifacts.
+- Prevention: Resolve a writable runs root before creating artifacts. If the default repo runs directory is unavailable, fall back to `${TMPDIR:-/tmp}/triparty-runs` and record the actual `runs_dir` and `run_dir` in `state.json`.
+
+## AP-026: Gemini Browser Auth Hangs Review Flow
+
+- Failure: Gemini CLI exists, but headless execution opens or waits for interactive browser authentication during review.
+- Risk: A review or cross-audit spends its full timeout on auth instead of producing a clear partial result.
+- Prevention: Run the Gemini auth doctor before the content probe. Only `authenticated` may continue; `interactive-auth-required`, `binary-missing`, and `timeout` must fail fast and mark the run partial.

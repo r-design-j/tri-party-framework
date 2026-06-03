@@ -2,7 +2,9 @@
 set -u
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RUNS_DIR="${TRIPARTY_RUNS_DIR:-"$ROOT_DIR/docs/framework/runs"}"
+# shellcheck source=scripts/triparty-runs-dir.sh
+. "$ROOT_DIR/scripts/triparty-runs-dir.sh"
+RUNS_DIR="$(triparty_resolve_runs_dir "$ROOT_DIR")" || exit $?
 CORE_VERSION="$(cat "$ROOT_DIR/VERSION" 2>/dev/null || printf '0.0.0-dev')"
 MODEL_BINDING_FILE="$ROOT_DIR/docs/framework/model-binding.yaml"
 
@@ -20,6 +22,8 @@ Usage:
   scripts/triparty.sh runs [limit]
   scripts/triparty.sh stats
   scripts/triparty.sh archive [--keep N] [--dry-run]
+  scripts/triparty.sh continuity checkpoint [--out-dir DIR] [--workstream NAME] [--goal TEXT] [--run-dir RUN_DIR]
+  scripts/triparty.sh continuity bootstrap [--out-dir DIR]
   scripts/triparty.sh release-gate [run-dir]
   scripts/triparty.sh lint
   scripts/triparty.sh regression
@@ -38,7 +42,17 @@ now_utc() {
 }
 
 latest_run_dir() {
-  find "$RUNS_DIR" -maxdepth 1 -type d -name 'review-*' 2>/dev/null | sort | tail -n 1
+  triparty_candidate_runs_dirs "$ROOT_DIR" "$RUNS_DIR" \
+    | while IFS= read -r candidate_dir; do
+        find "$candidate_dir" -maxdepth 1 -type d -name 'review-*' 2>/dev/null
+      done \
+    | awk '!seen[$0]++ { print }' \
+    | while IFS= read -r candidate; do
+        printf '%s\t%s\n' "$(basename "$candidate")" "$candidate"
+      done \
+    | sort -k1,1 \
+    | tail -n 1 \
+    | cut -f2-
 }
 
 resolve_run_dir() {
@@ -291,6 +305,10 @@ write_state() {
   GEMINI_VERSION=""
   GEMINI_BIN_SHA256=""
   GEMINI_POLICY_SHA256=""
+  GEMINI_AUTH_STATUS="unknown"
+  GEMINI_AUTH_OUTPUT=""
+  GEMINI_AUTH_TIMEOUT=0
+  GEMINI_AUTH_DOCTOR_CODE=0
   CLAUDE_REVIEW_STATUS="Missing"
   GEMINI_REVIEW_STATUS="Missing"
   CLAUDE_REVIEW_SHA256=""
@@ -357,6 +375,7 @@ write_state() {
   "schema_version": "triparty.state.v1",
   "core_version": "$(json_string "$CORE_VERSION")",
   "generated_at": "$(now_utc)",
+  "runs_dir": "$(json_string "$(dirname "$run_dir")")",
   "run_dir": "$(json_string "$run_dir")",
   "phase": "$(json_string "$phase")",
   "true_triparty_ready": $true_ready,
@@ -390,6 +409,12 @@ write_state() {
       "preflight_version": "$(json_string "${GEMINI_VERSION:-}")",
       "preflight_binary_sha256": "$(json_string "${GEMINI_BIN_SHA256:-}")",
       "preflight_policy_sha256": "$(json_string "${GEMINI_POLICY_SHA256:-}")",
+      "auth_doctor": {
+        "status": "$(json_string "${GEMINI_AUTH_STATUS:-unknown}")",
+        "output": "$(json_string "${GEMINI_AUTH_OUTPUT:-}")",
+        "timeout_seconds": ${GEMINI_AUTH_TIMEOUT:-0},
+        "exit_code": ${GEMINI_AUTH_DOCTOR_CODE:-0}
+      },
       "review": "$(json_string "${GEMINI_REVIEW_STATUS:-Missing}")",
       "review_error_code": "$(json_string "${GEMINI_REVIEW_ERROR_CODE:-$(status_error_code REVIEW "${GEMINI_REVIEW_STATUS:-Missing}")}")",
       "review_provenance": "$(json_string "${GEMINI_REVIEW_PROVENANCE:-automated_cli}")",
@@ -545,6 +570,10 @@ load_run_env() {
   GEMINI_VERSION=""
   GEMINI_BIN_SHA256=""
   GEMINI_POLICY_SHA256=""
+  GEMINI_AUTH_STATUS="unknown"
+  GEMINI_AUTH_OUTPUT=""
+  GEMINI_AUTH_TIMEOUT=0
+  GEMINI_AUTH_DOCTOR_CODE=0
   CLAUDE_REVIEW_STATUS="Missing"
   GEMINI_REVIEW_STATUS="Missing"
   CLAUDE_REVIEW_SHA256=""
@@ -693,7 +722,18 @@ resume_run() {
 
 list_runs() {
   local limit="${1:-20}"
-  find "$RUNS_DIR" -maxdepth 1 -type d -name 'review-*' 2>/dev/null | sort | tail -n "$limit" | while read -r run_dir; do
+  triparty_candidate_runs_dirs "$ROOT_DIR" "$RUNS_DIR" \
+    | while IFS= read -r candidate_dir; do
+        find "$candidate_dir" -maxdepth 1 -type d -name 'review-*' 2>/dev/null
+      done \
+    | awk '!seen[$0]++ { print }' \
+    | while IFS= read -r candidate; do
+        printf '%s\t%s\n' "$(basename "$candidate")" "$candidate"
+      done \
+    | sort -k1,1 \
+    | tail -n "$limit" \
+    | cut -f2- \
+    | while read -r run_dir; do
     write_state "$run_dir" >/dev/null 2>&1 || true
     local phase="unknown"
     local ready="false"
@@ -728,7 +768,16 @@ stats_runs() {
       *) other=$((other + 1)) ;;
     esac
   done <<EOF
-$(find "$RUNS_DIR" -maxdepth 1 -type d -name 'review-*' 2>/dev/null | sort)
+$(triparty_candidate_runs_dirs "$ROOT_DIR" "$RUNS_DIR" \
+  | while IFS= read -r candidate_dir; do
+      find "$candidate_dir" -maxdepth 1 -type d -name 'review-*' 2>/dev/null
+    done \
+  | awk '!seen[$0]++ { print }' \
+  | while IFS= read -r candidate; do
+      printf '%s\t%s\n' "$(basename "$candidate")" "$candidate"
+    done \
+  | sort -k1,1 \
+  | cut -f2-)
 EOF
 
   cat <<EOF
@@ -791,9 +840,10 @@ print_status() {
   fi
 
   printf 'Run: %s\n' "$run_dir"
+  printf 'Runs dir: %s\n' "$(dirname "$run_dir")"
   printf 'Conclusion: %s\n' "$conclusion"
   printf 'Claude: preflight=%s review=%s cross_audit=%s\n' "${CLAUDE_STATUS:-Missing}" "${CLAUDE_REVIEW_STATUS:-Missing}" "${CLAUDE_CROSS_STATUS:-Missing}"
-  printf 'Gemini: preflight=%s review=%s cross_audit=%s\n' "${GEMINI_STATUS:-Missing}" "${GEMINI_REVIEW_STATUS:-Missing}" "${GEMINI_CROSS_STATUS:-Missing}"
+  printf 'Gemini: preflight=%s auth=%s review=%s cross_audit=%s\n' "${GEMINI_STATUS:-Missing}" "${GEMINI_AUTH_STATUS:-unknown}" "${GEMINI_REVIEW_STATUS:-Missing}" "${GEMINI_CROSS_STATUS:-Missing}"
   printf 'State: %s\n' "$run_dir/state.json"
 }
 
@@ -878,6 +928,27 @@ case "$cmd" in
     ;;
   archive)
     archive_runs "$@"
+    ;;
+  continuity)
+    subcmd="${1:-}"
+    if [ -z "$subcmd" ]; then
+      usage >&2
+      exit 2
+    fi
+    shift
+    case "$subcmd" in
+      checkpoint)
+        "$ROOT_DIR/scripts/triparty-continuity-checkpoint.sh" "$@"
+        ;;
+      bootstrap|status)
+        "$ROOT_DIR/scripts/triparty-continuity-bootstrap.sh" "$@"
+        ;;
+      *)
+        printf 'Unknown continuity subcommand: %s\n' "$subcmd" >&2
+        usage >&2
+        exit 2
+        ;;
+    esac
     ;;
   release-gate)
     "$ROOT_DIR/scripts/triparty-release-gate.sh" "${1:-}"

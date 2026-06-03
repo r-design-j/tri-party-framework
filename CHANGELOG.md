@@ -24,3 +24,7 @@
 - Added regression coverage for invalid injection inputs and injected artifact hash mismatch.
 - Added runner-written artifact metadata and completion-marker checks to the merge gate.
 - Added atomic status/state file publication and preflight model-binding SHA256 recording.
+- Added writable runs-directory fallback through `scripts/triparty-runs-dir.sh`; core CLI, preflight, review, release gate, and HTTP adapter now record/read the actual runs directory instead of assuming `docs/framework/runs`.
+- Added `scripts/triparty-gemini-auth-doctor.sh` and preflight/state integration so Gemini browser-auth waits are classified before long review calls.
+- Added continuity checkpoint/bootstrap commands with manifest hash verification for file-backed session handoff.
+- Tightened release-gate/state validation so true release claims require authenticated Gemini auth-doctor status and complete review plus cross-audit evidence.
