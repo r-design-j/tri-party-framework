@@ -196,16 +196,16 @@
       }
 
       .hero {
-        min-height: 1000px;
+        min-height: min(840px, calc(100svh - 49px));
         position: relative;
         display: grid;
         place-items: center;
-        padding: 160px 24px 110px;
+        padding: 68px 24px 112px;
       }
 
       .clock {
         position: absolute;
-        top: 104px;
+        top: 86px;
         left: 50%;
         transform: translateX(-50%);
         font-weight: 900;
@@ -308,14 +308,14 @@
       }
 
       .sticker.left {
-        left: 4%;
-        top: 28%;
+        left: 9%;
+        top: 30%;
         background: var(--mint);
         transform: rotate(14deg);
       }
 
       .sticker.right {
-        right: 3%;
+        right: 8%;
         top: 31%;
         background: #ffe2a0;
         transform: rotate(-8deg);
@@ -330,16 +330,16 @@
         color: #fff;
         text-transform: uppercase;
         font-weight: 900;
-        bottom: 250px;
-        right: 13%;
+        bottom: 160px;
+        right: 15%;
         transform: rotate(-3deg);
         box-shadow: 5px 5px 0 var(--ink);
       }
 
       .chip-sticker {
         position: absolute;
-        left: 4%;
-        bottom: 120px;
+        left: 9%;
+        bottom: 78px;
         padding: 16px 27px;
         background: var(--yellow);
         border: 3px solid var(--ink);
@@ -351,7 +351,7 @@
 
       .intro-tool {
         position: absolute;
-        bottom: 118px;
+        bottom: 102px;
         left: 50%;
         transform: translateX(-50%);
         text-align: center;
@@ -370,7 +370,7 @@
 
       .hero-actions {
         position: absolute;
-        bottom: 42px;
+        bottom: 28px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
@@ -1672,12 +1672,12 @@
         }
 
         .hero {
-          min-height: 850px;
-          padding-top: 120px;
+          min-height: 760px;
+          padding-top: 96px;
         }
 
         .clock {
-          top: 82px;
+          top: 76px;
         }
 
         .display-frame {
