@@ -9,6 +9,16 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="assets/triparty-icon-512.png" />
+    <script>
+      (() => {
+        try {
+          const saved = localStorage.getItem("triparty-theme");
+          document.documentElement.dataset.theme = saved || "light";
+        } catch {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
     <style>
       :root {
         --ink: #080808;
@@ -27,6 +37,21 @@
         --font-brand: "Avenir Next Condensed", "Arial Black", "PingFang SC", "HarmonyOS Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
         --font-mono: "SFMono-Regular", "Cascadia Mono", "Menlo", "Consolas", monospace;
         font-family: var(--font-ui);
+      }
+
+      html[data-theme="dark"] {
+        --ink: #f6f1e7;
+        --paper: #0f1014;
+        --line: rgba(246, 241, 231, 0.08);
+        --line-strong: rgba(246, 241, 231, 0.22);
+        --blue: #45c8ee;
+        --pink: #ff3b78;
+        --yellow: #ffd15e;
+        --mint: #80dabd;
+        --green: #37d894;
+        --gray: #292b31;
+        --shadow: 0 26px 90px rgba(0, 0, 0, 0.48);
+        color-scheme: dark;
       }
 
       * {
@@ -133,6 +158,23 @@
         cursor: pointer;
         font-size: 12px;
         font-weight: 800;
+      }
+
+      .theme-toggle {
+        width: 39px;
+        height: 33px;
+        border-radius: 0;
+        border: 1px solid var(--ink);
+        background: var(--paper);
+        color: var(--ink);
+        box-shadow: 3px 3px 0 var(--ink);
+        display: inline-grid;
+        place-items: center;
+      }
+
+      .theme-toggle[aria-pressed="true"] {
+        background: var(--yellow);
+        color: #080808;
       }
 
       .contact {
@@ -1854,6 +1896,143 @@
         transform: rotate(-3deg) translateY(0);
       }
 
+      html[data-theme="dark"] .topbar {
+        background: rgba(15, 16, 20, 0.92);
+      }
+
+      html[data-theme="dark"] .loader {
+        background:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px),
+          rgba(15, 16, 20, 0.96);
+      }
+
+      html[data-theme="dark"] .contact,
+      html[data-theme="dark"] .hero-action.secondary,
+      html[data-theme="dark"] .tool-actions button,
+      html[data-theme="dark"] .copy,
+      html[data-theme="dark"] .definition-title,
+      html[data-theme="dark"] .def-card,
+      html[data-theme="dark"] .value-card,
+      html[data-theme="dark"] .platform-note,
+      html[data-theme="dark"] .agent-card.command,
+      html[data-theme="dark"] .install-card,
+      html[data-theme="dark"] .command-card,
+      html[data-theme="dark"] .case-main,
+      html[data-theme="dark"] .case-detail,
+      html[data-theme="dark"] .play-card,
+      html[data-theme="dark"] .contact-panel > div,
+      html[data-theme="dark"] .floating-result,
+      html[data-theme="dark"] code,
+      html[data-theme="dark"] .generated,
+      html[data-theme="dark"] .drop-zone,
+      html[data-theme="dark"] .plain-step,
+      html[data-theme="dark"] .value-proof {
+        background: #17191f;
+        color: var(--ink);
+      }
+
+      html[data-theme="dark"] .agent-card.prompt,
+      html[data-theme="dark"] .advanced-shell,
+      html[data-theme="dark"] .tool-panel,
+      html[data-theme="dark"] .checklist,
+      html[data-theme="dark"] .case-row,
+      html[data-theme="dark"] .footer,
+      html[data-theme="dark"] .case-art,
+      html[data-theme="dark"] .boundary-strip,
+      html[data-theme="dark"] .panel-tag {
+        background: #07080b;
+        color: var(--ink);
+      }
+
+      html[data-theme="dark"] .nav-item.active,
+      html[data-theme="dark"] .hero-action span,
+      html[data-theme="dark"] .hero-action.secondary span,
+      html[data-theme="dark"] .loader-badge,
+      html[data-theme="dark"] .install-card.primary,
+      html[data-theme="dark"] .def-card:nth-child(2),
+      html[data-theme="dark"] .def-card:nth-child(3),
+      html[data-theme="dark"] .value-card.main,
+      html[data-theme="dark"] .value-card:nth-child(2),
+      html[data-theme="dark"] .value-card:nth-child(3),
+      html[data-theme="dark"] .platform-list span,
+      html[data-theme="dark"] .boundary-strip strong {
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .install-card:nth-child(2),
+      html[data-theme="dark"] .value-card:nth-child(2),
+      html[data-theme="dark"] .def-card:nth-child(2),
+      html[data-theme="dark"] .note {
+        background: #ffd15e;
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .def-card:nth-child(3),
+      html[data-theme="dark"] .value-card:nth-child(3) {
+        background: var(--mint);
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .value-card:nth-child(4),
+      html[data-theme="dark"] .pill-sticker,
+      html[data-theme="dark"] .check.completed {
+        background: var(--pink);
+        color: #fff;
+      }
+
+      html[data-theme="dark"] .def-card:nth-child(4),
+      html[data-theme="dark"] .value-card:nth-child(5),
+      html[data-theme="dark"] .platform-list span:last-child {
+        background: #252832;
+        color: var(--ink);
+      }
+
+      html[data-theme="dark"] .hero-action {
+        background: var(--ink);
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .agent-card.prompt code,
+      html[data-theme="dark"] .status-cell,
+      html[data-theme="dark"] .result,
+      html[data-theme="dark"] .meta-cell,
+      html[data-theme="dark"] .detail-section,
+      html[data-theme="dark"] .check,
+      html[data-theme="dark"] .case-tags span,
+      html[data-theme="dark"] .media-chip {
+        background: rgba(246, 241, 231, 0.08);
+        color: var(--ink);
+        border-color: var(--line-strong);
+      }
+
+      html[data-theme="dark"] .tool-actions button.secondary {
+        background: transparent;
+        color: var(--ink);
+      }
+
+      html[data-theme="dark"] .contact-panel a {
+        color: var(--blue);
+      }
+
+      html[data-theme="dark"] .nav-item.active,
+      html[data-theme="dark"] .loader-badge,
+      html[data-theme="dark"] .install-card.primary,
+      html[data-theme="dark"] .value-card.main {
+        background: var(--blue);
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .hero-action span {
+        background: var(--blue);
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .hero-action.secondary span {
+        background: var(--yellow);
+        color: #080808;
+      }
+
       @media (max-width: 1120px) {
         .sticker {
           min-width: 188px;
@@ -1895,6 +2074,10 @@
 
         .round {
           display: none;
+        }
+
+        .theme-toggle {
+          display: inline-grid;
         }
 
         .contact {
@@ -2285,6 +2468,7 @@
         <a class="nav-item hide-mobile" href="https://github.com/r-design-j/tri-party-framework"><span class="ico">↗</span>GitHub</a>
       </nav>
       <div class="nav-right">
+        <button class="round theme-toggle" id="themeToggle" type="button" aria-label="切换到暗黑模式" aria-pressed="false" title="切换到暗黑模式"><span class="ico" id="themeIcon">夜</span></button>
         <a class="contact" href="https://github.com/r-design-j/tri-party-framework"><span>♥</span>GitHub</a>
       </div>
     </header>
@@ -2964,9 +3148,35 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
         clock: document.getElementById("clock"),
         checkCount: document.getElementById("checkCount"),
         checkNext: document.getElementById("checkNext"),
-        checkProgress: document.getElementById("checkProgress")
+        checkProgress: document.getElementById("checkProgress"),
+        themeToggle: document.getElementById("themeToggle"),
+        themeIcon: document.getElementById("themeIcon")
       };
       const checkItems = Array.from(document.querySelectorAll(".check input"));
+
+      function applyTheme(theme) {
+        const nextTheme = theme === "dark" ? "dark" : "light";
+        const isDark = nextTheme === "dark";
+        document.documentElement.dataset.theme = nextTheme;
+        if (els.themeToggle && els.themeIcon) {
+          els.themeToggle.setAttribute("aria-pressed", String(isDark));
+          els.themeToggle.setAttribute("aria-label", isDark ? "切换到白昼模式" : "切换到暗黑模式");
+          els.themeToggle.setAttribute("title", isDark ? "切换到白昼模式" : "切换到暗黑模式");
+          els.themeIcon.textContent = isDark ? "昼" : "夜";
+        }
+      }
+
+      function toggleTheme() {
+        const currentTheme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+        const nextTheme = currentTheme === "dark" ? "light" : "dark";
+        try {
+          localStorage.setItem("triparty-theme", nextTheme);
+        } catch {
+          // localStorage may be unavailable in restricted browser modes.
+        }
+        applyTheme(nextTheme);
+        setFloating(nextTheme === "dark" ? "已切换到暗黑模式" : "已切换到白昼模式", nextTheme === "dark" ? "var(--yellow)" : "var(--blue)");
+      }
 
       function setClock() {
         const now = new Date();
@@ -3159,6 +3369,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
         });
       });
       document.querySelector(".mark").addEventListener("click", () => setActiveNav("#home"));
+      els.themeToggle?.addEventListener("click", toggleTheme);
       advanced?.addEventListener("toggle", revealAdvancedContent);
       window.addEventListener("hashchange", () => openAdvancedForHash(window.location.hash));
       document.querySelectorAll(".case-link").forEach((link) => {
@@ -3186,6 +3397,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
 
       setClock();
       setInterval(setClock, 1000);
+      applyTheme(document.documentElement.dataset.theme);
       buildRunCommand();
       explainErrorCode();
       updateChecklist();
