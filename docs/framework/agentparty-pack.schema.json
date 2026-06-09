@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentParty product pack registry",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "packs"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "agentparty.packs.v1"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "packs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "display_name",
+          "status",
+          "agents",
+          "completion_semantics",
+          "os_support",
+          "entrypoints",
+          "docs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["productized", "scaffolded", "roadmap"]
+          },
+          "agents": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "required": ["id", "name", "role", "source"],
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "role": { "type": "string" },
+                "source": {
+                  "type": "string",
+                  "enum": ["local_cli", "agent_runtime", "transcript", "connector", "manual"]
+                }
+              }
+            }
+          },
+          "completion_semantics": {
+            "type": "object",
+            "required": ["ready_label", "must_not_claim"],
+            "properties": {
+              "ready_label": { "type": "string" },
+              "must_not_claim": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "state_schema": { "type": "string" }
+            }
+          },
+          "os_support": {
+            "type": "object",
+            "required": ["macos", "linux", "windows_wsl2", "windows_powershell"],
+            "properties": {
+              "macos": { "$ref": "#/$defs/os_status" },
+              "linux": { "$ref": "#/$defs/os_status" },
+              "windows_wsl2": { "$ref": "#/$defs/os_status" },
+              "windows_powershell": { "$ref": "#/$defs/os_status" }
+            }
+          },
+          "entrypoints": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "docs": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "os_status": {
+      "type": "string",
+      "enum": ["supported", "roadmap", "blocked", "not_applicable"]
+    }
+  }
+}

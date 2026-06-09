@@ -1,8 +1,14 @@
-# Tri-party Framework
+# AgentParty / triparty Framework
 
-Verifiable Codex + Claude + Gemini collaboration for agent workflows.
+AgentParty is a productizable multi-agent protocol for repeatable agent workflows.
+`triparty` is the first productized AgentParty pack: verifiable Codex + Claude + Gemini collaboration with source checks, cross-audit, and release gates.
 
-This project prevents a common failure mode in AI-agent work: a single model claims to have used several models, but there is no source trail, no independent review, and no cross-audit. Tri-party Framework turns that into an executable workflow with source checks, archived model outputs, mutual audits, and a merge gate before synthesis.
+This project prevents two common failure modes in AI-agent work:
+
+- A single model claims to have used several models, but there is no source trail, no independent review, and no cross-audit.
+- The same skill is copied between agent runtimes, but quality drops because context, tools, memory, auth, and output gates differ.
+
+AgentParty makes agent roles, evidence, product-pack boundaries, and completion claims explicit. The current executable pack, `triparty`, turns Codex + Claude + Gemini collaboration into an executable workflow with source checks, archived model outputs, mutual audits, and a merge gate before synthesis.
 
 Repository: https://github.com/r-design-j/tri-party-framework
 
@@ -12,7 +18,68 @@ Download ZIP: https://github.com/r-design-j/tri-party-framework/archive/refs/hea
 
 ![triparty 工具台首屏](web/assets/triparty-home-first-screen.png)
 
-## What It Does
+## Product Shape
+
+| Layer | Current status | Meaning |
+| --- | --- | --- |
+| AgentParty protocol | Scaffolded | Generic multi-agent contracts, pack registry, skill portability rules, OS matrix |
+| `triparty` pack | Productized | Codex + Claude + Gemini with `true_triparty_ready` release gate |
+| Claude Code + Feishu Claw pack | Scaffolded | 2-agent workflow for Claude Code and Feishu Claw transcripts; never true tri-party |
+
+Core AgentParty files:
+
+- `docs/framework/agentparty-protocol.md`
+- `docs/framework/agentparty-packs.json`
+- `docs/framework/product-packs/triparty.md`
+- `docs/framework/product-packs/claude-code-feishu-claw.md`
+- `docs/framework/agentparty-managed-install-lifecycle.md`
+- `scripts/agentparty.py`
+- `scripts/agentparty-pack-lint.py`
+
+AgentParty commands:
+
+```bash
+scripts/agentparty.sh packs
+scripts/agentparty.sh info --pack triparty
+scripts/agentparty.sh info --pack claude-code-feishu-claw
+scripts/agentparty.sh doctor
+scripts/agentparty.sh onboard --pack triparty --target-os auto
+scripts/agentparty.sh install --pack triparty --target-os auto
+scripts/agentparty.sh install --pack triparty --target-os auto --execute
+scripts/agentparty.sh install-plan --pack triparty --target-os auto
+scripts/agentparty.sh install-plan --pack triparty --target-os windows_powershell
+scripts/agentparty.sh quickstart --pack triparty --target-os auto
+scripts/agentparty.sh quickstart --pack claude-code-feishu-claw --target-os auto
+scripts/agentparty.sh release-check
+scripts/agentparty.sh release-check --full --triparty-run-dir docs/framework/runs/review-YYYYMMDD-HHMMSS
+scripts/agentparty.sh package --out dist/agentparty-release --archive
+scripts/agentparty.sh prompt --pack claude-code-feishu-claw --task "整理飞书文档"
+scripts/agentparty.sh kit --pack claude-code-feishu-claw --task "整理飞书文档" --out claw-kit
+scripts/agentparty.sh bridge-kit --pack claude-code-feishu-claw --task "整理飞书文档" --out claw-bridge
+scripts/agentparty.sh bridge-validate --bridge-dir claw-bridge
+scripts/agentparty.sh run --pack claude-code-feishu-claw --task "整理飞书文档"
+scripts/agentparty.sh evidence-template --pack claude-code-feishu-claw --run-dir "<run-dir>" --out claw-evidence
+scripts/agentparty.sh evidence-fill --pack claude-code-feishu-claw --bundle claw-evidence/agentparty-claw-evidence.json --feishu-link "<飞书链接>"
+scripts/agentparty.sh evidence --pack claude-code-feishu-claw --bundle claw-evidence/agentparty-claw-evidence.json
+scripts/agentparty.sh validate-run --run-dir "<run-dir>"
+scripts/agentparty.sh guide --pack claude-code-feishu-claw --run-dir "<run-dir>"
+scripts/agentparty.sh claw-e2e --pack claude-code-feishu-claw --task "创建一个 AgentParty 测试文档" --out claw-e2e-run
+scripts/agentparty.sh run --pack triparty --task "审查这个方案"
+```
+
+`agentparty onboard --pack triparty` is the productized first-use surface for the TriParty pack. It shows the current OS path, readiness checks, install/preflight/first-run/release-gate steps, and the one-copy prompt to hand to another local agent. It does not run models or upgrade probe success into completion. `agentparty quickstart --pack ...` prints a shorter install/use path and an agent delegation prompt for the selected pack and OS target. `agentparty kit --pack claude-code-feishu-claw` creates a reusable local Claw handoff kit with `START_HERE.md`, Claude Code prompt, Feishu Claw prompt, action request, initial `state.json`, and an evidence bundle in one directory. It writes local files only and does not call Feishu or import evidence. `agentparty bridge-kit --pack claude-code-feishu-claw` is the target-shape scaffold: Feishu Claw is the user-facing intake/report surface, Claude Code is a controlled runner, and both sides share file-backed resources plus bridge state with one-active-writer and mutual-review rules. `bridge-validate` validates that bridge state without claiming native Feishu Claw callback support. `START_HERE.md` is the first page for ordinary users: copy order, evidence checklist, import commands, and boundaries. `agentparty run --pack claude-code-feishu-claw` creates a pack-scoped run with Claude Code and Feishu Claw prompts plus `agentparty.pack-state.v1`. Both start as `partial` until Feishu Claw transcript, Feishu link, operation summary, and Claude review evidence are imported. `agentparty guide --pack claude-code-feishu-claw --run-dir ...` reads the current state and prints the next command for `partial`, `blocked`, `scoped`, or `pack_ready` runs. `agentparty evidence-template` creates a fill-in bundle so users can hand the same evidence shape between Claude Code and Feishu Claw; `agentparty evidence-fill` updates that local bundle without calling Feishu, importing evidence, or changing `state.json`; `agentparty evidence --bundle ...` imports it. `agentparty claw-e2e --pack claude-code-feishu-claw` runs the scoped local E2E adapter: Claude Code plan/review, Feishu CLI docx create/fetch, evidence import, and validation. It can produce `pack_ready` without manual transcript copy/paste, but it is not native Feishu Claw connector automation. With complete evidence the pack can become `pack_ready`; it still keeps `true_triparty_ready=false`.
+
+`agentparty release-check` is the AgentParty productization gate before commit or release packaging. Quick mode checks Python syntax, pack registry lint, triparty lint, `git diff --check`, website anchors, and the exact website command-card copy commands. `--full` adds the complete regression suite; `--triparty-run-dir` also runs the triparty release gate for a completed review run.
+
+`agentparty package --out <dir> --archive` creates a read-only AgentParty release bundle with protocol docs, pack registry, product-pack docs, adapters, installer/uninstaller scripts, website files, an `INSTALL.md`, and `agentparty-package-manifest.json` with file hashes and pack boundaries. Packaging is a distribution surface only; it does not install global files, execute model workflows, claim native PowerShell execution, or automate Feishu Claw auth.
+
+`.github/workflows/agentparty-release.yml` turns that local gate into repeatable release artifacts:
+
+- Ubuntu and macOS jobs run `scripts/agentparty.sh release-check --full --json`, then build and upload `agentparty package` bundles.
+- The Windows job runs the native PowerShell package path as a supported read-only distribution surface, then asserts `install --execute`, `run`, `doctor --deep`, `evidence`, and `claw-e2e` emit `E_BLOCKED_OS` plus the WSL2 handoff.
+- The workflow must not run model workflows or claim native PowerShell execution.
+
+## What triparty Does
 
 - Runs a preflight check for Codex, Claude, and Gemini availability.
 - Collects independent Claude and Gemini review artifacts.
@@ -43,6 +110,7 @@ Codex sub-agents do not count as Claude or Gemini.
 请在这台机器上安装 triparty。
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
+先判断系统环境：macOS / Linux / Windows WSL2 可按当前流程执行；Windows 原生 PowerShell/CMD 目前只做环境准备和检查，不要硬跑 bash 脚本，请引导进入 WSL2 或等待 PowerShell 原生 AgentParty CLI 路线完成。
 1. clone 仓库并进入目录。
 2. 补齐必要脚本权限。
 3. 运行项目自检。
@@ -55,17 +123,82 @@ Codex sub-agents do not count as Claude or Gemini.
 先 clone 框架并跑本地检查：
 
 ```bash
+# 适用 macOS / Linux / Windows WSL2；PowerShell 原生路线仍在 AgentParty 通用层中。
 git clone https://github.com/r-design-j/tri-party-framework.git
 cd tri-party-framework
 chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
 scripts/triparty-lint.sh
 ```
 
-每台机器只需要安装一次全局 bootstrap：
+Windows 原生 PowerShell/CMD/Git Bash/MSYS/Cygwin 当前不要直接运行 `scripts/*.sh`。推荐先进入 WSL2 + Ubuntu 后按 Linux 路径执行；PowerShell 原生 `agentparty` CLI 是路线，不是已发布能力。`scripts/agentparty.ps1` 只作为发现 / doctor / quickstart / install dry-run / install-plan / prompt / guide / validate-run / bridge-kit / bridge-validate / kit / evidence-template / evidence-fill / package 兼容 scaffold；Windows 非 WSL shell 下的 `install --execute`、`run`、`doctor --deep`、`evidence` 和 `claw-e2e` 会被阻断。当前 PowerShell 证据是静态 / regression / package 边界证据；没有单独 Windows 真机 run 记录时，不得写成已验证原生 Windows 执行。
+
+按系统生成安装计划：
+
+```bash
+scripts/agentparty.sh install --pack triparty --target-os auto
+scripts/agentparty.sh install --pack triparty --target-os auto --execute
+scripts/agentparty.sh install-plan --pack triparty --target-os auto
+scripts/agentparty.sh quickstart --pack triparty --target-os auto
+scripts/agentparty.sh install-plan --pack claude-code-feishu-claw --target-os windows_powershell
+```
+
+`agentparty install` defaults to dry-run. `--execute` is required before it writes managed bootstrap artifacts. On native PowerShell, install execution remains blocked; use WSL2 for the current executable Windows path.
+For execution, the requested `--target-os` must match the detected host OS. Use `--target-os auto` on the machine that will receive the install.
+
+PowerShell 原生环境中只使用兼容 scaffold 做发现和计划：
+
+```powershell
+.\scripts\agentparty.ps1 packs
+.\scripts\agentparty.ps1 doctor --pack triparty
+.\scripts\agentparty.ps1 install --pack triparty --target-os windows_powershell
+.\scripts\agentparty.ps1 install-plan --pack triparty --target-os windows_powershell
+.\scripts\agentparty.ps1 quickstart --pack triparty --target-os windows_powershell
+.\scripts\agentparty.ps1 prompt --pack claude-code-feishu-claw --task "整理飞书文档"
+.\scripts\agentparty.ps1 kit --pack claude-code-feishu-claw --task "整理飞书文档" --out claw-kit
+.\scripts\agentparty.ps1 evidence-fill --pack claude-code-feishu-claw --bundle claw-kit\evidence\agentparty-claw-evidence.json --feishu-link "<飞书链接>"
+.\scripts\agentparty.ps1 guide --pack claude-code-feishu-claw --target-os windows_powershell
+.\scripts\agentparty.ps1 package --out dist\agentparty-release --archive
+.\scripts\uninstall-triparty-global-bootstrap.ps1 -DryRun
+```
+
+每台机器只需要安装一次全局 bootstrap。推荐通过 AgentParty 入口执行：
+
+```bash
+scripts/agentparty.sh install --pack triparty --target-os auto
+scripts/agentparty.sh install --pack triparty --target-os auto --execute
+```
+
+底层等价命令：
 
 ```bash
 scripts/install-triparty-global-bootstrap.sh
 ```
+
+This installs both wrappers when possible:
+
+```bash
+triparty preflight
+agentparty packs
+agentparty doctor
+```
+
+卸载或回滚全局 bootstrap 时先 dry-run，再显式执行：
+
+```bash
+scripts/uninstall-triparty-global-bootstrap.sh --dry-run
+scripts/uninstall-triparty-global-bootstrap.sh --execute
+```
+
+The uninstaller removes only managed bootstrap blocks, wrappers, config, the managed install manifest, and copied Claude slash files that match the install manifest or current repository source. Modified user files are skipped.
+
+Native PowerShell has a matching cleanup scaffold:
+
+```powershell
+.\scripts\uninstall-triparty-global-bootstrap.ps1 -DryRun
+.\scripts\uninstall-triparty-global-bootstrap.ps1 -Execute
+```
+
+This is a cleanup surface only. It does not make native PowerShell `run`, `doctor --deep`, `evidence`, or `claw-e2e` execution shipped, and it is not a real Windows host execution claim without a separate Windows evidence run.
 
 然后验证已安装的 CLI wrapper：
 
@@ -104,7 +237,7 @@ Install the new-session bootstrap once on each machine:
 scripts/install-triparty-global-bootstrap.sh
 ```
 
-This writes global bootstrap blocks for Codex and Claude Code, installs Claude Code slash entrypoints `/triparty` and `/tp`, stores the framework home in `~/.triparty-framework/config`, and creates a `triparty` CLI wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`. New sessions should use this installed framework instead of creating new Markdown files to reconstruct the protocol.
+This writes global bootstrap blocks for Codex and Claude Code, installs Claude Code slash entrypoints `/triparty`, `/tp`, `/agentparty-claw`, and `/ap-claw`, stores the framework home in `~/.triparty-framework/config`, writes `~/.triparty-framework/managed-install.env` with installed managed-file hashes, and creates `triparty` plus `agentparty` CLI wrappers in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`. The rollback rules are documented in `docs/framework/agentparty-managed-install-lifecycle.md`. New sessions should use this installed framework instead of creating new Markdown files to reconstruct the protocol.
 
 Run the full workflow:
 
@@ -215,9 +348,13 @@ The installer also installs Claude Code slash entrypoints, so a new Claude Code 
 /triparty preflight
 /triparty run "请用 Codex + Claude + Gemini 三方模型协作框架审查这个方案"
 /tp status
+/agentparty-claw kit "整理飞书文档"
+/agentparty-claw guide agentparty-claw-kit-YYYYMMDD-HHMMSS
+/ap-claw "整理飞书文档"
 ```
 
 Slash invocation is an adapter surface, not the framework core. If a different agent does not support Claude Code slash skills or slash commands, use the portable `triparty` CLI, HTTP adapter, or MCP adapter instead.
+The Claw slash entries are AgentParty product-pack adapters: they create or inspect local Claw kits, but they do not call Feishu, configure Claw auth, import evidence, or claim `true_triparty_ready=true`. If the AgentParty CLI cannot be resolved from PATH, framework config, or the current repository, the slash command must stop and report that the framework is not installed or discoverable; it must not invent replacement Markdown protocols.
 
 ## Common Commands
 
@@ -334,7 +471,7 @@ See [examples](examples/) for:
 - `AGENTS.md`: stable working agreements inherited by future Codex sessions.
 - `CLAUDE.md`: Claude Code entrypoint that imports `AGENTS.md`.
 - `.claude/skills/triparty/SKILL.md`: Claude Code `/triparty` slash skill.
-- `.claude/commands/`: fallback Claude Code slash command files, including `/triparty` and `/tp`.
+- `.claude/commands/`: fallback Claude Code slash command files, including `/triparty`, `/tp`, `/agentparty-claw`, and `/ap-claw`.
 - `docs/framework/tri-party-protocol.md`: executable protocol and source rules.
 - `docs/framework/adapter-contract.md`: rules every external adapter must obey.
 - `docs/framework/model-binding.yaml`: current model-version binding for each role.

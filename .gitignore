@@ -1,4 +1,6 @@
 docs/framework/runs/
+docs/framework/agentparty-runs/
+dist/
 .agent/continuity/
 __pycache__/
 *.pyc

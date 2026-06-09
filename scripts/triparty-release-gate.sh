@@ -17,6 +17,26 @@ EOF
 }
 
 latest_run_dir() {
+  local timestamped
+  timestamped="$(
+    triparty_candidate_runs_dirs "$ROOT_DIR" "$RUNS_DIR" \
+      | while IFS= read -r candidate_dir; do
+          find "$candidate_dir" -maxdepth 1 -type d -name 'review-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-*' 2>/dev/null
+        done \
+      | while IFS= read -r candidate; do
+          if [ -f "$candidate/source-status.md" ]; then
+            printf '%s\t%s\n' "$(basename "$candidate")" "$candidate"
+          fi
+        done \
+      | sort -k1,1 \
+      | tail -n 1 \
+      | cut -f2-
+  )"
+  if [ -n "$timestamped" ]; then
+    printf '%s\n' "$timestamped"
+    return 0
+  fi
+
   triparty_candidate_runs_dirs "$ROOT_DIR" "$RUNS_DIR" \
     | while IFS= read -r candidate_dir; do
         find "$candidate_dir" -maxdepth 1 -type d -name 'review-*' 2>/dev/null

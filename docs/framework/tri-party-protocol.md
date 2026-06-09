@@ -80,7 +80,7 @@ The installer writes:
 
 - a global Codex `AGENTS.md` bootstrap block;
 - a global Claude Code `~/.claude/CLAUDE.md` bootstrap block;
-- a Claude Code `/triparty` slash skill and `/triparty` plus `/tp` slash command files;
+- a Claude Code `/triparty` slash skill and `/triparty`, `/tp`, `/agentparty-claw`, plus `/ap-claw` slash command files;
 - `~/.triparty-framework/config` with the installed framework path;
 - a `triparty` wrapper in a user bin directory already on PATH when possible, such as `~/.npm-global/bin`.
 

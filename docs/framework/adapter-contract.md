@@ -1,12 +1,16 @@
-# Tri-party Adapter Contract
+# AgentParty / triparty Adapter Contract
 
 ## Purpose
 
-Adapters connect external environments to the portable core without changing core truth. An adapter may improve access, UI, auth, or deployment, but it must not redefine tri-party status or synthesize conclusions outside the merge gate.
+Adapters connect external environments to AgentParty product packs without changing core truth. An adapter may improve access, UI, auth, transcript capture, or deployment, but it must not redefine pack status or synthesize conclusions outside the pack gate.
+
+The current executable adapter contract is for the `triparty` pack. Generic AgentParty and other product packs must preserve the same truth rules while using their own completion semantics.
+
+The generic CLI surface is `scripts/agentparty.py` / `scripts/agentparty.sh`. It may discover packs and scaffold pack-specific runs, but it must delegate `triparty` execution to `scripts/triparty.sh` and must not redefine true tri-party readiness.
 
 ## Required Invariants
 
-- The portable core remains the source of truth.
+- The portable core or product pack gate remains the source of truth.
 - Adapters must call `scripts/triparty.sh` or read artifacts created by it.
 - Adapters must preserve run directories, source labels, review artifacts, cross-audit artifacts, hashes, and error codes.
 - Adapters must read the actual `runs_dir` / `run_dir` from core output or `state.json`; the repo-local `docs/framework/runs` path is only the preferred default and may fall back to `${TMPDIR:-/tmp}/triparty-runs`.
@@ -14,6 +18,8 @@ Adapters connect external environments to the portable core without changing cor
 - Adapters must preserve runner-written artifact metadata and completion markers. Missing metadata, party/stage mismatch, marker mismatch, hash drift, or source-label contamination must remain merge-blocking.
 - Core status writers should publish state/status files through temp-file-and-rename atomic writes so adapters never trust partially written JSON or env files.
 - Adapters must not mark a run as true tri-party unless `state.json` says `true_triparty_ready: true`.
+- Adapters for non-triparty packs must not write or imply `true_triparty_ready`.
+- Adapters for 2-agent packs must label results as pack-ready, partial, blocked, or scoped according to that pack's contract.
 - Adapters must validate `state.json` against the current artifact hashes before returning it as trusted state.
 - Adapters must expose partial states honestly and keep handoff prompts available when a party is missing.
 - Adapters must treat `state.json` as the machine-readable status contract.
@@ -31,6 +37,10 @@ Every adapter should read:
 - `partial-report.md` when the merge gate fails
 
 `state.json` must conform to `docs/framework/state.schema.json`.
+
+For AgentParty product-pack discovery, adapters should read `docs/framework/agentparty-packs.json`. The registry tells the UI, the current `agentparty` CLI scaffold, and future native surfaces which packs exist, which OS paths are supported, and which claims are forbidden.
+Adapters that need user installation should call or mirror `scripts/agentparty.sh install --pack <pack-id> --target-os <os>` first. It defaults to dry-run and requires explicit `--execute` before writing managed bootstrap artifacts. Execute must run on the detected target host; adapters must not spoof `--target-os` to force writes on a different platform. Adapters that only need guidance should call or mirror `scripts/agentparty.sh install-plan --pack <pack-id> --target-os <os>`. The install plan is the boundary-safe source for macOS/Linux/WSL2 executable commands, Windows native preparation commands, blocked commands, and whether a pack can ever claim `true_triparty_ready`.
+For cleanup UX, adapters should expose `scripts/uninstall-triparty-global-bootstrap.sh --dry-run` before `--execute`, or `scripts/uninstall-triparty-global-bootstrap.ps1 -DryRun` before `-Execute` on native PowerShell. Adapters should not delete user-modified files outside the uninstaller's managed-artifact checks.
 
 For injected artifacts, adapters must read the relevant `review_provenance_detail` or `cross_audit_provenance_detail` object instead of inferring source from filenames. `origin=user_supplied` means the artifact was provided through `inject`; `source_sha256` records the original file hash, and `artifact_sha256` records the copied run artifact hash.
 
@@ -114,6 +124,39 @@ It exposes these tools:
 - `triparty_regression`
 
 The MCP adapter is a thin wrapper around `scripts/triparty.sh`; it must not synthesize its own true/partial status.
+
+## Feishu Claw Pack Boundary
+
+The `claude-code-feishu-claw` product pack is currently transcript-based:
+
+- Claude Code output is an artifact.
+- Feishu Claw output is a transcript, Feishu document link, or user-supplied operation summary.
+- Standard manual evidence bundles are created through `scripts/agentparty.sh evidence-template --pack claude-code-feishu-claw --run-dir <run-dir> --out <dir>`.
+- Pack evidence is imported through `scripts/agentparty.sh evidence --pack claude-code-feishu-claw --bundle <dir>/agentparty-claw-evidence.json`, with direct `--run-dir ... --feishu-link ...` flags kept for compatibility.
+- Pack state is validated through `scripts/agentparty.sh validate-run --run-dir <run-dir>`.
+- The adapter or user must preserve source labels and timestamps.
+- Placeholder template files containing `TODO_AGENTPARTY_REPLACE` must not be accepted as real evidence.
+- Evidence files below the CLI's minimum content threshold and Feishu links that are not `http://` or `https://` URLs must not be accepted as pack-ready evidence.
+- Bundle artifact paths must stay inside the evidence bundle directory, and an explicit `--run-dir` must match the bundle's recorded `run_dir`.
+- Missing Feishu permissions, missing transcript, or missing document evidence must produce partial or blocked status.
+- This 2-agent pack must never be surfaced as true tri-party.
+
+The target bridge scaffold for the same pack is created through:
+
+```bash
+scripts/agentparty.sh bridge-kit --pack claude-code-feishu-claw --task "<task>" --out "<bridge-dir>"
+scripts/agentparty.sh bridge-validate --bridge-dir "<bridge-dir>"
+```
+
+This bridge state treats Feishu Claw as the user-facing intake/report surface and Claude Code as a controlled runner. Adapters must preserve these bridge rules:
+
+- `state.json` must use `schema_version=agentparty.claw-bridge-state.v1`.
+- Feishu may enqueue or report tasks, but it must not directly execute arbitrary local shell.
+- Claude Code execution must go through a controlled runner with an allowlist, audit log, and explicit user/auth boundary.
+- Shared resources are prompts, skill contracts, manifests, evidence files, and state files; private runtime folders such as `~/.claude/skills` and `~/.codex/skills` are not shared directly.
+- The bridge must keep one active writer, revision tracking, and read-only reviewers.
+- Claw reviews Claude output and Claude reviews Claw output; if either side is missing or lacks evidence, the bridge remains partial or blocked.
+- Native Feishu Claw callback support is not implied by a valid bridge scaffold.
 
 ## Resume and Archive Semantics
 

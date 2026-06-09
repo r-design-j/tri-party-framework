@@ -208,7 +208,7 @@ write_slim_context() {
     for file in "$@"; do
       if [ -f "$file" ]; then
         printf '\n--- %s excerpt ---\n' "$file"
-        sed -n '1,90p' "$file"
+        sed -n '1,160p' "$file"
       fi
     done
   } > "$context_file"
@@ -216,8 +216,10 @@ write_slim_context() {
 
 write_ultra_slim_context() {
   local context_file="$1"
+  shift
 
-  cat > "$context_file" <<EOF
+  {
+    cat <<EOF
 # Ultra-slim Tri-party Review Context
 
 Question: $QUESTION
@@ -241,6 +243,19 @@ Review request:
 
 Assess architecture, logic, execution reliability, user experience, failure recovery, and capability-role dispatch. Return concrete issues and iteration suggestions using P0/P1/P2.
 EOF
+
+    if [ "$#" -gt 0 ]; then
+      printf '\nTask evidence excerpts:\n'
+      for file in "$@"; do
+        if [ -f "$file" ]; then
+          printf '\n--- %s excerpt ---\n' "$file"
+          sed -n '1,180p' "$file"
+        else
+          printf '\n--- Missing file: %s ---\n' "$file"
+        fi
+      done
+    fi
+  } > "$context_file"
 }
 
 sanitize_context() {
@@ -343,7 +358,7 @@ else
   sanitize_context "$CONTEXT_FILE" "$MODEL_CONTEXT_FILE"
 fi
 if [ "$(wc -c < "$MODEL_CONTEXT_FILE" | tr -d ' ')" -gt "$PROMPT_MAX_CHARS" ]; then
-  write_ultra_slim_context "$MODEL_CONTEXT_FILE"
+  write_ultra_slim_context "$MODEL_CONTEXT_FILE" "$@"
 fi
 
 cat > "$RUN_DIR/claude-prompt.txt" <<EOF
@@ -352,8 +367,9 @@ Do not claim to be Codex-only. Do not edit files.
 Do not call tools, shell commands, file readers, or MCP tools. Use only the provided prompt context.
 You are one independent party in a larger orchestrated run. The runner, not you, records whether Codex, Claude, and Gemini were called.
 Do not state that the overall run is partial, Codex-only, or that another party was not called. If another party's output is not in your prompt, say it is not evaluated in this independent review.
-Based only on the provided context, review the tri-party framework itself.
-Focus on architecture, logic, user experience, call reliability, process closure, documentation layering, and failure review.
+Based only on the provided context, review the task evidence and delivery requested in the Question.
+If no task-specific context files are provided, review the tri-party framework itself.
+Focus on architecture, logic, user experience, call reliability, process closure, documentation layering, failure review, and overclaim risk.
 Return Chinese output with P0/P1/P2 priorities, within 1200 Chinese characters.
 
 $(cat "$MODEL_CONTEXT_FILE")
@@ -365,8 +381,9 @@ Do not claim to be Codex-only. Do not edit files.
 Do not call tools, shell commands, file readers, or MCP tools. Use only the provided prompt context.
 You are one independent party in a larger orchestrated run. The runner, not you, records whether Codex, Claude, and Gemini were called.
 Do not state that the overall run is partial, Codex-only, or that another party was not called. If another party's output is not in your prompt, say it is not evaluated in this independent review.
-Based only on the provided context, review the tri-party framework itself.
-Focus on architecture, logic, user experience, call reliability, process closure, documentation layering, and failure review.
+Based only on the provided context, review the task evidence and delivery requested in the Question.
+If no task-specific context files are provided, review the tri-party framework itself.
+Focus on architecture, logic, user experience, call reliability, process closure, documentation layering, failure review, and overclaim risk.
 Return Chinese output with P0/P1/P2 priorities, within 1200 Chinese characters.
 
 $(cat "$MODEL_CONTEXT_FILE")

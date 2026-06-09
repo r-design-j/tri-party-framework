@@ -1,0 +1,76 @@
+{
+  "schema_version": "agentparty.packs.v1",
+  "generated_at": "2026-06-05T03:30:00Z",
+  "packs": [
+    {
+      "id": "triparty",
+      "display_name": "triparty",
+      "status": "productized",
+      "agents": [
+        {
+          "id": "codex",
+          "name": "Codex",
+          "role": "implementation owner and final synthesis",
+          "source": "agent_runtime"
+        },
+        {
+          "id": "claude",
+          "name": "Claude Code",
+          "role": "reasoning and architecture review",
+          "source": "local_cli"
+        },
+        {
+          "id": "gemini",
+          "name": "Gemini CLI",
+          "role": "multimodal and Google-context review",
+          "source": "local_cli"
+        }
+      ],
+      "completion_semantics": {
+        "ready_label": "true_triparty_ready",
+        "state_schema": "docs/framework/state.schema.json",
+        "must_not_claim": ["pack_ready_without_release_gate", "true_tri_party_without_claude_and_gemini"]
+      },
+      "os_support": {
+        "macos": "supported",
+        "linux": "supported",
+        "windows_wsl2": "supported",
+        "windows_powershell": "roadmap"
+      },
+      "entrypoints": ["triparty CLI", "scripts/triparty.sh", "agentparty CLI delegated run", "agentparty guide", "Claude Code /triparty", "HTTP adapter", "MCP adapter"],
+      "docs": "docs/framework/product-packs/triparty.md"
+    },
+    {
+      "id": "claude-code-feishu-claw",
+      "display_name": "Claude Code + Feishu Claw",
+      "status": "scaffolded",
+      "agents": [
+        {
+          "id": "claude-code",
+          "name": "Claude Code",
+          "role": "reasoning, planning, and code/workflow critique",
+          "source": "agent_runtime"
+        },
+        {
+          "id": "feishu-claw",
+          "name": "Feishu Claw",
+          "role": "Feishu-context operation, document/workflow execution, and transcript evidence",
+          "source": "transcript"
+        }
+      ],
+      "completion_semantics": {
+        "ready_label": "pack_ready",
+        "state_schema": "docs/framework/agentparty-pack-state.schema.json",
+        "must_not_claim": ["true_triparty_ready", "true_tri_party", "codex_claude_gemini_complete"]
+      },
+      "os_support": {
+        "macos": "supported",
+        "linux": "supported",
+        "windows_wsl2": "supported",
+        "windows_powershell": "roadmap"
+      },
+      "entrypoints": ["agentparty CLI prompt/kit/bridge-kit/run/guide scaffold", "AgentParty bridge-validate", "Claude Code /agentparty-claw and /ap-claw", "Claude Code workflow prompt", "Feishu Claw transcript handoff", "manual artifact injection"],
+      "docs": "docs/framework/product-packs/claude-code-feishu-claw.md"
+    }
+  ]
+}

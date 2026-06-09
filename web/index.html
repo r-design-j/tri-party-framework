@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>triparty 工具台</title>
+    <title>AgentParty | TriParty 官方三方产品包</title>
     <link rel="shortcut icon" href="favicon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
@@ -351,7 +351,7 @@
         border-radius: 999px;
         padding: 16px 31px;
         background: var(--pink);
-        color: #fff;
+        color: #080808;
         text-transform: none;
         font-weight: 900;
         bottom: 214px;
@@ -375,21 +375,22 @@
 
       .intro-tool {
         position: absolute;
-        bottom: 102px;
+        bottom: 118px;
         left: 50%;
         transform: translateX(-50%);
         text-align: center;
         font-family: var(--font-display);
-        font-size: clamp(28px, 2.7vw, 38px);
+        font-size: clamp(19px, 2vw, 28px);
         font-weight: 800;
-        line-height: 1.14;
-        width: min(860px, calc(100vw - 32px));
+        line-height: 1.16;
+        width: min(940px, calc(100vw - 32px));
         word-break: keep-all;
         overflow-wrap: normal;
       }
 
       .intro-tool span {
         display: block;
+        white-space: nowrap;
       }
 
       .hero-actions {
@@ -478,6 +479,262 @@
         font-size: 16px;
         line-height: 1.48;
         transform: rotate(-3deg);
+      }
+
+      .home-story {
+        width: min(1180px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 30px 0 104px;
+      }
+
+      .product-proof {
+        width: min(1180px, calc(100vw - 32px));
+        margin: -12px auto 72px;
+        position: relative;
+        z-index: 3;
+        display: grid;
+        grid-template-columns: 1.12fr 0.94fr 0.94fr;
+        gap: 16px;
+      }
+
+      .proof-tile {
+        min-height: 168px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 7px 7px 0 var(--ink);
+        padding: 22px;
+        display: grid;
+        align-content: space-between;
+        min-width: 0;
+      }
+
+      .proof-tile.primary {
+        background: var(--blue);
+      }
+
+      .proof-tile:nth-child(2) {
+        background: #ffe2a0;
+      }
+
+      .proof-tile h2,
+      .proof-tile h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .proof-tile h2 {
+        font-size: clamp(34px, 4.8vw, 64px);
+      }
+
+      .proof-tile h3 {
+        font-size: clamp(26px, 3vw, 40px);
+      }
+
+      .proof-tile p {
+        margin: 14px 0 0;
+        font-weight: 900;
+        line-height: 1.36;
+      }
+
+      .proof-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      .proof-actions a,
+      .proof-actions button {
+        min-height: 38px;
+        border: 2px solid var(--ink);
+        background: var(--ink);
+        color: #fff;
+        padding: 0 12px;
+        font-weight: 900;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .proof-actions a.secondary,
+      .proof-actions button.secondary {
+        background: #fff;
+        color: var(--ink);
+      }
+
+      .story-header {
+        display: grid;
+        grid-template-columns: minmax(300px, 0.85fr) minmax(360px, 1.15fr);
+        gap: 24px;
+        align-items: end;
+        margin-bottom: 24px;
+      }
+
+      .story-header h2 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(42px, 6vw, 84px);
+        line-height: 0.94;
+        letter-spacing: 0;
+      }
+
+      .story-header p {
+        margin: 0;
+        max-width: 560px;
+        font-family: var(--font-display);
+        font-size: 19px;
+        line-height: 1.38;
+        font-weight: 800;
+      }
+
+      .story-strip {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 42px;
+        padding: 0 14px;
+        margin-bottom: 18px;
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 5px 5px 0 var(--ink);
+        font-weight: 900;
+      }
+
+      .story-flow,
+      .pack-choices,
+      .benefit-compact {
+        display: grid;
+        gap: 16px;
+      }
+
+      .story-flow {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin-bottom: 18px;
+      }
+
+      .pack-choices {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-bottom: 18px;
+      }
+
+      .benefit-compact {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .story-card {
+        min-width: 0;
+        border: 3px solid var(--ink);
+        background: #fff;
+        box-shadow: 7px 7px 0 var(--ink);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .story-card:hover,
+      .story-card:focus-within,
+      .story-card[open] {
+        transform: translate(-2px, -2px);
+        box-shadow: 10px 10px 0 var(--ink);
+      }
+
+      .story-card summary {
+        min-height: 168px;
+        padding: 22px;
+        display: grid;
+        align-content: space-between;
+        gap: 18px;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .story-card summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .story-card .role-tag {
+        width: fit-content;
+      }
+
+      .story-card h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(30px, 3vw, 46px);
+        line-height: 0.98;
+      }
+
+      .story-card .summary-line {
+        margin: 0;
+        font-weight: 900;
+        line-height: 1.35;
+      }
+
+      .story-card .card-detail {
+        display: block;
+        margin: 0;
+        padding: 0 22px;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        font-family: var(--font-display);
+        font-weight: 750;
+        line-height: 1.42;
+        transition: max-height 0.22s ease, opacity 0.18s ease, padding-bottom 0.22s ease;
+      }
+
+      .story-card summary .card-detail {
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .story-card:hover .card-detail,
+      .story-card:focus-within .card-detail,
+      .story-card[open] .card-detail {
+        max-height: 180px;
+        opacity: 1;
+        padding-bottom: 22px;
+      }
+
+      .story-card.protocol {
+        background: var(--blue);
+      }
+
+      .story-card.pack {
+        background: #ffe2a0;
+      }
+
+      .story-card.evidence {
+        background: var(--mint);
+      }
+
+      .pack-choice summary {
+        min-height: 226px;
+      }
+
+      .pack-choice h3 {
+        font-size: clamp(38px, 4.8vw, 64px);
+      }
+
+      .mini-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .mini-tags span {
+        padding: 7px 9px;
+        border: 2px solid var(--ink);
+        background: #f6f1e7;
+        color: #080808;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .benefit-compact .story-card summary {
+        min-height: 148px;
+      }
+
+      .benefit-compact .story-card h3 {
+        font-size: clamp(24px, 2.4vw, 34px);
       }
 
       .workspace {
@@ -623,8 +880,9 @@
       .status-cell {
         min-height: 116px;
         padding: 14px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(246, 241, 231, 0.34);
+        background: #17191f;
+        color: #f6f1e7;
       }
 
       .status-cell strong {
@@ -701,6 +959,16 @@
         color: #fff;
       }
 
+      .tool-panel .tool-actions button.secondary {
+        border-color: #fff;
+        color: #fff;
+      }
+
+      .play-card .tool-actions button.secondary {
+        border-color: var(--ink);
+        color: var(--ink);
+      }
+
       .result {
         min-height: 92px;
         margin-top: 16px;
@@ -727,7 +995,7 @@
       }
 
       .install-card {
-        min-height: 420px;
+        min-height: 300px;
         padding: 28px;
         border: 3px solid var(--ink);
         background: #fff;
@@ -760,6 +1028,41 @@
         font-weight: 800;
       }
 
+      .decision-list {
+        display: grid;
+        gap: 12px;
+        margin: 0 0 22px;
+      }
+
+      .decision-row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-family: var(--font-display);
+        font-size: 16px;
+        line-height: 1.35;
+        font-weight: 850;
+        overflow-wrap: anywhere;
+      }
+
+      .decision-row::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 12px;
+        height: 12px;
+        margin-top: 6px;
+        background: var(--ink);
+        clip-path: polygon(45% 0, 100% 0, 100% 100%, 0 100%, 0 55%, 45% 55%);
+      }
+
+      .decision-row.ok::before {
+        background: var(--green);
+      }
+
+      .decision-row.blocked::before {
+        background: var(--pink);
+      }
+
       .install-card code {
         min-height: 132px;
       }
@@ -770,7 +1073,8 @@
         min-height: 88px;
         display: grid;
         align-content: center;
-        background: rgba(8, 8, 8, 0.08);
+        background: #f6f1e7;
+        color: #080808;
         border: 2px solid var(--ink);
         font-family: var(--font-display);
         font-size: 18px;
@@ -783,7 +1087,7 @@
         margin: 0 auto;
         padding: 0 0 34px;
         display: grid;
-        grid-template-columns: 1.05fr 0.95fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 22px;
       }
 
@@ -838,7 +1142,7 @@
       }
 
       .agent-card {
-        min-height: 430px;
+        min-height: 320px;
         padding: 28px;
         border: 3px solid var(--ink);
         box-shadow: 8px 8px 0 var(--ink);
@@ -854,6 +1158,14 @@
 
       .agent-card.command {
         background: var(--mint);
+      }
+
+      .agent-card.claw {
+        background: #ffe2a0;
+      }
+
+      .agent-handoff .agent-card h3 {
+        font-size: clamp(30px, 3vw, 46px);
       }
 
       .agent-card h3 {
@@ -882,7 +1194,48 @@
       }
 
       .agent-card code {
-        min-height: 190px;
+        min-height: 160px;
+      }
+
+      .text-reveal {
+        margin-top: 18px;
+        border: 2px solid currentColor;
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .text-reveal > summary {
+        min-height: 44px;
+        padding: 0 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: #080808;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 950;
+        list-style: none;
+      }
+
+      .text-reveal > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .text-reveal > summary::after {
+        content: "+";
+        font-size: 22px;
+        line-height: 1;
+      }
+
+      .text-reveal[open] > summary::after {
+        content: "-";
+      }
+
+      .text-reveal code {
+        display: block;
+        margin: 0;
+        max-height: 300px;
+        overflow: auto;
       }
 
       .advanced-shell {
@@ -1000,6 +1353,7 @@
         padding: 14px;
         line-height: 1.5;
         min-height: 78px;
+        white-space: pre-wrap;
         overflow-wrap: anywhere;
       }
 
@@ -1130,7 +1484,7 @@
 
       .value-card:nth-child(4) {
         background: var(--pink);
-        color: #fff;
+        color: #080808;
         transform: rotate(-1deg);
       }
 
@@ -1559,6 +1913,7 @@
         border: 2px solid var(--ink);
         padding: 14px;
         background: #fff;
+        color: #080808;
       }
 
       .play-card textarea {
@@ -1593,7 +1948,7 @@
 
       .contact-panel > div:first-child {
         background: var(--pink);
-        color: #fff;
+        color: #080808;
       }
 
       .contact-panel h2 {
@@ -1615,7 +1970,7 @@
 
       .check-label {
         background: var(--pink);
-        color: #fff;
+        color: #080808;
         padding: 38px;
         display: grid;
         align-content: center;
@@ -1682,7 +2037,7 @@
       }
 
       .check.completed span:last-child {
-        color: var(--green);
+        color: #075f36;
       }
 
       .check input {
@@ -1732,6 +2087,15 @@
         box-shadow: var(--shadow);
         font-size: 12px;
         font-weight: 900;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(10px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+
+      .floating-result.show {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       body,
@@ -1898,6 +2262,21 @@
 
       html[data-theme="dark"] .topbar {
         background: rgba(15, 16, 20, 0.92);
+        color: var(--ink);
+        border-color: var(--line-strong);
+      }
+
+      html[data-theme="dark"] .nav-item,
+      html[data-theme="dark"] .mark,
+      html[data-theme="dark"] .round,
+      html[data-theme="dark"] .theme-toggle {
+        color: var(--ink);
+        border-color: var(--line-strong);
+      }
+
+      html[data-theme="dark"] .round,
+      html[data-theme="dark"] .theme-toggle {
+        background: #07080b;
       }
 
       html[data-theme="dark"] .loader {
@@ -1978,7 +2357,7 @@
       html[data-theme="dark"] .pill-sticker,
       html[data-theme="dark"] .check.completed {
         background: var(--pink);
-        color: #fff;
+        color: #080808;
       }
 
       html[data-theme="dark"] .def-card:nth-child(4),
@@ -1994,7 +2373,6 @@
       }
 
       html[data-theme="dark"] .agent-card.prompt code,
-      html[data-theme="dark"] .status-cell,
       html[data-theme="dark"] .result,
       html[data-theme="dark"] .meta-cell,
       html[data-theme="dark"] .detail-section,
@@ -2004,6 +2382,12 @@
         background: rgba(246, 241, 231, 0.08);
         color: var(--ink);
         border-color: var(--line-strong);
+      }
+
+      html[data-theme="dark"] .status-cell {
+        background: #17191f;
+        color: #f6f1e7;
+        border-color: rgba(246, 241, 231, 0.34);
       }
 
       html[data-theme="dark"] .tool-actions button.secondary {
@@ -2031,6 +2415,181 @@
       html[data-theme="dark"] .hero-action.secondary span {
         background: var(--yellow);
         color: #080808;
+      }
+
+      html[data-theme="dark"] .advanced-shell > summary {
+        background: #ffd15e;
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .advanced-shell > summary .summary-action {
+        background: #f6f1e7;
+        color: #080808;
+        border-color: #080808;
+      }
+
+      html[data-theme="dark"] .advanced-shell[open] > summary .summary-action {
+        background: #080808;
+        color: #f6f1e7;
+      }
+
+      html[data-theme="dark"] .advanced-content {
+        background:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px),
+          #101114;
+      }
+
+      html[data-theme="dark"] .sticker.left,
+      html[data-theme="dark"] .sticker.right,
+      html[data-theme="dark"] .chip-sticker {
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .story-strip {
+        background: #17191f;
+        color: var(--ink);
+        border-color: var(--line-strong);
+      }
+
+      html[data-theme="dark"] .proof-tile {
+        background: #17191f;
+        color: var(--ink);
+        border-color: var(--line-strong);
+      }
+
+      html[data-theme="dark"] .proof-tile.primary {
+        background: var(--blue);
+        color: #080808;
+        border-color: #080808;
+      }
+
+      html[data-theme="dark"] .proof-tile:nth-child(2) {
+        background: #ffe2a0;
+        color: #080808;
+        border-color: #080808;
+      }
+
+      html[data-theme="dark"] .proof-actions a,
+      html[data-theme="dark"] .proof-actions button {
+        background: #080808;
+        color: #f6f1e7;
+        border-color: #080808;
+      }
+
+      html[data-theme="dark"] .proof-actions a.secondary,
+      html[data-theme="dark"] .proof-actions button.secondary {
+        background: #f6f1e7;
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .story-card.protocol,
+      html[data-theme="dark"] .story-card.pack-choice.protocol {
+        background: var(--blue);
+        color: #080808;
+        border-color: #080808;
+      }
+
+      html[data-theme="dark"] .story-card.pack,
+      html[data-theme="dark"] .story-card.pack-choice.pack,
+      html[data-theme="dark"] .agent-card.claw {
+        background: #ffe2a0;
+        color: #080808;
+        border-color: #080808;
+      }
+
+      html[data-theme="dark"] .story-card.evidence {
+        background: var(--mint);
+        color: #080808;
+        border-color: #080808;
+      }
+
+      html[data-theme="dark"] .tool-copy {
+        background: var(--blue);
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .benefit-compact .story-card {
+        background: #17191f;
+        color: var(--ink);
+        border-color: var(--line-strong);
+      }
+
+      html[data-theme="dark"] .story-card.protocol .mini-tags span,
+      html[data-theme="dark"] .story-card.pack .mini-tags span,
+      html[data-theme="dark"] .story-card.evidence .mini-tags span,
+      html[data-theme="dark"] .story-card.pack-choice.protocol .mini-tags span,
+      html[data-theme="dark"] .story-card.pack-choice.pack .mini-tags span {
+        background: #f6f1e7;
+        color: #080808;
+        border-color: #080808;
+      }
+
+      html[data-theme="dark"] .text-reveal {
+        background: #11131a;
+        color: var(--ink);
+        border-color: var(--line-strong);
+      }
+
+      html[data-theme="dark"] .story-card.protocol .text-reveal,
+      html[data-theme="dark"] .story-card.pack .text-reveal,
+      html[data-theme="dark"] .story-card.evidence .text-reveal,
+      html[data-theme="dark"] .story-card.pack-choice.protocol .text-reveal,
+      html[data-theme="dark"] .story-card.pack-choice.pack .text-reveal,
+      html[data-theme="dark"] .agent-card.claw .text-reveal,
+      html[data-theme="dark"] .install-card.primary .text-reveal,
+      html[data-theme="dark"] .install-card:nth-child(2) .text-reveal {
+        background: #f6f1e7;
+        color: #080808;
+        border-color: #080808;
+      }
+
+      html[data-theme="dark"] .case-detail .detail-title,
+      html[data-theme="dark"] .case-kicker {
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .check-label,
+      html[data-theme="dark"] .check.completed,
+      html[data-theme="dark"] .value-card:nth-child(4) {
+        background: var(--pink);
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .checks,
+      html[data-theme="dark"] .check-summary {
+        background: #17191f;
+        color: var(--ink);
+        border-color: var(--line-strong);
+      }
+
+      html[data-theme="dark"] .check.completed span,
+      html[data-theme="dark"] .check.completed span:last-child {
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .check span:last-child {
+        color: rgba(246, 241, 231, 0.72);
+      }
+
+      html[data-theme="dark"] .case-tags span {
+        background: #252832;
+        color: var(--ink);
+      }
+
+      html[data-theme="dark"] .detail-title {
+        background: var(--blue);
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .detail-title small,
+      html[data-theme="dark"] .detail-title h3,
+      html[data-theme="dark"] .detail-title p {
+        color: #080808;
+      }
+
+      html[data-theme="dark"] .meta-cell span:first-child {
+        color: rgba(246, 241, 231, 0.68);
       }
 
       @media (max-width: 1120px) {
@@ -2096,6 +2655,12 @@
         .hero {
           min-height: min(700px, calc(100svh - 92px));
           padding-top: 96px;
+          overflow-x: hidden;
+        }
+
+        .hero-stack {
+          width: 100%;
+          max-width: calc(100vw - 32px);
         }
 
         .clock {
@@ -2103,13 +2668,28 @@
         }
 
         .display-frame {
-          padding: 16px 18px;
+          width: 100%;
+          max-width: min(280px, calc(100vw - 112px));
+          padding: 14px 10px;
+          text-align: center;
+        }
+
+        .display-frame h1 {
+          font-size: clamp(40px, 9vw, 48px);
+          line-height: 0.9;
+          white-space: nowrap;
+        }
+
+        .hero-sub {
+          max-width: min(310px, calc(100vw - 52px));
+          flex-wrap: wrap;
+          gap: 8px;
+          font-size: 12px;
+          line-height: 1.35;
         }
 
         .sticker {
-          min-width: 150px;
-          padding: 11px 13px;
-          font-size: 11px;
+          display: none;
         }
 
         .sticker.left {
@@ -2128,16 +2708,86 @@
         }
 
         .intro-tool {
-          bottom: 132px;
-          width: min(340px, calc(100vw - 32px));
-          font-size: 24px;
+          bottom: 178px;
+          width: min(288px, calc(100vw - 64px));
+          font-size: 18px;
           line-height: 1.12;
-          word-break: keep-all;
-          overflow-wrap: normal;
+          word-break: normal;
+          overflow-wrap: anywhere;
+        }
+
+        .intro-tool span {
+          white-space: normal;
+          word-break: normal;
+          overflow-wrap: anywhere;
         }
 
         .hero-actions {
-          bottom: 62px;
+          bottom: 38px;
+          width: min(270px, calc(100vw - 52px));
+          align-items: stretch;
+        }
+
+        .hero-action {
+          max-width: 100%;
+          justify-content: center;
+        }
+
+        .section-label h2 {
+          max-width: calc(100vw - 40px);
+          white-space: normal;
+          word-break: normal;
+          overflow-wrap: anywhere;
+        }
+
+        .note {
+          width: min(320px, calc(100vw - 44px));
+          max-width: min(320px, calc(100vw - 44px));
+          transform: none;
+          overflow-wrap: anywhere;
+        }
+
+        .home-story {
+          padding: 34px 0 76px;
+        }
+
+        .story-header,
+        .story-flow,
+        .pack-choices,
+        .benefit-compact,
+        .product-proof {
+          grid-template-columns: 1fr;
+        }
+
+        .product-proof {
+          margin: 24px auto 48px;
+        }
+
+        .story-header {
+          gap: 14px;
+          margin-bottom: 18px;
+        }
+
+        .story-header p {
+          font-size: 17px;
+        }
+
+        .story-card summary,
+        .pack-choice summary,
+        .benefit-compact .story-card summary {
+          min-height: auto;
+          padding: 18px;
+        }
+
+        .story-card h3,
+        .pack-choice h3,
+        .benefit-compact .story-card h3 {
+          font-size: clamp(28px, 9vw, 42px);
+        }
+
+        .story-card .card-detail {
+          padding-left: 18px;
+          padding-right: 18px;
         }
 
         .tool-card,
@@ -2296,6 +2946,33 @@
         .hero {
           min-height: min(680px, calc(100svh - 90px));
           padding: 96px 16px 82px;
+          overflow-x: hidden;
+        }
+
+        .hero-stack {
+          width: 100%;
+          max-width: calc(100vw - 32px);
+        }
+
+        .display-frame {
+          width: 100%;
+          max-width: calc(100vw - 72px);
+          padding: 16px 12px;
+          text-align: center;
+        }
+
+        .display-frame h1 {
+          font-size: clamp(46px, 14vw, 56px);
+          line-height: 0.9;
+          white-space: nowrap;
+        }
+
+        .hero-sub {
+          max-width: calc(100vw - 44px);
+          flex-wrap: wrap;
+          gap: 8px;
+          font-size: 12px;
+          line-height: 1.35;
         }
 
         .sticker {
@@ -2308,32 +2985,39 @@
 
         .intro-tool {
           bottom: 158px;
-          width: min(300px, calc(100vw - 32px));
-          font-size: 20px;
+          width: min(320px, calc(100vw - 36px));
+          font-size: 17px;
+          line-height: 1.14;
           word-break: normal;
           overflow-wrap: anywhere;
         }
 
         .intro-tool span {
+          white-space: normal;
           word-break: normal;
           overflow-wrap: anywhere;
         }
 
         .hero-actions {
           bottom: 24px;
-          gap: 10px;
-          width: min(288px, calc(100vw - 32px));
+          gap: 9px;
+          width: min(260px, calc(100vw - 44px));
+          flex-direction: column;
+          align-items: stretch;
         }
 
         .hero-action {
           height: 46px;
-          padding-right: 14px;
+          width: 100%;
+          justify-content: center;
+          padding: 0 14px 0 8px;
         }
 
         .workspace,
         .definition,
         .value-field,
         .advanced-shell,
+        .product-proof,
         .agent-handoff,
         .platform-note,
         .install-guide,
@@ -2362,7 +3046,9 @@
         .contact-panel,
         .tool-card {
           min-width: 0;
-          max-width: 100%;
+          width: 100%;
+          max-width: calc(100vw - 40px);
+          box-shadow: 5px 5px 0 var(--ink);
         }
 
         .definition-title,
@@ -2376,15 +3062,16 @@
         }
 
         .definition-title h2 {
-          font-size: clamp(38px, 12vw, 46px);
+          font-size: clamp(30px, 8vw, 34px);
           white-space: normal;
-          word-break: normal;
+          word-break: break-all;
           overflow-wrap: anywhere;
+          line-height: 1.05;
         }
 
         .definition-title p {
           font-size: 18px;
-          word-break: normal;
+          word-break: break-word;
           overflow-wrap: anywhere;
         }
 
@@ -2401,8 +3088,20 @@
         }
 
         .value-card h3 {
-          font-size: 28px;
+          font-size: clamp(28px, 7.4vw, 34px);
+          line-height: 1.05;
+          white-space: normal;
           word-break: normal;
+          overflow-wrap: break-word;
+        }
+
+        .install-card h3,
+        .agent-card h3,
+        .command-card h3 {
+          font-size: clamp(28px, 7.4vw, 34px);
+          line-height: 1.05;
+          white-space: normal;
+          word-break: break-all;
           overflow-wrap: anywhere;
         }
 
@@ -2453,17 +3152,18 @@
   </head>
   <body>
     <div class="loader" aria-hidden="true">
-      <div class="loader-badge">triparty</div>
+      <div class="loader-badge">TriParty</div>
     </div>
 
     <header class="topbar">
       <nav class="nav-left" aria-label="主导航">
-        <a class="mark" href="#home" aria-label="triparty 首页">
+        <a class="mark" href="#home" aria-label="AgentParty 首页">
           <img class="mark-icon" src="assets/favicon-32.png" srcset="assets/favicon-32.png 1x, assets/apple-touch-icon.png 2x" width="36" height="36" alt="" />
         </a>
         <a class="nav-item active" href="#home"><span class="ico">⌂</span>首页</a>
-        <a class="nav-item" href="#install"><span class="ico">↓</span>交给 Agent</a>
-        <a class="nav-item hide-mobile" href="#flow"><span class="ico">✱</span>三步说明</a>
+        <a class="nav-item" href="#packs"><span class="ico">▣</span>产品包</a>
+        <a class="nav-item hide-mobile" href="#install"><span class="ico">↓</span>安装 TriParty</a>
+        <a class="nav-item hide-mobile" href="#windows"><span class="ico">⊞</span>Windows</a>
         <a class="nav-item hide-mobile" href="#advanced"><span class="ico">▟</span>高级工具</a>
         <a class="nav-item hide-mobile" href="https://github.com/r-design-j/tri-party-framework"><span class="ico">↗</span>GitHub</a>
       </nav>
@@ -2478,12 +3178,12 @@
       <section class="hero">
         <div class="clock" id="clock">10:38:00 AM</div>
         <div class="hero-stack reveal">
-          <div class="scribble">把三模型协作交给你的 AI agent</div>
+          <div class="scribble">多 Agent 协作的底层协议</div>
           <div class="display-frame">
             <span class="corner"></span>
-            <h1>triparty</h1>
+            <h1>AgentParty</h1>
           </div>
-          <div class="hero-sub"><span class="dot"></span>复制指令 · 本机安装 · 自动回报结果</div>
+          <div class="hero-sub"><span class="dot"></span>Installable protocol · TriParty pack · Evidence gate</div>
         </div>
 
         <div class="sticker left reveal">用户不用读命令<br />直接复制给 Agent</div>
@@ -2491,105 +3191,154 @@
         <div class="pill-sticker reveal">不会把未完成说成完成</div>
         <div class="chip-sticker reveal">本机可安装</div>
         <div class="intro-tool reveal">
-          <span>triparty 帮你把 Codex、Claude、Gemini</span>
-          <span>组织成一套可检查的本机协作流程。</span>
+          <span>把多 Agent 协作变成可安装、可审计、可复用的工作框架</span>
         </div>
         <div class="hero-actions reveal in">
-          <button class="hero-action" type="button" data-copy="请在这台机器上安装 triparty。
+          <button class="hero-action" type="button" data-copy="请在这台机器上安装 TriParty。
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
-先判断系统环境：macOS / Linux / Windows WSL 按当前流程执行；Windows 原生 PowerShell/CMD 安装方案还在迭代中，不要硬跑 bash 脚本，请先建议使用 WSL 或给出适配方案。
+先判断系统环境：macOS / Linux / Windows WSL2 可按当前流程执行；Windows 原生 PowerShell/CMD 目前只做环境准备和检查，不要硬跑 bash 脚本，请引导进入 WSL2 或等待 PowerShell 原生 AgentParty CLI 路线完成。
 1. clone 仓库并进入目录。
 2. 补齐必要脚本权限。
 3. 运行项目自检。
-4. 安装全局发现规则和 triparty 命令。
-5. 运行 triparty preflight 验证。
+4. 安装全局发现规则和 TriParty 命令。
+5. 运行 TriParty preflight 验证。
 6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run / 未完成协作说成 true tri-party / 完整三方。
 完成后告诉我本机安装路径和 preflight 结果。" data-copy-success="安装指令已复制"><span>↘</span>复制给 Agent</button>
-          <a class="hero-action secondary" href="#flow"><span>↗</span>看三步说明</a>
+          <a class="hero-action secondary" href="#packs"><span>↗</span>看产品包</a>
         </div>
       </section>
 
-      <section class="section-label" id="about">
-        <div class="reveal">
-          <h2>不用自己装</h2>
-          <div class="note">这个页面不是让用户学习一堆命令，而是给你一段可以直接丢给 AI agent 的安装委托。</div>
-        </div>
+      <section class="product-proof" aria-label="产品入口">
+        <article class="proof-tile primary">
+          <div>
+            <div class="eyebrow"><span class="mini-square"></span>用户入口</div>
+            <h2>复制给 Agent，就能开始安装</h2>
+            <p>AgentParty 是底层框架。普通用户不用读脚本，直接获得 OS 边界、安装步骤、preflight 和下一步。</p>
+          </div>
+          <div class="proof-actions">
+            <button type="button" data-copy="scripts/agentparty.sh onboard --pack triparty --target-os auto">复制 onboard</button>
+            <a class="secondary" href="#install">安装 TriParty</a>
+          </div>
+        </article>
+        <article class="proof-tile">
+          <div>
+            <div class="eyebrow"><span class="mini-square"></span>官方三方包</div>
+            <h3>TriParty</h3>
+            <p>Codex + Claude + Gemini。只有 review、cross-audit、merge、release gate 都通过，才写 true_triparty_ready。</p>
+          </div>
+          <div class="mini-tags"><span>productized</span><span>release gate</span></div>
+        </article>
+        <article class="proof-tile">
+          <div>
+            <div class="eyebrow"><span class="mini-square"></span>飞书协作包</div>
+            <h3>Claude Code + Feishu Claw</h3>
+            <p>用于飞书文档和 Claw transcript 后验收。它是 2-agent pack，不声称 true tri-party。</p>
+          </div>
+          <div class="mini-tags"><span>pack-ready</span><span>partial safe</span></div>
+        </article>
       </section>
 
-      <section class="definition reveal">
-        <div class="definition-title">
-          <h2>普通用户怎么理解</h2>
-          <p>triparty 是一套本机协作框架。你把安装任务交给 agent，它负责拉取项目、安装规则、检查环境，再把结果告诉你。</p>
+      <section class="home-story reveal" id="about" aria-label="AgentParty 首页逻辑">
+        <div class="story-strip">底层框架 + 两个产品化产物</div>
+        <div class="story-header">
+          <h2>先把框架立住，再把产品包做实</h2>
+          <p>AgentParty 解决“同一个 skill 到不同 agent 会折损”的问题；TriParty 是官方三方包；Claw 包服务飞书协作。结论必须靠证据，不靠口头完成。</p>
         </div>
-        <div class="definition-grid">
-          <article class="def-card">
-            <h3>你只要复制</h3>
-            <p>点击“复制给 Agent”，把那段话发给能操作本机终端的 AI agent。</p>
-          </article>
-          <article class="def-card">
-            <h3>Agent 去安装</h3>
-            <p>agent 会 clone GitHub 项目、补权限、安装 bootstrap，并运行检查。</p>
-          </article>
-          <article class="def-card">
-            <h3>结果会回报</h3>
-            <p>安装后它会告诉你路径、检查结果，以及缺少 Claude、Gemini 或认证时该补什么。</p>
-          </article>
-          <article class="def-card">
-            <h3>网页不越权</h3>
-            <p>网页不会偷偷写你的电脑。真正安装必须由你授权的本机 agent 或终端完成。</p>
-          </article>
-        </div>
-      </section>
 
-      <section class="section-label" id="benefits">
-        <div class="reveal">
-          <h2>日常工作怎么提效</h2>
-          <div class="note">按场景理解会更直接：triparty 不是多叫两个模型聊天，而是把复核、证据和失败定位变成一套可重复流程。</div>
-        </div>
-      </section>
+        <div class="story-flow" id="layers" aria-label="三层理解路径">
+          <details class="story-card protocol">
+            <summary>
+              <span class="role-tag">01 · 底层</span>
+              <h3>AgentParty</h3>
+              <p class="summary-line">定义 agent 如何协作、审计、产出证据</p>
+              <p class="card-detail">协议层只规定 Agent、Capability、Role、Artifact、Audit、Gate 和 RunState；模型品牌只是配置。</p>
+            </summary>
+          </details>
 
-      <section class="value-field reveal" aria-label="triparty 对日常工作的帮助">
-        <article class="value-card main">
-          <div>
-            <span class="role-tag">方案 / 决策</span>
-            <h3>重要想法先过三遍</h3>
-            <p>一个方案先让 Codex 看能不能落地，让 Claude 梳理逻辑，让 Gemini 补外部视角。适合产品方案、内容选题、发布前检查和复杂决策。</p>
-          </div>
-          <div class="value-proof">减少拍脑袋，降低只听一个模型的盲区。</div>
-        </article>
-        <article class="value-card">
-          <div>
-            <span class="role-tag">运营 / 内容</span>
-            <h3>把选题变成可检查流程</h3>
-            <p>从标题、受众、论点到发布检查，每一步都能留下依据，不用靠聊天记录回忆刚才为什么这么定。</p>
-          </div>
-          <div class="value-proof">少返工，复盘更快。</div>
-        </article>
-        <article class="value-card">
-          <div>
-            <span class="role-tag">设计 / 研究</span>
-            <h3>多视角找问题</h3>
-            <p>让不同模型分别看逻辑、体验、外部资料和风险点，再把结论合并，适合页面上线、竞品分析和调研整理。</p>
-          </div>
-          <div class="value-proof">更容易发现漏项。</div>
-        </article>
-        <article class="value-card">
-          <div>
-            <span class="role-tag">开发 / 自动化</span>
-            <h3>失败会说清楚</h3>
-            <p>没有完成就标 partial，缺模型、缺认证、缺 cross-audit 都会被说出来，不把“跑了一半”包装成“已完成”。</p>
-          </div>
-          <div class="value-proof">定位问题更快。</div>
-        </article>
-        <article class="value-card">
-          <div>
-            <span class="role-tag">个人工作台</span>
-            <h3>重复任务沉淀下来</h3>
-            <p>安装、检查、复核、交接都能变成固定入口。以后遇到类似任务，不用重新解释一遍工作流。</p>
-          </div>
-          <div class="value-proof">把一次经验变成下次可复用。</div>
-        </article>
+          <details class="story-card pack">
+            <summary>
+              <span class="role-tag">02 · 产品包</span>
+              <h3>Pack</h3>
+              <p class="summary-line">把协议封成可安装、可复用的组合</p>
+              <p class="card-detail">TriParty 是 Codex + Claude + Gemini 的官方三方包；Claude Code + Feishu Claw 是飞书协作的 2-agent 包。</p>
+            </summary>
+          </details>
+
+          <details class="story-card evidence">
+            <summary>
+              <span class="role-tag">03 · 证据</span>
+              <h3>Gate</h3>
+              <p class="summary-line">probe 成功不等于 review 完成</p>
+              <p class="card-detail">preflight、review、cross-audit、merge、release gate 都要留下文件证据；partial 不能写成 complete。</p>
+            </summary>
+          </details>
+        </div>
+
+        <div class="pack-choices" id="packs" aria-label="两个产品包">
+          <details class="story-card pack-choice protocol">
+            <summary>
+              <span class="role-tag">Productized</span>
+              <h3>TriParty</h3>
+              <p class="summary-line">Codex + Claude + Gemini，默认三方套件</p>
+              <div class="mini-tags" aria-label="TriParty 状态">
+                <span>true tri-party</span>
+                <span>macOS / Linux / WSL2</span>
+                <span>release gate</span>
+              </div>
+              <p class="card-detail">适合复杂方案、代码/设计/研究发布前复核。只有通过三方证据和 release gate，才声明 true_triparty_ready。</p>
+            </summary>
+          </details>
+
+          <details class="story-card pack-choice pack">
+            <summary>
+              <span class="role-tag">Scaffold</span>
+              <h3>Claude Code + Feishu Claw</h3>
+              <p class="summary-line">飞书文档和 Claw transcript 协作入口</p>
+              <div class="mini-tags" aria-label="Claw pack 状态">
+                <span>2-agent</span>
+                <span>pack-ready / partial</span>
+                <span>evidence bundle</span>
+              </div>
+              <p class="card-detail">Claude Code 生成 kit、guide 和复核要求；Claw 提供 transcript、飞书链接和操作摘要。它是 AgentParty 子集，不声称 true tri-party。</p>
+            </summary>
+          </details>
+        </div>
+
+        <div class="benefit-compact" id="benefits" aria-label="普通用户怎么选">
+          <details class="story-card">
+            <summary>
+              <span class="role-tag">方案</span>
+              <h3>重要决定</h3>
+              <p class="summary-line">先过三方复核</p>
+              <p class="card-detail">让 Codex 看落地、Claude 看逻辑、Gemini 补外部视角，再合并结论。</p>
+            </summary>
+          </details>
+          <details class="story-card">
+            <summary>
+              <span class="role-tag">内容</span>
+              <h3>选题发布</h3>
+              <p class="summary-line">留下判断依据</p>
+              <p class="card-detail">从标题、受众、论点到发布检查，都能变成可复盘的 evidence。</p>
+            </summary>
+          </details>
+          <details class="story-card">
+            <summary>
+              <span class="role-tag">飞书</span>
+              <h3>Claw 协作</h3>
+              <p class="summary-line">文档操作可验收</p>
+              <p class="card-detail">用 kit 和 evidence bundle 记录 Claw 做了什么、Claude 怎么复核。</p>
+            </summary>
+          </details>
+          <details class="story-card">
+            <summary>
+              <span class="role-tag">边界</span>
+              <h3>失败也清楚</h3>
+              <p class="summary-line">partial 就标 partial</p>
+              <p class="card-detail">缺认证、缺模型、缺 cross-audit 时，页面和 CLI 都不能包装成完成。</p>
+            </summary>
+          </details>
+        </div>
       </section>
 
       <section class="section-label" id="install">
@@ -2602,14 +3351,50 @@
       <section class="platform-note reveal" aria-label="系统支持说明">
         <strong>系统支持说明</strong>
         <p>
-          当前推荐在 macOS、Linux、Windows WSL 中安装。Windows 原生 PowerShell/CMD 安装方案还在迭代中；遇到 Windows 原生环境时，请先让 Agent 建议使用 WSL 或给出适配方案。
+          当前 TriParty 推荐在 macOS、Linux、Windows WSL2 中安装。Windows 原生 PowerShell 还不是完整执行路径，页面只保留最短提示，不把路线中能力写成已完成。
           <span class="platform-list">
             <span>macOS 可按当前流程</span>
             <span>Linux 可按当前流程</span>
-            <span>Windows WSL 推荐</span>
-            <span>Windows 原生迭代中</span>
+            <span>Windows WSL2 当前路径</span>
+            <span>PowerShell 暂不主推</span>
           </span>
         </p>
+      </section>
+
+      <section class="section-label" id="windows">
+        <div class="reveal">
+          <h2>Windows 怎么装</h2>
+          <div class="note">当前只推荐 WSL2。PowerShell 原生执行还没完备，所以不在用户主路径里展开。</div>
+        </div>
+      </section>
+
+      <section class="install-guide reveal" aria-label="Windows 安装方案">
+        <article class="install-card primary">
+          <div class="eyebrow"><span class="mini-square"></span>推荐路径</div>
+          <h3>用 WSL2</h3>
+          <p>Windows 用户先进入 Ubuntu，再按 Linux 路径安装 TriParty。</p>
+          <details class="text-reveal">
+            <summary>查看 WSL2 命令</summary>
+            <code>wsl --install -d Ubuntu
+wsl
+git clone \
+  https://github.com/r-design-j/tri-party-framework.git
+cd tri-party-framework
+scripts/agentparty.sh quickstart --pack triparty --target-os auto</code>
+          </details>
+        </article>
+        <article class="install-card">
+          <div class="eyebrow"><span class="mini-square"></span>暂不主推</div>
+          <h3>PowerShell</h3>
+          <p>现在只作为环境准备和产品化路线，不给普通用户当完整安装入口。</p>
+          <div class="plain-step">不写成“已支持原生一键执行”。</div>
+        </article>
+        <article class="install-card">
+          <div class="eyebrow"><span class="mini-square"></span>页面原则</div>
+          <h3>少说路线</h3>
+          <p>未完成能力只留边界提示，不在主页面展开内部逻辑。</p>
+          <div class="plain-step">用户只需要记住：Windows 先用 WSL2。</div>
+        </article>
       </section>
 
       <section class="agent-handoff reveal" aria-label="给 Agent 的安装指令">
@@ -2617,28 +3402,31 @@
           <div>
             <div class="eyebrow"><span class="mini-square"></span>AI 时代入口</div>
             <h3>复制给 Agent</h3>
-            <p>用户不用逐条阅读安装步骤。把这段话发给 Codex、Claude Code、Gemini CLI 或其他能操作本机终端的 agent，让它按步骤安装并回报结果。</p>
-            <code>请在这台机器上安装 triparty。
+            <p>普通用户只需要复制这段委托，让本机 agent 安装 TriParty 并回报检查结果。</p>
+            <details class="text-reveal">
+              <summary>查看完整委托</summary>
+              <code>请在这台机器上安装 TriParty。
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
-先判断系统环境：macOS / Linux / Windows WSL 按当前流程执行；Windows 原生 PowerShell/CMD 安装方案还在迭代中，不要硬跑 bash 脚本，请先建议使用 WSL 或给出适配方案。
+先判断系统环境：macOS / Linux / Windows WSL2 可按当前流程执行；Windows 原生 PowerShell/CMD 目前只做环境准备和检查，不要硬跑 bash 脚本，请引导进入 WSL2 或等待 PowerShell 原生 AgentParty CLI 路线完成。
 1. clone 仓库并进入目录。
 2. 补齐必要脚本权限。
 3. 运行项目自检。
-4. 安装全局发现规则和 triparty 命令。
-5. 运行 triparty preflight 验证。
+4. 安装全局发现规则和 TriParty 命令。
+5. 运行 TriParty preflight 验证。
 6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run / 未完成协作说成 true tri-party / 完整三方。
 完成后告诉我本机安装路径和 preflight 结果。</code>
+            </details>
           </div>
-          <button class="copy" type="button" data-copy="请在这台机器上安装 triparty。
+          <button class="copy" type="button" data-copy="请在这台机器上安装 TriParty。
 目标仓库：https://github.com/r-design-j/tri-party-framework
 执行要求：
-先判断系统环境：macOS / Linux / Windows WSL 按当前流程执行；Windows 原生 PowerShell/CMD 安装方案还在迭代中，不要硬跑 bash 脚本，请先建议使用 WSL 或给出适配方案。
+先判断系统环境：macOS / Linux / Windows WSL2 可按当前流程执行；Windows 原生 PowerShell/CMD 目前只做环境准备和检查，不要硬跑 bash 脚本，请引导进入 WSL2 或等待 PowerShell 原生 AgentParty CLI 路线完成。
 1. clone 仓库并进入目录。
 2. 补齐必要脚本权限。
 3. 运行项目自检。
-4. 安装全局发现规则和 triparty 命令。
-5. 运行 triparty preflight 验证。
+4. 安装全局发现规则和 TriParty 命令。
+5. 运行 TriParty preflight 验证。
 6. 如果缺少 Claude Code、Gemini CLI、认证或权限，请明确报告缺失项；不要把 partial run / 未完成协作说成 true tri-party / 完整三方。
 完成后告诉我本机安装路径和 preflight 结果。"><span class="ico">↗</span>复制给 Agent</button>
         </article>
@@ -2646,22 +3434,57 @@
           <div>
             <div class="eyebrow"><span class="mini-square"></span>终端命令</div>
             <h3>让 Agent 执行</h3>
-            <p>如果 agent 支持直接运行 shell，就让它执行这组命令。当前命令适用于 macOS、Linux 和 Windows WSL；Windows 原生安装方案还在迭代中。</p>
-            <code># 适用 macOS / Linux / Windows WSL；Windows 原生安装方案还在迭代中。
+            <p>给能运行 shell 的 agent 使用。普通用户不需要逐行读命令。</p>
+            <details class="text-reveal">
+              <summary>查看完整命令</summary>
+              <code># 适用 macOS / Linux / Windows WSL2；PowerShell 原生路线仍在 AgentParty 通用层中。
 git clone https://github.com/r-design-j/tri-party-framework.git
 cd tri-party-framework
 chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
 scripts/triparty-lint.sh
-scripts/install-triparty-global-bootstrap.sh
+scripts/agentparty.sh install --pack triparty --target-os auto
+scripts/agentparty.sh install --pack triparty --target-os auto --execute
 triparty preflight</code>
+            </details>
           </div>
-          <button class="copy" type="button" data-copy="# 适用 macOS / Linux / Windows WSL；Windows 原生安装方案还在迭代中。
+          <button class="copy" type="button" data-copy="# 适用 macOS / Linux / Windows WSL2；PowerShell 原生路线仍在 AgentParty 通用层中。
 git clone https://github.com/r-design-j/tri-party-framework.git
 cd tri-party-framework
 chmod +x scripts/*.sh adapters/http/triparty_http_adapter.py adapters/mcp/triparty_mcp_adapter.py
 scripts/triparty-lint.sh
-scripts/install-triparty-global-bootstrap.sh
+scripts/agentparty.sh install --pack triparty --target-os auto
+scripts/agentparty.sh install --pack triparty --target-os auto --execute
 triparty preflight"><span class="ico">↗</span>复制命令</button>
+        </article>
+        <article class="agent-card claw">
+          <div>
+            <div class="eyebrow"><span class="mini-square"></span>飞书协作包</div>
+            <h3>复制 Claw 包</h3>
+            <p>用于 Claude Code + 飞书小龙虾 Claw。它是 2-agent 包，只做 evidence 后验收。</p>
+            <details class="text-reveal">
+              <summary>查看完整 Claw 委托</summary>
+              <code>请按 AgentParty 的 Claude Code + Feishu Claw 产品包处理这个任务。
+目标：&lt;任务&gt;
+要求：
+1. Claude Code 先输出任务拆解、风险、需要 Claw 执行的飞书动作。
+2. 把 Claw 要执行的动作写成可复制指令。
+3. Claw 执行后，把飞书链接、操作摘要和 transcript 填入 AgentParty evidence bundle；可用 evidence-fill 设置链接和复制本地证据文件。
+4. Claude Code 读取 transcript，检查是否满足任务 brief。
+5. 如果缺权限、缺链接、缺 transcript 或结果不一致，标记 partial，不要声称完整完成。
+6. 这是 2-agent AgentParty pack，不要声称 true tri-party，不要写 true_triparty_ready=true。
+7. 最终只允许输出 pack_ready、partial、blocked 或 scoped。</code>
+            </details>
+          </div>
+          <button class="copy" type="button" data-copy="请按 AgentParty 的 Claude Code + Feishu Claw 产品包处理这个任务。
+目标：&lt;任务&gt;
+要求：
+1. Claude Code 先输出任务拆解、风险、需要 Claw 执行的飞书动作。
+2. 把 Claw 要执行的动作写成可复制指令。
+3. Claw 执行后，把飞书链接、操作摘要和 transcript 填入 AgentParty evidence bundle；可用 evidence-fill 设置链接和复制本地证据文件。
+4. Claude Code 读取 transcript，检查是否满足任务 brief。
+5. 如果缺权限、缺链接、缺 transcript 或结果不一致，标记 partial，不要声称完整完成。
+6. 这是 2-agent AgentParty pack，不要声称 true tri-party，不要写 true_triparty_ready=true。
+7. 最终只允许输出 pack_ready、partial、blocked 或 scoped。"><span class="ico">↗</span>复制 Claw 包</button>
         </article>
       </section>
 
@@ -2669,13 +3492,13 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
         <article class="install-card primary">
           <div class="eyebrow"><span class="mini-square"></span>会发生 01</div>
           <h3>拉取项目</h3>
-          <p>Agent 会从 GitHub 拉取 triparty，并在本机建立一个可重复使用的框架目录。</p>
+          <p>Agent 会从 GitHub 拉取 TriParty，并在本机建立一个可重复使用的框架目录。</p>
           <div class="plain-step">你不需要手动下载 ZIP，也不需要逐条复制命令。</div>
         </article>
         <article class="install-card">
           <div class="eyebrow"><span class="mini-square"></span>会发生 02</div>
           <h3>写入规则</h3>
-          <p>Agent 会安装全局发现规则，让之后的新会话也能找到 triparty，不需要每次重新解释。</p>
+          <p>Agent 会安装全局发现规则，让之后的新会话也能找到 TriParty，不需要每次重新解释。</p>
           <div class="plain-step">Claude Code 会有 `/triparty` 和 `/tp`，Codex 可用 `triparty` 命令。</div>
         </article>
         <article class="install-card">
@@ -2691,7 +3514,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
           <div>
             <div class="eyebrow"><span class="mini-square"></span>给 Agent / 高级用户</div>
             <h2>高级工具与排查台</h2>
-            <p>普通用户通常不需要读这里。安装失败、需要验证三方是否真的完成、或开发者接入时，再展开这些工具。</p>
+          <p>普通用户通常不需要读这里。安装失败、需要验证 TriParty 产品包是否真的完成、或开发者接入 AgentParty 通用层时，再展开这些工具。</p>
           </div>
           <span class="summary-action">展开</span>
         </summary>
@@ -2706,7 +3529,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
       <section class="workspace">
         <div class="boundary-strip reveal" role="note" aria-label="执行边界提示">
           <strong>只生成命令，不执行模型</strong>
-          <span>本页只读 `state.json` 并生成可复制命令；真实执行请回到 Codex、Claude Code、Gemini CLI、CLI/Python/HTTP/MCP adapter。</span>
+          <span>本页只读 TriParty 的 `state.json` 并生成可复制命令；真实执行请回到 Codex、Claude Code、Gemini CLI、CLI/Python/HTTP/MCP adapter。未来 AgentParty state 会作为通用层扩展。</span>
         </div>
 
         <article class="tool-card reveal">
@@ -2768,6 +3591,127 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
             </div>
             <button class="copy" type="button" data-copy="scripts/triparty.sh continuity bootstrap"><span class="ico">↗</span>复制</button>
           </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 05</div>
+              <h3>生成 Claw Kit</h3>
+              <code>scripts/agentparty.sh kit --pack claude-code-feishu-claw --task '&lt;task&gt;' --out claw-kit</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh kit --pack claude-code-feishu-claw --task '<task>' --out claw-kit"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 06</div>
+              <h3>生成 Claw 证据包</h3>
+              <code>scripts/agentparty.sh evidence-template --pack claude-code-feishu-claw --run-dir '&lt;run-dir&gt;' --out claw-evidence</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh evidence-template --pack claude-code-feishu-claw --run-dir '<run-dir>' --out claw-evidence"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 07</div>
+              <h3>导入 Claw Bundle</h3>
+              <code>scripts/agentparty.sh evidence --pack claude-code-feishu-claw --bundle claw-evidence/agentparty-claw-evidence.json</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh evidence --pack claude-code-feishu-claw --bundle claw-evidence/agentparty-claw-evidence.json"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 08</div>
+              <h3>验证 Pack 状态</h3>
+              <code>scripts/agentparty.sh validate-run --run-dir '&lt;run-dir&gt;'</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh validate-run --run-dir '<run-dir>'"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 09</div>
+              <h3>下一步指南</h3>
+              <code>scripts/agentparty.sh guide --pack claude-code-feishu-claw --run-dir '&lt;run-dir&gt;'</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh guide --pack claude-code-feishu-claw --run-dir '<run-dir>'"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 10</div>
+              <h3>查看产品包</h3>
+              <code>scripts/agentparty.sh info --pack claude-code-feishu-claw</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh info --pack claude-code-feishu-claw"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 11</div>
+              <h3>产品化上手</h3>
+              <code>scripts/agentparty.sh onboard --pack triparty --target-os auto</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh onboard --pack triparty --target-os auto"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 12</div>
+              <h3>快速上手</h3>
+              <code>scripts/agentparty.sh quickstart --pack triparty --target-os auto</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh quickstart --pack triparty --target-os auto"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 13</div>
+              <h3>安装预检</h3>
+              <code>scripts/agentparty.sh install --pack triparty --target-os auto</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh install --pack triparty --target-os auto"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 14</div>
+              <h3>执行安装</h3>
+              <code>scripts/agentparty.sh install --pack triparty --target-os auto --execute</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh install --pack triparty --target-os auto --execute"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 15</div>
+              <h3>生成安装计划</h3>
+              <code>scripts/agentparty.sh install-plan --pack triparty --target-os auto</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh install-plan --pack triparty --target-os auto"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 16</div>
+              <h3>发布自检</h3>
+              <code>scripts/agentparty.sh release-check --full</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh release-check --full"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 17</div>
+              <h3>生成发布包</h3>
+              <code>scripts/agentparty.sh package --out dist/agentparty-release --archive</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/agentparty.sh package --out dist/agentparty-release --archive"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 18</div>
+              <h3>卸载预检</h3>
+              <code>scripts/uninstall-triparty-global-bootstrap.sh --dry-run</code>
+            </div>
+            <button class="copy" type="button" data-copy="scripts/uninstall-triparty-global-bootstrap.sh --dry-run"><span class="ico">↗</span>复制</button>
+          </article>
+          <article class="command-card">
+            <div>
+              <div class="eyebrow"><span class="mini-square"></span>命令 19</div>
+              <h3>PowerShell 卸载预检</h3>
+              <div class="mini-tags"><span>Windows PowerShell only</span><span>dry-run</span></div>
+              <code>.\scripts\uninstall-triparty-global-bootstrap.ps1 -DryRun</code>
+            </div>
+            <button class="copy" type="button" data-copy=".\scripts\uninstall-triparty-global-bootstrap.ps1 -DryRun"><span class="ico">↗</span>复制</button>
+          </article>
         </div>
 
         <section class="checklist reveal" id="checklist">
@@ -2783,9 +3727,9 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
             <label class="check"><input type="checkbox" checked /><span>已提交公开版本基线</span><span>已完成</span></label>
             <label class="check"><input type="checkbox" checked /><span>提交后完成一次三方检查</span><span>已完成</span></label>
             <label class="check"><input type="checkbox" checked /><span>发布前检查通过</span><span>已完成</span></label>
-            <label class="check"><input type="checkbox" /><span>冻结本地服务接入字段</span><span>下一步</span></label>
-            <label class="check"><input type="checkbox" /><span>补齐安装 / 卸载 / 认证检查流程</span><span>下一步</span></label>
-            <label class="check"><input type="checkbox" /><span>补齐完成 / 未完成 / 失败样例</span><span>下一步</span></label>
+            <label class="check"><input type="checkbox" /><span>冻结本地服务接入 / 认证字段</span><span>下一步</span></label>
+            <label class="check"><input type="checkbox" checked /><span>补齐安装 dry-run / execute / 卸载 dry-run</span><span>已完成</span></label>
+            <label class="check"><input type="checkbox" checked /><span>补齐 Claw ready / partial / blocked 样例</span><span>已完成</span></label>
           </div>
         </section>
       </section>
@@ -2793,7 +3737,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
       <section class="section-label" id="cases">
         <div class="reveal">
           <h2>可信证据</h2>
-          <div class="note">这些内容不是给普通用户必读，而是说明 triparty 为什么能判断“完成 / 未完成 / 失败原因”。</div>
+          <div class="note">这些内容不是给普通用户必读，而是说明 AgentParty 的证据链原则如何在 TriParty 产品包中落地，并判断“完成 / 未完成 / 失败原因”。</div>
         </div>
       </section>
 
@@ -2949,7 +3893,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
             <div class="detail-title">
               <small>案例 03 · 已实现</small>
               <h3>失败恢复</h3>
-              <p>把最常见的 triparty 失败变成中文恢复路线，而不是让用户在 stderr 和日志里猜。</p>
+              <p>把最常见的 TriParty 失败变成中文恢复路线，而不是让用户在 stderr 和日志里猜。</p>
             </div>
             <div class="detail-meta">
               <div class="meta-cell"><span>角色</span><span>排障向导</span></div>
@@ -3039,13 +3983,13 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
       <section class="playground reveal">
         <article class="play-card">
           <h3>任务命令生成器</h3>
-          <label for="taskInput">输入这次要交给 triparty 的任务</label>
-          <textarea id="taskInput">检查 triparty 是否安装成功，并说明下一步该做什么。</textarea>
+          <label for="taskInput">输入这次要交给 TriParty 的任务</label>
+          <textarea id="taskInput">检查 TriParty 是否安装成功，并说明下一步该做什么。</textarea>
           <div class="tool-actions">
             <button type="button" id="buildRun">生成命令文本</button>
             <button class="secondary" type="button" id="copyRun">复制命令</button>
           </div>
-          <div class="generated" id="runCommand">scripts/triparty.sh run '检查 triparty 是否安装成功，并说明下一步该做什么。'</div>
+          <div class="generated" id="runCommand">scripts/triparty.sh run '检查 TriParty 是否安装成功，并说明下一步该做什么。'</div>
         </article>
         <article class="play-card">
           <h3>失败恢复路由</h3>
@@ -3069,11 +4013,14 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
         </div>
         <div>
           <ul>
+            <li>新增 AgentParty 底层说明，同时保留 TriParty 作为官方三方产品包。</li>
+            <li>新增 Claude Code + Feishu Claw 产品包脚手架，作为 2-agent AgentParty pack。</li>
+            <li>新增产品包注册表，区分 true tri-party 与 pack-ready / partial / blocked。</li>
             <li>冻结运行状态字段，避免 UI 猜测协议。</li>
             <li>补齐完成、未完成、认证失败、文件不一致等样例。</li>
             <li>把当前静态页面接入本地只读服务，不直接调用模型。</li>
             <li>公开访问地址：<a href="https://r-design-j.github.io/tri-party-framework/">https://r-design-j.github.io/tri-party-framework/</a></li>
-            <li>保留 triparty 作为产品名；正文、说明、按钮默认中文。</li>
+            <li>保留 TriParty 作为产品名；把 AgentParty 标为母框架 / 通用协议层。</li>
           </ul>
         </div>
       </section>
@@ -3088,7 +4035,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
       </details>
     </main>
 
-    <div class="floating-result" id="floating" role="status" aria-live="polite"><span class="dot"></span>复制安装指令给 Agent 开始。</div>
+    <div class="floating-result" id="floating" role="status" aria-live="polite"><span class="dot"></span></div>
 
     <script>
       const trueState = {
@@ -3152,6 +4099,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
         themeToggle: document.getElementById("themeToggle"),
         themeIcon: document.getElementById("themeIcon")
       };
+      let floatingTimer;
       const checkItems = Array.from(document.querySelectorAll(".check input"));
 
       function applyTheme(theme) {
@@ -3185,6 +4133,9 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
 
       function setFloating(text, color = "var(--blue)") {
         els.floating.innerHTML = `<span class="dot" style="background:${color}"></span>${text}`;
+        els.floating.classList.add("show");
+        window.clearTimeout(floatingTimer);
+        floatingTimer = window.setTimeout(() => els.floating.classList.remove("show"), 2600);
       }
 
       function updateChecklist(announce = false) {
@@ -3305,7 +4256,7 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
       }
 
       function buildRunCommand(announce = false) {
-        const task = els.taskInput.value.trim() || "审查当前 triparty 工作流";
+        const task = els.taskInput.value.trim() || "审查当前 TriParty 工作流";
         els.runCommand.textContent = `scripts/triparty.sh run ${shellQuote(task)}`;
         if (announce) setFloating("run 命令文本已生成");
       }
@@ -3403,7 +4354,6 @@ triparty preflight"><span class="ico">↗</span>复制命令</button>
       updateChecklist();
       els.input.value = JSON.stringify(trueState, null, 2);
       els.result.textContent = summarize(trueState).text;
-      setFloating("复制安装指令给 Agent 开始。");
       openAdvancedForHash(window.location.hash);
     </script>
   </body>

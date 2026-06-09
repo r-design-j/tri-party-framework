@@ -3,7 +3,7 @@ set -u
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT_FILE="${1:-}"
-AUTH_TIMEOUT="${TRIPARTY_GEMINI_AUTH_TIMEOUT:-12}"
+AUTH_TIMEOUT="${TRIPARTY_GEMINI_AUTH_TIMEOUT:-60}"
 GEMINI_MODEL="${TRIPARTY_GEMINI_MODEL:-gemini-3.1-pro-preview}"
 GEMINI_MCP_ALLOWED="${TRIPARTY_GEMINI_MCP_ALLOWED:-__none__}"
 GEMINI_APPROVAL_MODE="${TRIPARTY_GEMINI_APPROVAL_MODE:-plan}"
@@ -41,17 +41,33 @@ run_with_timeout() {
   wait "$pid"
 }
 
+has_authenticated_api_evidence() {
+  local file="$1"
+  if grep -Eiq 'GEMINI_AUTH_OK|RESOURCE_EXHAUSTED|MODEL_CAPACITY_EXHAUSTED|No capacity available|exhausted your capacity|429|rateLimitExceeded|quota' "$file"; then
+    return 0
+  fi
+  return 1
+}
+
+has_interactive_auth_evidence() {
+  local file="$1"
+  if grep -Eiq 'login|log in|oauth|auth|authenticate|browser|sign in|signin|credential|token|not authenticated|Please.*authenticate|Run.*auth' "$file"; then
+    return 0
+  fi
+  return 1
+}
+
 classify_output() {
   local file="$1"
-  if grep -Eiq 'GEMINI_AUTH_OK|RESOURCE_EXHAUSTED|MODEL_CAPACITY_EXHAUSTED|No capacity available|429|rateLimitExceeded|quota' "$file"; then
+  if has_authenticated_api_evidence "$file"; then
     printf 'authenticated'
     return
   fi
-  if grep -Eiq 'login|log in|oauth|auth|authenticate|browser|sign in|signin|credential|token|not authenticated|Please.*authenticate|Run.*auth' "$file"; then
+  if has_interactive_auth_evidence "$file"; then
     printf 'interactive-auth-required'
     return
   fi
-  printf 'interactive-auth-required'
+  printf 'failed'
 }
 
 path="$(command -v gemini 2>/dev/null || true)"
@@ -67,8 +83,14 @@ run_with_timeout "$AUTH_TIMEOUT" "$OUT_FILE" \
   env TERM="$GEMINI_TERM" gemini -m "$GEMINI_MODEL" -p "Return exactly: GEMINI_AUTH_OK" --output-format text --skip-trust --approval-mode "$GEMINI_APPROVAL_MODE" --allowed-mcp-server-names "$GEMINI_MCP_ALLOWED" --policy "$GEMINI_POLICY_FILE"
 code=$?
 
-if [ "$code" -eq 124 ]; then
-  status="timeout"
+if [ "$code" -eq 124 ] || [ "$code" -eq 137 ] || [ "$code" -eq 143 ]; then
+  if has_authenticated_api_evidence "$OUT_FILE"; then
+    status="authenticated"
+  elif has_interactive_auth_evidence "$OUT_FILE"; then
+    status="interactive-auth-required"
+  else
+    status="timeout"
+  fi
 elif [ "$code" -eq 0 ] && grep -q "GEMINI_AUTH_OK" "$OUT_FILE"; then
   status="authenticated"
 else

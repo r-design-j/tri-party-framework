@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentParty product pack run state",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "pack_id",
+    "pack_status",
+    "pack_ready",
+    "true_triparty_ready",
+    "completion_label",
+    "errors",
+    "agents",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "agentparty.pack-state.v1"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "pack_id": {
+      "type": "string"
+    },
+    "pack_status": {
+      "type": "string",
+      "enum": ["ready", "partial", "blocked", "scoped", "roadmap"]
+    },
+    "pack_ready": {
+      "type": "boolean"
+    },
+    "true_triparty_ready": {
+      "type": "boolean",
+      "const": false
+    },
+    "completion_label": {
+      "type": "string"
+    },
+    "task": {
+      "type": "string"
+    },
+    "run_dir": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "agents": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "role", "evidence_status"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "evidence_status": {
+            "type": "string",
+            "enum": ["planned", "provided", "missing", "blocked"]
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object"
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "validated_at": { "type": "string" },
+        "required_evidence": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "missing": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "blocked_reason": {
+          "type": ["string", "null"]
+        },
+        "true_triparty_ready_forbidden": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    }
+  }
+}
